@@ -58,14 +58,14 @@ function getAccounts() {
     }
 
     if (
-        process.env.ACC_SYSTEM !== undefined &&
-        process.env.ACC_SYSTEM.trim() !== "" &&
-        reg_bytes64.test(process.env.ACC_SYSTEM)
+        process.env.DMS_SYSTEM !== undefined &&
+        process.env.DMS_SYSTEM.trim() !== "" &&
+        reg_bytes64.test(process.env.DMS_SYSTEM)
     ) {
-        accounts.push(process.env.ACC_SYSTEM);
+        accounts.push(process.env.DMS_SYSTEM);
     } else {
-        process.env.ACC_SYSTEM = Wallet.createRandom().privateKey;
-        accounts.push(process.env.ACC_SYSTEM);
+        process.env.DMS_SYSTEM = Wallet.createRandom().privateKey;
+        accounts.push(process.env.DMS_SYSTEM);
     }
 
     if (

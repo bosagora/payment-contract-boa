@@ -2,7 +2,7 @@
     "name": "dms-osx-subgraph-mainchain",
     "version": "1.0.0",
     "description": "The DMS Subgraph for mainchain",
-    "homepage": "https://github.com/acc-coin/acc-osx",
+    "homepage": "https://github.com/bosagora/dms-osx",
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "scripts": {
@@ -10,8 +10,8 @@
         "manifest": "scripts/build-manifest.sh",
         "build": "scripts/build-subgraph.sh",
         "deploy": "scripts/deploy-subgraph.sh",
-        "create:mainchain": "graph create acc-coin/acc-osx-mainchain --node http://localhost:8020",
-        "remove:mainchain": "graph remove acc-coin/acc-osx-mainchain --node http://localhost:8020",
+        "create:mainchain": "graph create bosagora/dms-osx-mainchain --node http://localhost:8020",
+        "remove:mainchain": "graph remove bosagora/dms-osx-mainchain --node http://localhost:8020",
         "deploy:mainchain": "LOCAL=true scripts/deploy-subgraph.sh",
         "formatting:check": "prettier '**/*.{json,ts,js}' -c",
         "formatting:write": "prettier '**/*.{json,ts,js}' --write"

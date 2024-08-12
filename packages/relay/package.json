@@ -1,5 +1,5 @@
 {
-    "name": "acc-relay",
+    "name": "dms-relay",
     "version": "2.0.0",
     "description": "Relay the transaction for the decentralized loyalty system",
     "main": "src/main.js",
@@ -33,14 +33,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acc-coin/acc-osx.git"
+        "url": "git+https://github.com/bosagora/dms-osx.git"
     },
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "bugs": {
-        "url": "https://github.com/acc-coin/acc-osx/issues"
+        "url": "https://github.com/bosagora/dms-osx/issues"
     },
-    "homepage": "https://github.com/acc-coin/acc-osx#readme",
+    "homepage": "https://github.com/bosagora/dms-osx#readme",
     "devDependencies": {
         "@ethersproject/constants": "^5.7.0",
         "@ethersproject/experimental": "^5.7.0",
@@ -66,8 +66,6 @@
         "@types/urijs": "^1.19.12"
     },
     "dependencies": {
-        "acc-bridge-contracts-v2": "~2.5.0",
-        "acc-contracts-v2": "~2.6.0",
         "argparse": "^2.0.1",
         "assert": "^2.0.0",
         "axios": "^1.6.7",
@@ -76,6 +74,8 @@
         "chai-http": "^4.3.7",
         "cors": "^2.8.5",
         "dotenv": "^10.0.0",
+        "dms-bridge-contracts-v2": "~2.5.0",
+        "dms-contracts-v2": "~2.6.0",
         "ethereum-waffle": "^4.0.10",
         "ethereumjs-util": "^7.1.5",
         "ethers": "^5.7.0",

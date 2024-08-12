@@ -461,9 +461,9 @@ export class TokenRouter {
         logger.http(`GET /v1/system/info ${req.ip}:${JSON.stringify(req.query)}`);
         try {
             const tokenSymbol = await this.contractManager.sideTokenContract.symbol();
-            const precision = tokenSymbol === "ACC" ? 2 : 0;
-            const equivalentCurrency = tokenSymbol === "ACC" ? "PHP" : "KRW";
-            const language = tokenSymbol === "ACC" ? "en" : "kr";
+            const precision = tokenSymbol === "KIOS" ? 2 : 0;
+            const equivalentCurrency = tokenSymbol === "KIOS" ? "PHP" : "KRW";
+            const language = tokenSymbol === "KIOS" ? "en" : "kr";
             this.metrics.add("success", 1);
             return res.status(200).json(
                 this.makeResponseData(0, {

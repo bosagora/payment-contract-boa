@@ -1,5 +1,5 @@
 {
-  "acc_mainnet": {
+  "kios_mainnet": {
     "LoyaltyToken": "0xB5e4d7AF952F612A2CCB1474b49bd03459F1429f",
     "PhoneLinkCollection": "0x8382d54B85e30706e9Bbf62825D0fE2a7Ef9D0C7",
     "Validator": "0x18087d75396BEEABC97528083237DB0B0652CB9b",
@@ -14,7 +14,7 @@
     "Shop": "0x7ebbe71bDB2B22808A3954D77df7EAb1cED5133d",
     "Ledger": "0x6a77Fc2308C5326615921909358bACb904E5a1B0"
   },
-  "acc_testnet": {
+  "kios_testnet": {
     "LoyaltyToken": "0x8D34D6102AD64abDa8bcF36c278140bAC4D97323",
     "PhoneLinkCollection": "0x23074adeD2E687C30483A64869AaA0e8C22e90C9",
     "Validator": "0x80DAa9bF9B8Db32A36141DE9308784e91e9215FF",
@@ -29,7 +29,7 @@
     "Shop": "0x911b2749053f966c651777A4485DDB4E33CE495F",
     "Ledger": "0xe782E73900613EF72E972C9e73669e1e0aBc859E"
   },
-  "acc_devnet": {
+  "kios_devnet": {
     "LoyaltyToken": "0xB1A90a5C6e30d64Ab6f64C30eD392F46eDBcb022",
     "PhoneLinkCollection": "0x3bAB9e04b609dE0d51Aa74261fFD5fcE555b4b0B",
     "Validator": "0x01dfc87EC0f8B199cF841079EC1fF394d7f59455",

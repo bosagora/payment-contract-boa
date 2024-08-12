@@ -1,5 +1,5 @@
 {
-    "name": "acc-contracts-v2",
+    "name": "dms-contracts-v2",
     "version": "2.6.0",
     "description": "Smart contracts that decentralized loyalty systems",
     "files": [
@@ -27,14 +27,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acc-coin/acc-osx.git"
+        "url": "git+https://github.com/bosagora/dms-osx.git"
     },
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "bugs": {
-        "url": "https://github.com/acc-coin/acc-osx/issues"
+        "url": "https://github.com/bosagora/dms-osx/issues"
     },
-    "homepage": "https://github.com/acc-coin/acc-osx#readme",
+    "homepage": "https://github.com/bosagora/dms-osx#readme",
     "devDependencies": {
         "@ethersproject/constants": "^5.7.0",
         "@nomiclabs/hardhat-ethers": "^2.2.3",
@@ -70,7 +70,7 @@
         "@openzeppelin/contracts": "^4.9.5",
         "@openzeppelin/contracts-upgradeable": "^4.9.5",
         "@openzeppelin/hardhat-upgrades": "^1.28.0",
-        "acc-bridge-contracts-v2": "~2.5.0",
+        "dms-bridge-contracts-v2": "~2.5.0",
         "loyalty-tokens": "~2.1.1",
         "multisig-wallet-contracts": "~2.0.0"
     }

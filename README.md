@@ -15,10 +15,6 @@ This package contains the code for the smart contract.
 
 This package is what is needed to create an SDK by utilizing the code of the smart contract.
 
-## Faker
-
-This package functions to store fake purchase data in a smart contract.
-
 ## Relay
 
 This package has two functions.

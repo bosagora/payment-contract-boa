@@ -95,7 +95,7 @@ relay:
   encryptKey: "${RELAY_ENCRYPT_KEY}"
   testMode: ${RELAY_TEST_MODE}
   bridgeActiveStatus: true
-  allowedShopIdPrefix: "0x0001"
+  allowedShopIdPrefix: "0x0005"
 
 contracts:
   sideChain:

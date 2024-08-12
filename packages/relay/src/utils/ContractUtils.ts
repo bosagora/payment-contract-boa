@@ -27,7 +27,9 @@ import * as hre from "hardhat";
 
 export enum LoyaltyNetworkID {
     ACC_TESTNET = 1,
-    ACC_MAINNET,
+    ACC_MAINNET = 2,
+    KIOS_TESTNET = 5,
+    KIOS_MAINNET = 6,
 }
 export class ContractUtils {
     public static findLog(receipt: ContractReceipt, iface: Interface, eventName: string): Log | undefined {

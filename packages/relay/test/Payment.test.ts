@@ -156,7 +156,7 @@ describe("Test of Server", function () {
     context("Test point relay endpoints", () => {
         before("Set Shop ID", async () => {
             for (const elem of shopData) {
-                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.KIOS_TESTNET);
             }
         });
 
@@ -640,7 +640,7 @@ describe("Test of Server", function () {
     context("Test point relay endpoints - Cancel Confirm", () => {
         before("Set Shop ID", async () => {
             for (const elem of shopData) {
-                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.KIOS_TESTNET);
             }
         });
 
@@ -1046,7 +1046,7 @@ describe("Test of Server", function () {
     context("Test point relay endpoints - Cancel Deny", () => {
         before("Set Shop ID", async () => {
             for (const elem of shopData) {
-                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.KIOS_TESTNET);
             }
         });
 
@@ -1513,7 +1513,7 @@ describe("Test of Server", function () {
 
         before("Set Shop ID", async () => {
             for (const elem of shopData) {
-                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.KIOS_TESTNET);
             }
         });
 

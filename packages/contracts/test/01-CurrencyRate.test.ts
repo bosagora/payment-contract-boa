@@ -40,7 +40,7 @@ describe("Test for CurrencyRate", () => {
     });
 
     it("Check default symbol", async () => {
-        expect(await currencyRateContract.defaultSymbol()).to.equal("php");
+        expect(await currencyRateContract.defaultSymbol()).to.equal("krw");
     });
 
     it("Set Array - revert", async () => {
@@ -60,7 +60,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -94,7 +94,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -130,7 +130,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -166,7 +166,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -202,7 +202,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -246,7 +246,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];
@@ -286,7 +286,7 @@ describe("Test for CurrencyRate", () => {
                 rate: multiple.mul(1),
             },
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
         ];

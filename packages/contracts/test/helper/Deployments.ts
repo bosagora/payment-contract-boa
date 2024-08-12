@@ -435,7 +435,7 @@ async function deployCurrencyRate(accounts: IAccount, deployment: Deployments) {
         const height = 0;
         const rates = [
             {
-                symbol: "LYT",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
             {

@@ -19,7 +19,7 @@
     -   [3.2. 지불에 사용될 예상 로열티 산출](#32-지불에-사용될-예상-로열티-산출)
     -   [3.3. 상점의 정보](#33-상점의-정보)
     -   [3.4. 모든 상점의 정보](#34-모든-상점의-정보)
-    -   [3.5. 환률 변환](#36-환률-변환)
+    -   [3.5. 환률 변환](#35-환률-변환)
 
 -   [4. KIOSK 를 위한 결제관련 엔드포인트](#4-kiosk-를-위한-결제관련-엔드포인트)
 
@@ -209,9 +209,9 @@
 
 ## 2. URL
 
--   메인넷: https://relay.main.acccoin.io
--   테스트넷: https://relay.test.acccoin.io
--   개발넷: http://relay.dev.acccoin.io:27070
+-   메인넷: https://relay.main.kios.bosagora.io
+-   테스트넷: https://relay.test.kios.bosagora.io
+-   개발넷: http://relay.dev.kios.bosagora.io:27070
 
 [상단으로 이동](#로열티를-사용한-결제-프로세스)
 
@@ -256,7 +256,7 @@
 | ---------- | ------ | ---- |----------------------------------------|
 | account    | string | Yes  | 월렛주소 (임시주소 or 실제주소)                    |
 | amount     | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음) |
-| currency   | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)         |
+| currency   | string | Yes  | 환률코드(usd, krw, ACC, point...)         |
 
 #### - 결과
 
@@ -264,7 +264,7 @@
 |--------------| ------ | ---- |----------------------------------------|
 | account      | string | Yes  | 월렛주소 (실제주소)                            |
 | amount       | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음) |
-| currency     | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)         |
+| currency     | string | Yes  | 환률코드(usd, krw, ACC, point...)         |
 | balance      | string | Yes  | 잔고 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)   |
 | balanceValue | string | Yes  | 잔고의 currency 단위의 가치                    |
 | paidPoint    | string | Yes  | (예상)지불될 포인트, loyaltyType가 0일때 유효한 값이다  |
@@ -360,8 +360,8 @@
 | 파라메타명  | 유형     | 필수 | 설명                                    |
 |--------|--------| ---- |---------------------------------------|
 | amount | string | Yes  | 금액 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)  |
-| from   | string | Yes  | 변환 할 환률코드(usd, krw, lyt, acc, point...)   |                                                                                                                                                                                                     |
-| to     | string | Yes  | 변환 될 환률코드(usd, krw, lyt, acc, point...)   |
+| from   | string | Yes  | 변환 할 환률코드(usd, krw, ACC, point...)   |                                                                                                                                                                                                     |
+| to     | string | Yes  | 변환 될 환률코드(usd, krw, ACC, point...)   |
 
 #### - 결과
 
@@ -395,7 +395,7 @@
 | ---------- | ------ | ---- |----------------------------------------|
 | purchaseId | string | Yes  | 구매 아이디                                 |
 | amount     | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음) |
-| currency   | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)         |
+| currency   | string | Yes  | 환률코드(usd, krw, ACC, point...)         |
 | shopId     | string | Yes  | 상점 아이디                                 |
 | account    | string | Yes  | 월렛주소(임시주소)                             |
 
@@ -406,7 +406,7 @@
 | paymentId            | string | Yes  | 지불 아이디                                                                                                                                                                                                                                                                                                      |
 | purchaseId           | string | Yes  | 구매 아이디                                                                                                                                                                                                                                                                                                      |
 | amount               | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                                                                                                                                                                                                                                      |
-| currency             | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                                                                                                                                                                                                              |
+| currency             | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                                                                                                                                                                                                              |
 | shopId               | string | Yes  | 상점 아이디                                                                                                                                                                                                                                                                                                      |
 | account              | string | Yes  | 월렛주소(실제주소)                                                                                                                                                                                                                                                                                                  |
 | paidPoint            | string | Yes  | (예상)지불될 포인트, loyaltyType가 0일때 유효한 값이다                                                                                                                                                                                                                                                                       |
@@ -457,7 +457,7 @@
 | paymentId            | string | Yes  | 지불 아이디                                                                                                                                                                                                                                                                                                      |
 | purchaseId           | string | Yes  | 구매 아이디                                                                                                                                                                                                                                                                                                      |
 | amount               | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                                                                                                                                                                                                                                      |
-| currency             | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                                                                                                                                                                                                              |
+| currency             | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                                                                                                                                                                                                              |
 | shopId               | string | Yes  | 상점 아이디                                                                                                                                                                                                                                                                                                      |
 | account              | string | Yes  | 월렛주소(실제주소)                                                                                                                                                                                                                                                                                                        |
 | paidPoint            | string | Yes  | (예상)지불될 포인트, loyaltyType가 0일때 유효한 값이다                                                                                                                                                                                                                                                                       |
@@ -503,7 +503,7 @@
 | paymentId            | string | Yes  | 지불 아이디                                                                                                                                                  |
 | purchaseId           | string | Yes  | 구매 아이디                                                                                                                                                  |
 | amount               | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                                                                                  |
-| currency             | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                                                          |
+| currency             | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                                                          |
 | shopId               | string | Yes  | 상점 아이디                                                                                                                                                  |
 | account              | string | Yes  | 월렛주소(실제주소)                                                                                                                                                   |
 | paidPoint            | string | Yes  | (예상)지불될 포인트, loyaltyType가 0일때 유효한 값이다                                                                                                                   |
@@ -550,7 +550,7 @@
 | paymentId            | string | Yes  | 지불 아이디                                                                                                                                                                                                    |
 | purchaseId           | string | Yes  | 구매 아이디                                                                                                                                                                                                    |
 | amount               | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                                                                                                               |
-| currency             | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                                                                                                             |
+| currency             | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                                                                                                             |
 | shopId               | string | Yes  | 상점 아이디                                                                                                                                                                                                    |
 | account              | string | Yes  | 월렛주소(실제주소)                                                                                                                                                                                                       |
 | paidPoint            | string | Yes  | (예상)지불될 포인트, loyaltyType가 0일때 유효한 값이다                                                                                                                                                         |
@@ -610,24 +610,24 @@
 
 ```json
 {
-  "type": "pay_new",
-  "code": 0,
-  "message": "Success",
-  "data": {
-    "paymentId": "0x04785fda06b5e8c61bc857884b66663ed55bf61269508656a5cc7e5df5a7510b",
-    "purchaseId": "P000002",
-    "amount": "10000000000000000000",
-    "currency": "krw",
-    "shopId": "0x62f131c124c10dd7023e2d1a98ac8aa4c925137207118178d0267d2079447a65",
-    "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
-    "paidPoint": "10000000000000000000",
-    "paidValue": "10000000000000000000",
-    "feePoint": "500000000000000000",
-    "feeValue": "500000000000000000",
-    "totalPoint": "10500000000000000000",
-    "totalValue": "10500000000000000000",
-    "paymentStatus": 18
-  }
+    "type": "pay_new",
+    "code": 0,
+    "message": "Success",
+    "data": {
+        "paymentId": "0x04785fda06b5e8c61bc857884b66663ed55bf61269508656a5cc7e5df5a7510b",
+        "purchaseId": "P000002",
+        "amount": "10000000000000000000",
+        "currency": "krw",
+        "shopId": "0x62f131c124c10dd7023e2d1a98ac8aa4c925137207118178d0267d2079447a65",
+        "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
+        "paidPoint": "10000000000000000000",
+        "paidValue": "10000000000000000000",
+        "feePoint": "500000000000000000",
+        "feeValue": "500000000000000000",
+        "totalPoint": "10500000000000000000",
+        "totalValue": "10500000000000000000",
+        "paymentStatus": 18
+    }
 }
 ```
 
@@ -635,24 +635,24 @@
 
 ```json
 {
-  "type": "pay_new",
-  "code": 4000,
-  "message": "Denied by user",
-  "data": {
-    "paymentId": "0x9aa18cfb0df5e528f0415fb1aeea2b2454508655314bf58b91f96e4502b22828",
-    "purchaseId": "P000002",
-    "amount": "10000000000000000000",
-    "currency": "krw",
-    "shopId": "0x7f67cd5291da2f283ca5bad25c836fa76f3855cc892e55984ead1af46b2db38a",
-    "account": "0x3beF528430a09b12a52ea65F3cBcdCb96444E7d2",
-    "paidPoint": "10000000000000000000",
-    "paidValue": "10000000000000000000",
-    "feePoint": "500000000000000000",
-    "feeValue": "500000000000000000",
-    "totalPoint": "10500000000000000000",
-    "totalValue": "10500000000000000000",
-    "paymentStatus": 16
-  }
+    "type": "pay_new",
+    "code": 4000,
+    "message": "Denied by user",
+    "data": {
+        "paymentId": "0x9aa18cfb0df5e528f0415fb1aeea2b2454508655314bf58b91f96e4502b22828",
+        "purchaseId": "P000002",
+        "amount": "10000000000000000000",
+        "currency": "krw",
+        "shopId": "0x7f67cd5291da2f283ca5bad25c836fa76f3855cc892e55984ead1af46b2db38a",
+        "account": "0x3beF528430a09b12a52ea65F3cBcdCb96444E7d2",
+        "paidPoint": "10000000000000000000",
+        "paidValue": "10000000000000000000",
+        "feePoint": "500000000000000000",
+        "feeValue": "500000000000000000",
+        "totalPoint": "10500000000000000000",
+        "totalValue": "10500000000000000000",
+        "paymentStatus": 16
+    }
 }
 ```
 
@@ -660,24 +660,24 @@
 
 ```json
 {
-  "type": "pay_cancel",
-  "code": 0,
-  "message": "Success",
-  "data": {
-    "paymentId": "0x491c07d0fee5eb7d129e21d9c818fb19f1c80603b519bf79ed42e486d8019bfc",
-    "purchaseId": "P000002",
-    "amount": "10000000000000000000",
-    "currency": "krw",
-    "shopId": "0x270e6da973370b647972531e965e27879211092f748e8382faa48de43e37055d",
-    "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
-    "paidPoint": "10000000000000000000",
-    "paidValue": "10000000000000000000",
-    "feePoint": "500000000000000000",
-    "feeValue": "500000000000000000",
-    "totalPoint": "10500000000000000000",
-    "totalValue": "10500000000000000000",
-    "paymentStatus": 58
-  }
+    "type": "pay_cancel",
+    "code": 0,
+    "message": "Success",
+    "data": {
+        "paymentId": "0x491c07d0fee5eb7d129e21d9c818fb19f1c80603b519bf79ed42e486d8019bfc",
+        "purchaseId": "P000002",
+        "amount": "10000000000000000000",
+        "currency": "krw",
+        "shopId": "0x270e6da973370b647972531e965e27879211092f748e8382faa48de43e37055d",
+        "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
+        "paidPoint": "10000000000000000000",
+        "paidValue": "10000000000000000000",
+        "feePoint": "500000000000000000",
+        "feeValue": "500000000000000000",
+        "totalPoint": "10500000000000000000",
+        "totalValue": "10500000000000000000",
+        "paymentStatus": 58
+    }
 }
 ```
 
@@ -685,24 +685,24 @@
 
 ```json
 {
-  "type": "pay_cancel",
-  "code": 4000,
-  "message": "Denied by user",
-  "data": {
-    "paymentId": "0x61fc70b3a919aab586898fcfcc76e266e386c5a66a605a03d7569f5bd0ff7458",
-    "purchaseId": "P000002",
-    "amount": "10000000000000000000",
-    "currency": "krw",
-    "shopId": "0xf14d74201ab85a04e1f56cb43884592f9656b624100bf71313084076a9661112",
-    "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
-    "paidPoint": "10000000000000000000",
-    "paidValue": "10000000000000000000",
-    "feePoint": "500000000000000000",
-    "feeValue": "500000000000000000",
-    "totalPoint": "10500000000000000000",
-    "totalValue": "10500000000000000000",
-    "paymentStatus": 56
-  }
+    "type": "pay_cancel",
+    "code": 4000,
+    "message": "Denied by user",
+    "data": {
+        "paymentId": "0x61fc70b3a919aab586898fcfcc76e266e386c5a66a605a03d7569f5bd0ff7458",
+        "purchaseId": "P000002",
+        "amount": "10000000000000000000",
+        "currency": "krw",
+        "shopId": "0xf14d74201ab85a04e1f56cb43884592f9656b624100bf71313084076a9661112",
+        "account": "0x2793111915DA87B03F90ee0Cb6E0709A8514891F",
+        "paidPoint": "10000000000000000000",
+        "paidValue": "10000000000000000000",
+        "feePoint": "500000000000000000",
+        "feeValue": "500000000000000000",
+        "totalPoint": "10500000000000000000",
+        "totalValue": "10500000000000000000",
+        "paymentStatus": 56
+    }
 }
 ```
 
@@ -822,17 +822,17 @@
 
 ```json
 {
-  "type": "shop_add",
-  "code": 0,
-  "message": "Success",
-  "data": {
-    "taskId": "",
-    "shopId": "0xb2980bfac07826f2f93bea8434b569a2a458cbbd39b812a062ddcd7d1fa8fff9",
-    "name": "Shop 5",
-    "currency": "krw",
-    "status": 2,
-    "account": "0x5b9aD6ad05c0fC423B34C1EaF2FF67C47F02E0D1"
-  }
+    "type": "shop_add",
+    "code": 0,
+    "message": "Success",
+    "data": {
+        "taskId": "",
+        "shopId": "0xb2980bfac07826f2f93bea8434b569a2a458cbbd39b812a062ddcd7d1fa8fff9",
+        "name": "Shop 5",
+        "currency": "krw",
+        "status": 2,
+        "account": "0x5b9aD6ad05c0fC423B34C1EaF2FF67C47F02E0D1"
+    }
 }
 ```
 
@@ -840,17 +840,17 @@
 
 ```json
 {
-  "type": "shop_update",
-  "code": 0,
-  "message": "Success",
-  "data": {
-    "taskId": "0x005423085d89ebc3edea3f8dd6bc4cfff0446c7393d22bf2de9f81c6f24e8ad0",
-    "shopId": "0xb29991db39fc61c96b5048b9d8863dbe40d556e1ae29c758c48468ffe3ecabad",
-    "name": "새로운 이름",
-    "currency": "krw",
-    "status": 2,
-    "account": "0x1956F0c574ee588efd4759948a40611613C87Bc6"
-  }
+    "type": "shop_update",
+    "code": 0,
+    "message": "Success",
+    "data": {
+        "taskId": "0x005423085d89ebc3edea3f8dd6bc4cfff0446c7393d22bf2de9f81c6f24e8ad0",
+        "shopId": "0xb29991db39fc61c96b5048b9d8863dbe40d556e1ae29c758c48468ffe3ecabad",
+        "name": "새로운 이름",
+        "currency": "krw",
+        "status": 2,
+        "account": "0x1956F0c574ee588efd4759948a40611613C87Bc6"
+    }
 }
 ```
 
@@ -858,17 +858,17 @@
 
 ```json
 {
-  "type": "shop_status",
-  "code": 0,
-  "message": "Success",
-  "data": {
-    "taskId": "0x5510311afd173081a0511559ed950634217e29c81f55a62f57bd4c3e434cfb89",
-    "shopId": "0xb29991db39fc61c96b5048b9d8863dbe40d556e1ae29c758c48468ffe3ecabad",
-    "name": "새로운 이름",
-    "currency": "krw",
-    "status": 1,
-    "account": "0x1956F0c574ee588efd4759948a40611613C87Bc6"
-  }
+    "type": "shop_status",
+    "code": 0,
+    "message": "Success",
+    "data": {
+        "taskId": "0x5510311afd173081a0511559ed950634217e29c81f55a62f57bd4c3e434cfb89",
+        "shopId": "0xb29991db39fc61c96b5048b9d8863dbe40d556e1ae29c758c48468ffe3ecabad",
+        "name": "새로운 이름",
+        "currency": "krw",
+        "status": 1,
+        "account": "0x1956F0c574ee588efd4759948a40611613C87Bc6"
+    }
 }
 ```
 
@@ -895,7 +895,7 @@
 | paymentId            | string | Yes  | 지불 아이디                                                                                                                  |
 | purchaseId           | string | Yes  | 구매 아이디                                                                                                                  |
 | amount               | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                             |
-| currency             | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                           |
+| currency             | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                           |
 | shopId               | string | Yes  | 상점 아이디                                                                                                                  |
 | account              | string | Yes  | 월렛주소                                                                                                                     |
 | paidPoint            | string | Yes  | 지불될(된) 포인트, loyaltyType가 0일때 유효한 값이다                                                                         |
@@ -937,7 +937,7 @@
 | paymentId      | string | Yes  | 지불 아이디                                                                                                                  |
 | purchaseId     | string | Yes  | 구매 아이디                                                                                                                  |
 | amount         | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                             |
-| currency       | string | Yes  | 환률코드(usd, krw, lyt, acc, point...)                                                                                           |
+| currency       | string | Yes  | 환률코드(usd, krw, ACC, point...)                                                                                           |
 | shopId         | string | Yes  | 상점 아이디                                                                                                                  |
 | account        | string | Yes  | 월렛주소                                                                                                                     |
 | paymentStatus  | int | Yes  | 처리상태 <br/>11:신규결제접수<br/>12:신규결제승인접수실패<br/>13:신규결제승인확인실패<br/>14:신규결제승인접수완료<br/>15:신규결제승인확인완료<br/>16:신규결제사용자거부<br/>17:신규결제결과응답<br/>18:신규결제완료<br/>19:신규결제실패<br/>51:취소결제접수<br/>52:취소결제승인접수실패<br/>53:취소결제승인확인실패<br/>54:취소결제승인접수완료<br/>55:취소결제승인확인완료<br/>56:취소결제사용자거부<br/>57:취소결제결과응답<br/>58:취소결제완료<br/>59:취소결제실패 |
@@ -970,7 +970,7 @@
 | paymentId     | string | Yes  | 지불 아이디                                                                                                                 |
 | purchaseId    | string | Yes  | 구매 아이디                                                                                                                 |
 | amount        | string | Yes  | 상품가격 (소수점이하 18자리로 표시된 문자, 소수점 포함하지 않음)                                                            |
-| currency      | string | Yes  | 환률코드(usd, krw, lyt, acc, acc, point...)                                                                                          |
+| currency      | string | Yes  | 환률코드(usd, krw, ACC, acc, point...)                                                                                          |
 | shopId        | string | Yes  | 상점 아이디                                                                                                                 |
 | account       | string | Yes  | 월렛주소                                                                                                                    |
 | paymentStatus | int    | Yes  | 처리상태 <br/>11:신규결제접수<br/>12:신규결제승인접수실패<br/>13:신규결제승인확인실패<br/>14:신규결제승인접수완료<br/>15:신규결제승인확인완료<br/>16:신규결제사용자거부<br/>17:신규결제결과응답<br/>18:신규결제완료<br/>19:신규결제실패<br/>51:취소결제접수<br/>52:취소결제승인접수실패<br/>53:취소결제승인확인실패<br/>54:취소결제승인접수완료<br/>55:취소결제승인확인완료<br/>56:취소결제사용자거부<br/>57:취소결제결과응답<br/>58:취소결제완료<br/>59:취소결제실패 |
@@ -1201,9 +1201,9 @@
 | 1030  | 금액이 gwei의 배수가 아닙니다<br/>Amount not multiple of gwei                                                                        |
 | 1031  | 입력된 금액이 최소금액보다 작습니다<br/>The amount entered is less than the minimum amount                                                |
 | 1050  | 트랜잭션을 보낸자는 인증되지 않은 자입니다<br/>Sender is not authorized to execute                                                           |
-| 1051  | 전송이 되지 않는 자금입니다<br/>Unable to transfer from system account                                                                |
-| 1052  | 전송할 수 없는 주소입니다<br/>Unable to transfer to system account                                                                   |
-| 1053  | 인출될 수 없는 자금입니다<br/>Unable to withdraw from the system account                                                             |
+| 1051  | 전송이 되지 않는 자금입니다<br/>Unable to transfer from foundation account                                                            |
+| 1052  | 전송할 수 없는 주소입니다<br/>Unable to transfer to foundation account                                                               |
+| 1053  | 인출될 수 없는 자금입니다<br/>Unable to withdraw from the foundation account                                                         |
 | 1200  | 상점아이디가 이미 존재합니다<br/>The shop ID already exists                                                                            |
 | 1201  | 상점아이디가 존재하지 않습니다<br/>The shop ID is not exists                                                                            |
 | 1202  | 상점이 활성화 되지 않았습니다<br/>The shop is not activated                                                                            |
@@ -1216,10 +1216,10 @@
 | 1503  | 등록된 지갑주소와 동일하지 않습니다<br/>Does not match registered wallet address                                                          |
 | 1505  | 유효하지 않은 비밀키입니다<br/>Invalid secret key                                                                                     |
 | 1506  | 만기된 서명입니다<br/>Expired signature                                                                                           |
-| 1510  | 시스템의 잔고가 부족합니다<br/>Insufficient system balance                                                                            |
+| 1510  | 재단의 잔고가 부족합니다<br/>Insufficient foundation balance                                                                         |
 | 1511  | 사용자의 잔고가 부족합니다<br/>Insufficient balance                                                                                   |
 | 1512  | 예치을 허용하지 않았습니다<br/>Not allowed deposit                                                                                    |
-| 1513  | 수수료 계정 또는 시스템 계정의 잔고가 부족합니다<br/>Insufficient fee or system balance                                                        |
+| 1513  | 수수료 계정 또는 재단 계정의 잔고가 부족합니다<br/>Insufficient fee or foundation balance                                                     |
 | 1514  | 교환을 위해 필요한 유동성자금이 충분하지 않습니다<br/>Insufficient liquidity balance                                                            |
 | 1520  | 로열티 종류가 토큰가 아닙니다. 토큰만이 인출과 예치가 가능합니다.<br/>Loyalty type is not TOKEN                                                       |
 | 1521  | 잘못된 값을 입력했습니다<br/>Invalid value entered                                                                                   |
@@ -1239,7 +1239,7 @@
 | 2004  | 임시주소가 존재하지 않거나 사용기간이 만료되었습니다<br/>Temporary address that does not exist                                                    |
 | 2005  | 사용자 모바일의 알림이 허용되지 않았습니다<br/>User's mobile notification is not allowed                                                     |
 | 2006  | 대리지갑주소를 찾을 수 없습니다<br/>Can not found delegator                                                                             |
-| 2007  | 전화번화형식이 유효하지 않습니다<br/>The phone number format is invalid                                                                  |
+| 2007  | 전화번호형식이 유효하지 않습니다<br/>The phone number format is invalid                                                                  |
 | 2008  | 메세지를 보내기 위해 필요한 모바일정보를 찾을 수 없습니다<br/>Mobile information not found                                                         |
 | 2020  | 지불에 대한 상태코드는 승인을 할 수 없습니다<br/>The status code for this payment cannot be approved                                         |
 | 2022  | 지불에 대한 상태코드는 취소를 할 수 없습니다<br/>The status code for this payment cannot be cancel                                           |
@@ -1252,6 +1252,8 @@
 | 2030  | 해당 지불은 승인 전이기 때문에 닫을 수 없습니다<br/>This payment cannot be closed before it is approved                                       |
 | 2033  | 작업아이디가 존재하지 않습니다<br/>The task ID is not exist                                                                             |
 | 2040  | 작업에 대한 상태코드는 승인을 할 수 없습니다<br/>The status code for this task cannot be approved                                            |
+| 3001  | 브릿지 기능은 아직 유효하지 않습니다<br/>Bridge functionality is not yet available                                                        |
+| 3072  | 상점아이디가 유효하지 않습니다<br/>The shopId is invalid                                                                                |
 | 4000  | 사용자에 의해 거부되었습니다<br/>Denied by user                                                                                        |
 | 5000  | 스마트컨트랙트 실행중 오류가 발생했습니다<br/>Smart Contract Error                                                                           |
 | 6000  | 내부서버에서 오류가 발생했습니다<br/>Server Error                                                                                        |

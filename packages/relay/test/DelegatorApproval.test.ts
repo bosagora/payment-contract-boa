@@ -115,7 +115,7 @@ describe("Test of Delegator", function () {
     context("Test delegator approval", () => {
         before("Set Shop ID", async () => {
             for (const elem of shopData) {
-                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.KIOS_TESTNET);
             }
         });
 

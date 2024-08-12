@@ -983,11 +983,7 @@ async function storeSampleExchangeRate(accounts: IAccount, deployment: Deploymen
     const height = 0;
     const rates = [
         {
-            symbol: "ACC",
-            rate: BigNumber.from(1761925042),
-        },
-        {
-            symbol: "LYT",
+            symbol: "KIOS",
             rate: BigNumber.from(1761925042),
         },
         {
