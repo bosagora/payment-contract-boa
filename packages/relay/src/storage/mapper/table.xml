@@ -126,7 +126,21 @@
         CREATE SEQUENCE IF NOT EXISTS register_provider_sequence_seq;
         CREATE INDEX IF NOT EXISTS register_provider_provider_index
             on register_provider (provider);
+    </sql>
 
+
+    <sql id="task_callback">
+        CREATE TABLE IF NOT EXISTS task_callback
+        (
+            "sequence"              BIGINT generated always as identity,
+            "type"                  VARCHAR(12)  NOT NULL,
+            "code"                  INT NOT NULL,
+            "message"               VARCHAR(256)  NOT NULL,
+            "contents"              TEXT NOT NULL,
+            "timestamp"             INT,
+            PRIMARY KEY ("sequence")
+            );
+        CREATE SEQUENCE IF NOT EXISTS task_callback_sequence_seq;
     </sql>
 
     <select id="create_table">
@@ -137,6 +151,7 @@
         <include refid="delegators"/>
         <include refid="temporary_accounts"/>
         <include refid="register_provider"/>
+        <include refid="task_callback"/>
     </select>
 
     <select id="drop_table">
@@ -147,6 +162,7 @@
         DROP TABLE delegators;
         DROP TABLE temporary_accounts;
         DROP TABLE register_provider;
+        DROP TABLE task_callback;
     </select>
 
 </mapper>

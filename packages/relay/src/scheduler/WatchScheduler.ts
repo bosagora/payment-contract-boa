@@ -9,9 +9,10 @@ import {
     ContractLoyaltyPaymentEvent,
     ContractShopStatusEvent,
     ContractShopUpdateEvent,
+    IPaymentTaskCallback,
+    IShopTaskCallback,
     LoyaltyPaymentTaskData,
     LoyaltyPaymentTaskStatus,
-    PaymentResultData,
     ShopTaskData,
     ShopTaskStatus,
     TaskResultCode,
@@ -134,11 +135,17 @@ export class WatchScheduler extends Scheduler {
                     await this.storage.updatePayment(payment);
                 }
 
-                await this.sendPaymentResult(
+                await this.storage.postCallBackOfPayment(
                     TaskResultType.NEW,
                     TaskResultCode.SUCCESS,
                     "Success",
-                    this.getCallBackResponse(payment)
+                    payment
+                );
+                await this.sendTaskResult(
+                    TaskResultType.NEW,
+                    TaskResultCode.SUCCESS,
+                    "Success",
+                    ContractUtils.getCallBackResponseOfPayment(payment)
                 );
 
                 if (item !== undefined && item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_NEW_SENT_TX) {
@@ -177,11 +184,17 @@ export class WatchScheduler extends Scheduler {
                     await this.storage.updatePayment(payment);
                 }
 
-                await this.sendPaymentResult(
+                await this.storage.postCallBackOfPayment(
                     TaskResultType.CANCEL,
                     TaskResultCode.SUCCESS,
                     "Success",
-                    this.getCallBackResponse(payment)
+                    payment
+                );
+                await this.sendTaskResult(
+                    TaskResultType.CANCEL,
+                    TaskResultCode.SUCCESS,
+                    "Success",
+                    ContractUtils.getCallBackResponseOfPayment(payment)
                 );
 
                 if (item !== undefined && item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_SENT_TX) {
@@ -201,25 +214,6 @@ export class WatchScheduler extends Scheduler {
         } finally {
             this.releaseRelaySigner(signerItem);
         }
-    }
-
-    private getCallBackResponse(item: LoyaltyPaymentTaskData): any {
-        return {
-            paymentId: item.paymentId,
-            purchaseId: item.purchaseId,
-            amount: item.amount.toString(),
-            currency: item.currency,
-            shopId: item.shopId,
-            account: item.account,
-            paidPoint: item.paidPoint.toString(),
-            paidValue: item.paidValue.toString(),
-            feePoint: item.feePoint.toString(),
-            feeValue: item.feeValue.toString(),
-            totalPoint: item.totalPoint.toString(),
-            totalValue: item.totalValue.toString(),
-            terminalId: item.terminalId,
-            paymentStatus: item.paymentStatus,
-        };
     }
 
     private updateEvent(event: ContractLoyaltyPaymentEvent, item: LoyaltyPaymentTaskData): void {
@@ -267,11 +261,11 @@ export class WatchScheduler extends Scheduler {
         } else return undefined;
     }
 
-    private async sendPaymentResult(
+    private async sendTaskResult(
         type: TaskResultType,
         code: TaskResultCode,
         message: string,
-        data: PaymentResultData
+        data: IPaymentTaskCallback | IShopTaskCallback
     ) {
         try {
             const client = new HTTPClient({
@@ -289,9 +283,9 @@ export class WatchScheduler extends Scheduler {
             logger.info(JSON.stringify(res.data));
         } catch (error) {
             if (error instanceof Error) {
-                logger.error(`sendPaymentResult : ${error.message}`);
+                logger.error(`sendTaskResult : ${error.message}`);
             } else {
-                logger.error(`sendPaymentResult : ${JSON.stringify(error)}`);
+                logger.error(`sendTaskResult : ${JSON.stringify(error)}`);
             }
         }
     }
@@ -329,11 +323,12 @@ export class WatchScheduler extends Scheduler {
                     task.status = event.status;
                     await this.storage.updateTask(task);
 
-                    await this.sendPaymentResult(
+                    await this.storage.postCallBackOfShop(TaskResultType.ADD, TaskResultCode.SUCCESS, "Success", task);
+                    await this.sendTaskResult(
                         TaskResultType.ADD,
                         TaskResultCode.SUCCESS,
                         "Success",
-                        this.getCallBackResponseOfTask(task)
+                        ContractUtils.getCallBackResponseOfTask(task)
                     );
                 } else {
                     task.taskStatus = ShopTaskStatus.REVERTED_TX;
@@ -363,11 +358,17 @@ export class WatchScheduler extends Scheduler {
                     task.status = event.status;
                     await this.storage.updateTask(task);
 
-                    await this.sendPaymentResult(
+                    await this.storage.postCallBackOfShop(
                         TaskResultType.UPDATE,
                         TaskResultCode.SUCCESS,
                         "Success",
-                        this.getCallBackResponseOfTask(task)
+                        task
+                    );
+                    await this.sendTaskResult(
+                        TaskResultType.UPDATE,
+                        TaskResultCode.SUCCESS,
+                        "Success",
+                        ContractUtils.getCallBackResponseOfTask(task)
                     );
                 } else {
                     task.taskStatus = ShopTaskStatus.REVERTED_TX;
@@ -395,11 +396,17 @@ export class WatchScheduler extends Scheduler {
                     task.status = event.status;
                     await this.storage.updateTask(task);
 
-                    await this.sendPaymentResult(
+                    await this.storage.postCallBackOfShop(
                         TaskResultType.STATUS,
                         TaskResultCode.SUCCESS,
                         "Success",
-                        this.getCallBackResponseOfTask(task)
+                        task
+                    );
+                    await this.sendTaskResult(
+                        TaskResultType.STATUS,
+                        TaskResultCode.SUCCESS,
+                        "Success",
+                        ContractUtils.getCallBackResponseOfTask(task)
                     );
                 } else {
                     task.taskStatus = ShopTaskStatus.REVERTED_TX;
@@ -465,18 +472,6 @@ export class WatchScheduler extends Scheduler {
                 status: parsedLog.args.status,
             };
         } else return undefined;
-    }
-
-    private getCallBackResponseOfTask(item: ShopTaskData): any {
-        return {
-            taskId: item.taskId,
-            shopId: item.shopId,
-            name: item.name,
-            currency: item.currency,
-            status: item.status,
-            account: item.account,
-            terminalId: item.terminalId,
-        };
     }
     /// endregion
 }

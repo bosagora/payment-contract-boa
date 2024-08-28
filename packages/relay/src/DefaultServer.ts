@@ -19,6 +19,7 @@ import { HistoryRouter } from "./routers/HistoryRouter";
 import { PhoneLinkRouter } from "./routers/PhoneLinkRouter";
 import { ProviderRouter } from "./routers/ProviderRouter";
 import { StorePurchaseRouter } from "./routers/StorePurchaseRouter";
+import { TaskRouter } from "./routers/TaskRouter";
 import { TokenRouter } from "./routers/TokenRouter";
 import { GraphStorage } from "./storage/GraphStorage";
 import { RelayStorage } from "./storage/RelayStorage";
@@ -40,6 +41,7 @@ export class DefaultServer extends WebService {
     public readonly etcRouter: ETCRouter;
     public readonly purchaseRouter: StorePurchaseRouter;
     public readonly tokenRouter: TokenRouter;
+    public readonly taskRouter: TaskRouter;
     public readonly phoneLinkRouter: PhoneLinkRouter;
     public readonly providerRouter: ProviderRouter;
     public readonly bridgeRouter: BridgeRouter;
@@ -187,6 +189,7 @@ export class DefaultServer extends WebService {
             this.graph_mainchain,
             this.relaySigners
         );
+        this.taskRouter = new TaskRouter(this, this.config, this.contractManager, this.metrics, this.storage);
 
         if (schedules) {
             schedules.forEach((m) => this.schedules.push(m));
@@ -232,6 +235,7 @@ export class DefaultServer extends WebService {
         await this.providerRouter.registerRoutes();
         await this.bridgeRouter.registerRoutes();
         await this.historyRouter.registerRoutes();
+        await this.taskRouter.registerRoutes();
 
         for (const m of this.schedules) await m.start();
 

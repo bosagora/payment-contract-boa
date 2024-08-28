@@ -1,3 +1,5 @@
+import { IPaymentTaskCallback, IShopTaskCallback, LoyaltyPaymentTaskData, ShopTaskData } from "../types";
+
 // tslint:disable-next-line:no-implicit-dependencies
 import { defaultAbiCoder, Interface } from "@ethersproject/abi";
 // tslint:disable-next-line:no-implicit-dependencies
@@ -839,4 +841,40 @@ export class ContractUtils {
     public static getTokenId(name: string, symbol: string): string {
         return keccak256(defaultAbiCoder.encode(["string", "string"], [name, symbol]));
     }
+
+    public static getCallBackResponseOfPayment(item: LoyaltyPaymentTaskData): IPaymentTaskCallback {
+        return {
+            paymentId: item.paymentId,
+            purchaseId: item.purchaseId,
+            amount: item.amount.toString(),
+            currency: item.currency,
+            shopId: item.shopId,
+            account: item.account,
+            paidPoint: item.paidPoint.toString(),
+            paidValue: item.paidValue.toString(),
+            feePoint: item.feePoint.toString(),
+            feeValue: item.feeValue.toString(),
+            totalPoint: item.totalPoint.toString(),
+            totalValue: item.totalValue.toString(),
+            terminalId: item.terminalId,
+            paymentStatus: item.paymentStatus,
+        };
+    }
+
+    public static getCallBackResponseOfTask(item: ShopTaskData): IShopTaskCallback {
+        return {
+            taskId: item.taskId,
+            shopId: item.shopId,
+            name: item.name,
+            currency: item.currency,
+            status: item.status,
+            account: item.account,
+            terminalId: item.terminalId,
+            taskStatus: item.taskStatus,
+        };
+    }
 }
+
+(BigNumber.prototype as any).toJSON = function () {
+    return this.toString();
+};
