@@ -1,4 +1,3 @@
-import { Shop } from "../../typechain-types";
 import { Config } from "../common/Config";
 import { logger } from "../common/Logger";
 import { ISignerItem, RelaySigners } from "../contract/Signers";
@@ -6,21 +5,13 @@ import { INotificationSender } from "../delegator/NotificationSender";
 import { WebService } from "../service/WebService";
 import { GraphStorage } from "../storage/GraphStorage";
 import { RelayStorage } from "../storage/RelayStorage";
-import {
-    ContractShopStatus,
-    ContractShopUpdateEvent,
-    MobileType,
-    ShopTaskData,
-    ShopTaskStatus,
-    TaskResultCode,
-    TaskResultType,
-} from "../types";
+import { ContractShopStatus, MobileType, ShopTaskData, ShopTaskStatus, TaskResultCode, TaskResultType } from "../types";
 import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { HTTPClient } from "../utils/Utils";
 import { Validation } from "../validation";
 
-import { ContractTransaction, ethers } from "ethers";
+import { ethers } from "ethers";
 import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 import * as hre from "hardhat";
@@ -747,11 +738,17 @@ export class ShopRouter {
                     item.taskStatus = ShopTaskStatus.TIMEOUT;
                     await this.storage.updateTaskStatus(item.taskId, item.taskStatus);
 
+                    await this.storage.postCallBackOfShop(
+                        TaskResultType.UPDATE,
+                        TaskResultCode.TIMEOUT,
+                        data.error.message,
+                        item
+                    );
                     await this.sendTaskResult(
                         TaskResultType.UPDATE,
                         TaskResultCode.TIMEOUT,
                         data.error.message,
-                        this.getCallBackResponse(item)
+                        ContractUtils.getCallBackResponseOfTask(item)
                     );
 
                     return res.status(200).json(data);
@@ -794,11 +791,17 @@ export class ShopRouter {
                     item.taskStatus = ShopTaskStatus.DENIED;
                     await this.storage.updateTaskStatus(item.taskId, item.taskStatus);
 
+                    await this.storage.postCallBackOfShop(
+                        TaskResultType.UPDATE,
+                        TaskResultCode.DENIED,
+                        "Denied by user",
+                        item
+                    );
                     await this.sendTaskResult(
                         TaskResultType.UPDATE,
                         TaskResultCode.DENIED,
                         "Denied by user",
-                        this.getCallBackResponse(item)
+                        ContractUtils.getCallBackResponseOfTask(item)
                     );
 
                     this.metrics.add("success", 1);
@@ -1025,11 +1028,17 @@ export class ShopRouter {
                     item.taskStatus = ShopTaskStatus.TIMEOUT;
                     await this.storage.updateTaskStatus(item.taskId, item.taskStatus);
 
+                    await this.storage.postCallBackOfShop(
+                        TaskResultType.STATUS,
+                        TaskResultCode.TIMEOUT,
+                        data.error.message,
+                        item
+                    );
                     await this.sendTaskResult(
                         TaskResultType.STATUS,
                         TaskResultCode.TIMEOUT,
                         data.error.message,
-                        this.getCallBackResponse(item)
+                        ContractUtils.getCallBackResponseOfTask(item)
                     );
                     this.metrics.add("success", 1);
                     return res.status(200).json(data);
@@ -1072,11 +1081,17 @@ export class ShopRouter {
                     item.taskStatus = ShopTaskStatus.DENIED;
                     await this.storage.updateTaskStatus(item.taskId, item.taskStatus);
 
+                    await this.storage.postCallBackOfShop(
+                        TaskResultType.STATUS,
+                        TaskResultCode.DENIED,
+                        "Denied by user",
+                        item
+                    );
                     await this.sendTaskResult(
                         TaskResultType.STATUS,
                         TaskResultCode.DENIED,
                         "Denied by user",
-                        this.getCallBackResponse(item)
+                        ContractUtils.getCallBackResponseOfTask(item)
                     );
 
                     this.metrics.add("success", 1);
@@ -1149,37 +1164,6 @@ export class ShopRouter {
         } finally {
             this.releaseRelaySigner(signerItem);
         }
-    }
-
-    private getCallBackResponse(item: ShopTaskData): any {
-        return {
-            taskId: item.taskId,
-            shopId: item.shopId,
-            name: item.name,
-            currency: item.currency,
-            status: item.status,
-            account: item.account,
-            terminalId: item.terminalId,
-        };
-    }
-
-    private async waitAndAddEvent(
-        contract: Shop,
-        tx: ContractTransaction
-    ): Promise<ContractShopUpdateEvent | undefined> {
-        const contractReceipt = await tx.wait();
-        const log = ContractUtils.findLog(contractReceipt, contract.interface, "AddedShop");
-        if (log !== undefined) {
-            const parsedLog = contract.interface.parseLog(log);
-
-            return {
-                shopId: parsedLog.args.shopId,
-                name: parsedLog.args.name,
-                currency: parsedLog.args.currency,
-                account: parsedLog.args.account,
-                status: parsedLog.args.status,
-            };
-        } else return undefined;
     }
 
     private async sendTaskResult(type: TaskResultType, code: TaskResultCode, message: string, data: any) {
