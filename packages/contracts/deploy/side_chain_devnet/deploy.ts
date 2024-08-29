@@ -971,6 +971,17 @@ async function deploySideChainBridge(accounts: IAccount, deployment: Deployments
         console.log(`Deposit Loyalty Token to Chain Bridge (tx: ${tx4.hash})...`);
         await tx4.wait();
     }
+
+    {
+        // Register Loyalty Provider for Testing
+        const users = JSON.parse(fs.readFileSync("./deploy/data/users.json", "utf8"));
+        for (const user of users) {
+            const tx10 = await (deployment.getContract("Ledger") as Ledger)
+                .connect(accounts.deployer)
+                .registerProvider(user.address);
+            console.log(`Register provider (tx: ${tx10.hash})...`);
+        }
+    }
 }
 
 async function storeSampleExchangeRate(accounts: IAccount, deployment: Deployments) {
