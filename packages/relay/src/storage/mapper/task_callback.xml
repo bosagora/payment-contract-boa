@@ -25,9 +25,12 @@
         SELECT * FROM task_callback WHERE "timestamp" <![CDATA[>=]]> cast(extract(epoch from now()) / 86400 as integer) * 86400 LIMIT 32;
     </select>
 
-
     <select id="read_latest">
         SELECT * FROM task_callback ORDER BY "sequence" DESC LIMIT 1;
+    </select>
+
+    <select id="read_latest_sequence">
+        SELECT "sequence" FROM task_callback ORDER BY "sequence" DESC LIMIT 1;
     </select>
 
     <select id="remove">
