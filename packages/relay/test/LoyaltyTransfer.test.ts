@@ -7,16 +7,6 @@ import { ContractManager } from "../src/contract/ContractManager";
 import { GraphStorage } from "../src/storage/GraphStorage";
 import { RelayStorage } from "../src/storage/RelayStorage";
 import { ContractUtils } from "../src/utils/ContractUtils";
-import {
-    CurrencyRate,
-    Ledger,
-    LoyaltyConsumer,
-    LoyaltyExchanger,
-    LoyaltyProvider,
-    LoyaltyTransfer,
-    PhoneLinkCollection,
-    Shop,
-} from "../typechain-types";
 import { Deployments } from "./helper/Deployments";
 import { TestClient, TestServer } from "./helper/Utility";
 

@@ -7,17 +7,7 @@ import { ContractManager } from "../src/contract/ContractManager";
 import { GraphStorage } from "../src/storage/GraphStorage";
 import { RelayStorage } from "../src/storage/RelayStorage";
 import { ContractUtils, LoyaltyNetworkID } from "../src/utils/ContractUtils";
-import {
-    BIP20DelegatedTransfer,
-    CurrencyRate,
-    Ledger,
-    LoyaltyConsumer,
-    LoyaltyExchanger,
-    LoyaltyProvider,
-    PhoneLinkCollection,
-    Shop,
-    Validator,
-} from "../typechain-types";
+import { Ledger, LoyaltyConsumer, LoyaltyProvider, Shop } from "../typechain-types";
 import { Deployments } from "./helper/Deployments";
 import { getPurchaseId, TestClient, TestServer } from "./helper/Utility";
 
@@ -67,14 +57,9 @@ describe("Test for Shop", () => {
     const userWallets = deployments.accounts.users;
     const shopWallets = deployments.accounts.shops;
 
-    let validatorContract: Validator;
-    let tokenContract: BIP20DelegatedTransfer;
-    let linkContract: PhoneLinkCollection;
-    let currencyRateContract: CurrencyRate;
     let shopContract: Shop;
     let consumerContract: LoyaltyConsumer;
     let providerContract: LoyaltyProvider;
-    let exchangerContract: LoyaltyExchanger;
     let ledgerContract: Ledger;
 
     const multiple = BigNumber.from(1000000000);
@@ -216,14 +201,9 @@ describe("Test for Shop", () => {
             deployments.setShopData(shopData);
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
-            tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
-            linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
             consumerContract = deployments.getContract("LoyaltyConsumer") as LoyaltyConsumer;
             providerContract = deployments.getContract("LoyaltyProvider") as LoyaltyProvider;
-            exchangerContract = deployments.getContract("LoyaltyExchanger") as LoyaltyExchanger;
-            currencyRateContract = deployments.getContract("CurrencyRate") as CurrencyRate;
             shopContract = deployments.getContract("Shop") as Shop;
         });
 

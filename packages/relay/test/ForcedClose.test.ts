@@ -49,14 +49,8 @@ describe("Test of Server", function () {
     const contractManager = new ContractManager(config);
     const deployments = new Deployments(config);
 
-    let validatorContract: Validator;
     let tokenContract: BIP20DelegatedTransfer;
-    let linkContract: PhoneLinkCollection;
-    let currencyRateContract: CurrencyRate;
-    let shopContract: Shop;
-    let consumerContract: LoyaltyConsumer;
     let providerContract: LoyaltyProvider;
-    let exchangerContract: LoyaltyExchanger;
     let ledgerContract: Ledger;
 
     const amount = Amount.make(20_000, 18);
@@ -121,15 +115,9 @@ describe("Test of Server", function () {
             );
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
             tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
-            linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
-            consumerContract = deployments.getContract("LoyaltyConsumer") as LoyaltyConsumer;
             providerContract = deployments.getContract("LoyaltyProvider") as LoyaltyProvider;
-            exchangerContract = deployments.getContract("LoyaltyExchanger") as LoyaltyExchanger;
-            currencyRateContract = deployments.getContract("CurrencyRate") as CurrencyRate;
-            shopContract = deployments.getContract("Shop") as Shop;
         });
 
         before("Create Config", async () => {
@@ -348,15 +336,9 @@ describe("Test of Server", function () {
             );
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
             tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
-            linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
-            consumerContract = deployments.getContract("LoyaltyConsumer") as LoyaltyConsumer;
             providerContract = deployments.getContract("LoyaltyProvider") as LoyaltyProvider;
-            exchangerContract = deployments.getContract("LoyaltyExchanger") as LoyaltyExchanger;
-            currencyRateContract = deployments.getContract("CurrencyRate") as CurrencyRate;
-            shopContract = deployments.getContract("Shop") as Shop;
         });
 
         before("Create Config", async () => {
