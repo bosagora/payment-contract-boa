@@ -10,23 +10,12 @@ import { GraphStorage } from "../src/storage/GraphStorage";
 import { RelayStorage } from "../src/storage/RelayStorage";
 import { ContractShopStatus, LoyaltyPaymentTaskStatus, ShopTaskStatus, TaskResultType } from "../src/types";
 import { ContractUtils, LoyaltyNetworkID } from "../src/utils/ContractUtils";
-import {
-    BIP20DelegatedTransfer,
-    CurrencyRate,
-    Ledger,
-    LoyaltyConsumer,
-    LoyaltyExchanger,
-    LoyaltyProvider,
-    PhoneLinkCollection,
-    Shop,
-    Validator,
-} from "../typechain-types";
+import { Ledger, LoyaltyProvider, Shop } from "../typechain-types";
 
 import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 
 import { Wallet } from "ethers";
-import { ethers } from "hardhat";
 
 import { ContractManager } from "../src/contract/ContractManager";
 import { Deployments } from "./helper/Deployments";
@@ -52,14 +41,8 @@ describe("Test of Delegator", function () {
     const users = deployments.accounts.users;
     const shops = deployments.accounts.shops;
 
-    let validatorContract: Validator;
-    let tokenContract: BIP20DelegatedTransfer;
-    let linkContract: PhoneLinkCollection;
-    let currencyRateContract: CurrencyRate;
     let shopContract: Shop;
-    let consumerContract: LoyaltyConsumer;
     let providerContract: LoyaltyProvider;
-    let exchangerContract: LoyaltyExchanger;
     let ledgerContract: Ledger;
 
     const amount = Amount.make(20_000, 18);
@@ -123,14 +106,8 @@ describe("Test of Delegator", function () {
             deployments.setShopData(shopData);
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
-            tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
-            linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
-            consumerContract = deployments.getContract("LoyaltyConsumer") as LoyaltyConsumer;
             providerContract = deployments.getContract("LoyaltyProvider") as LoyaltyProvider;
-            exchangerContract = deployments.getContract("LoyaltyExchanger") as LoyaltyExchanger;
-            currencyRateContract = deployments.getContract("CurrencyRate") as CurrencyRate;
             shopContract = deployments.getContract("Shop") as Shop;
         });
 

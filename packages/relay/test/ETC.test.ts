@@ -13,17 +13,6 @@ import * as hre from "hardhat";
 import path from "path";
 import URI from "urijs";
 import { URL } from "url";
-import {
-    BIP20DelegatedTransfer,
-    CurrencyRate,
-    Ledger,
-    LoyaltyConsumer,
-    LoyaltyExchanger,
-    LoyaltyProvider,
-    PhoneLinkCollection,
-    Shop,
-    Validator,
-} from "../typechain-types";
 import { Deployments } from "./helper/Deployments";
 
 describe("Test for ETC", function () {

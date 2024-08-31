@@ -15,7 +15,6 @@ import {
     LoyaltyProvider,
     PhoneLinkCollection,
     Shop,
-    Validator,
 } from "../typechain-types";
 import { Deployments } from "./helper/Deployments";
 import { getPurchaseId, TestClient, TestServer } from "./helper/Utility";
@@ -45,7 +44,6 @@ describe("Test of Server", function () {
     const contractManager = new ContractManager(config);
     const deployments = new Deployments(config);
 
-    let validatorContract: Validator;
     let tokenContract: BIP20DelegatedTransfer;
     let linkContract: PhoneLinkCollection;
     let currencyRateContract: CurrencyRate;
@@ -148,7 +146,6 @@ describe("Test of Server", function () {
             deployments.setShopData(shopData);
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
             tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
             linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
@@ -254,7 +251,6 @@ describe("Test of Server", function () {
             deployments.setShopData(shopData);
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
             tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
             linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;
@@ -438,7 +434,6 @@ describe("Test of Server", function () {
             deployments.setShopData(shopData);
             await deployments.doDeploy();
 
-            validatorContract = deployments.getContract("Validator") as Validator;
             tokenContract = deployments.getContract("TestLYT") as BIP20DelegatedTransfer;
             ledgerContract = deployments.getContract("Ledger") as Ledger;
             linkContract = deployments.getContract("PhoneLinkCollection") as PhoneLinkCollection;

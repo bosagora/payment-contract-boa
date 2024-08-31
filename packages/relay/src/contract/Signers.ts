@@ -7,6 +7,7 @@ import { NonceManager } from "@ethersproject/experimental";
 import { ContractUtils } from "../utils/ContractUtils";
 import { GasPriceManager } from "./GasPriceManager";
 
+// tslint:disable-next-line:no-duplicate-imports
 import { ethers } from "ethers";
 import * as hre from "hardhat";
 
