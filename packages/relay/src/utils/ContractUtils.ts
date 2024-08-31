@@ -27,6 +27,8 @@ import * as crypto from "crypto";
 
 import * as hre from "hardhat";
 
+import { toChecksumAddress } from "ethereumjs-util";
+
 export enum LoyaltyNetworkID {
     ACC_TESTNET = 1,
     ACC_MAINNET,
@@ -791,6 +793,45 @@ export class ContractUtils {
         return arrayify(keccak256(encodedResult));
     }
 
+    public static getOpenNewPaymentMessage(
+        purchaseId: string,
+        amount: BigNumberish,
+        currency: string,
+        shopId: string,
+        account: string,
+        terminalId: string
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "string", "uint256", "string", "bytes32", "address", "string"],
+            ["OpenNewPayment", purchaseId, amount, currency, shopId, account, terminalId]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCloseNewPaymentMessage(paymentId: string, confirm: boolean): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "string", "uint256"],
+            ["CloseNewPayment", paymentId, confirm ? 1 : 0]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getOpenCancelPaymentMessage(paymentId: string, terminalId: string): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "string", "string"],
+            ["OpenCancelPayment", paymentId, terminalId]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCloseCancelPaymentMessage(paymentId: string, confirm: boolean): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "string", "uint256"],
+            ["CloseCancelPayment", paymentId, confirm ? 1 : 0]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
     public static async signMessage(signer: Signer, message: Uint8Array): Promise<string> {
         return signer.signMessage(message);
     }
@@ -803,6 +844,16 @@ export class ContractUtils {
             return false;
         }
         return res.toLowerCase() === account.toLowerCase();
+    }
+
+    public static getAddressOfSigner(message: Uint8Array, signature: string): string {
+        let res: string;
+        try {
+            res = verifyMessage(message, signature);
+        } catch (error) {
+            return AddressZero;
+        }
+        return toChecksumAddress(res);
     }
 
     public static zeroGWEI(value: BigNumber): BigNumber {
