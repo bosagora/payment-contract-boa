@@ -151,7 +151,7 @@ describe("Test of Server", function () {
                 deployments.getContractAddress("MainChainLoyaltyBridge") || "";
             config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.forcedCloseSecond = 5;
             config.relay.paymentTimeoutSecond = 2;
             config.relay.callbackEndpoint = "http://127.0.0.1:3400/callback";
@@ -378,7 +378,7 @@ describe("Test of Server", function () {
                 deployments.getContractAddress("MainChainLoyaltyBridge") || "";
             config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.approvalSecond = 2;
             config.relay.forcedCloseSecond = 5;
             config.relay.callbackEndpoint = "http://127.0.0.1:3400/callback";

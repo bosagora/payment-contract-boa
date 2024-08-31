@@ -73,7 +73,7 @@ scheduler:
       expression: "*/5 * * * * *"
 
 relay:
-  managerKeys:
+  certifiers:
     - "${CERTIFIER01}"
     - "${CERTIFIER02}"
     - "${CERTIFIER03}"

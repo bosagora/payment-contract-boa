@@ -198,7 +198,7 @@ export class DatabaseConfig implements IDatabaseConfig {
 }
 
 export class RelayConfig implements IRelayConfig {
-    public managerKeys: string[];
+    public certifiers: string[];
     public accessKey: string;
     public callbackAccessKey: string;
     public callbackEndpoint: string;
@@ -216,7 +216,7 @@ export class RelayConfig implements IRelayConfig {
     constructor() {
         const defaults = RelayConfig.defaultValue();
 
-        this.managerKeys = defaults.managerKeys;
+        this.certifiers = defaults.certifiers;
         this.accessKey = defaults.accessKey;
         this.callbackAccessKey = defaults.callbackAccessKey;
         this.callbackEndpoint = defaults.callbackEndpoint;
@@ -234,7 +234,7 @@ export class RelayConfig implements IRelayConfig {
 
     public static defaultValue(): IRelayConfig {
         return {
-            managerKeys: [
+            certifiers: [
                 process.env.CERTIFIER01 || "",
                 process.env.CERTIFIER02 || "",
                 process.env.CERTIFIER03 || "",
@@ -258,7 +258,7 @@ export class RelayConfig implements IRelayConfig {
     }
 
     public readFromObject(config: IRelayConfig) {
-        if (config.managerKeys !== undefined) this.managerKeys = config.managerKeys;
+        if (config.certifiers !== undefined) this.certifiers = config.certifiers;
         if (config.accessKey !== undefined) this.accessKey = config.accessKey;
         if (config.callbackAccessKey !== undefined) this.callbackAccessKey = config.callbackAccessKey;
         if (config.callbackEndpoint !== undefined) this.callbackEndpoint = config.callbackEndpoint;
@@ -485,7 +485,7 @@ export interface ILoggingConfig {
 }
 
 export interface IRelayConfig {
-    managerKeys: string[];
+    certifiers: string[];
     accessKey: string;
     callbackAccessKey: string;
     callbackEndpoint: string;
