@@ -32,11 +32,9 @@ import { getPurchaseId, TestClient, TestServer } from "./helper/Utility";
 import * as assert from "assert";
 import * as fs from "fs";
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
 import { ContractManager } from "../src/contract/ContractManager";
-
-// tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
 
 chai.use(solidity);
 
