@@ -23,7 +23,7 @@ export class RelaySigners {
     constructor(config: Config) {
         this._config = config;
 
-        this._signers = this._config.relay.managerKeys.map((m) => {
+        this._signers = this._config.relay.certifiers.map((m) => {
             return {
                 wallet: new Wallet(m),
                 signer: new Wallet(m) as Signer,
