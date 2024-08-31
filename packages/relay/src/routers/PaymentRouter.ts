@@ -74,6 +74,11 @@ export class PaymentRouter {
             [query("account").exists().trim().isEthereumAddress()],
             this.user_balance.bind(this)
         );
+        this.app.get(
+            "/v2/payment/user/balance",
+            [query("account").exists().trim().isEthereumAddress()],
+            this.user_balance.bind(this)
+        );
 
         this.app.get(
             "/v1/payment/convert/currency",
@@ -82,7 +87,24 @@ export class PaymentRouter {
         );
 
         this.app.get(
+            "/v2/payment/convert/currency",
+            [query("amount").exists().custom(Validation.isAmount), query("from").exists(), query("to").exists()],
+            this.convert_currency.bind(this)
+        );
+
+        this.app.get(
             "/v1/payment/shop/info",
+            [
+                query("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+            ],
+            this.shop_info.bind(this)
+        );
+
+        this.app.get(
+            "/v2/payment/shop/info",
             [
                 query("shopId")
                     .exists()
@@ -103,8 +125,29 @@ export class PaymentRouter {
             this.payment_account_temporary.bind(this)
         );
 
+        this.app.post(
+            "/v2/payment/account/temporary",
+            [
+                body("account").exists().trim().isEthereumAddress(),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_account_temporary.bind(this)
+        );
+
         this.app.get(
             "/v1/payment/info",
+            [
+                query("account").exists().trim().isEthereumAddress(),
+                query("amount").exists().custom(Validation.isAmount),
+                query("currency").exists(),
+            ],
+            this.payment_info.bind(this)
+        );
+
+        this.app.get(
+            "/v2/payment/info",
             [
                 query("account").exists().trim().isEthereumAddress(),
                 query("amount").exists().custom(Validation.isAmount),
@@ -125,13 +168,44 @@ export class PaymentRouter {
                     .matches(/^(0x)[0-9a-f]{64}$/i),
                 body("account").exists().trim().isEthereumAddress(),
             ],
-            this.payment_new_open.bind(this)
+            this.payment_new_open_v1.bind(this)
+        );
+
+        this.app.post(
+            "/v2/payment/new/open",
+            [
+                body("purchaseId").exists(),
+                body("amount").exists().custom(Validation.isAmount),
+                body("currency").exists(),
+                body("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                body("account").exists().trim().isEthereumAddress(),
+                body("terminalId").exists(),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_new_open_v2.bind(this)
         );
 
         this.app.post(
             "/v1/payment/new/close",
             [body("confirm").exists().trim().toLowerCase().isIn(["true", "false"]), body("paymentId").exists()],
-            this.payment_new_close.bind(this)
+            this.payment_new_close_v1.bind(this)
+        );
+
+        this.app.post(
+            "/v2/payment/new/close",
+            [
+                body("paymentId").exists(),
+                body("confirm").exists().trim().toLowerCase().isIn(["true", "false"]),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_new_close_v2.bind(this)
         );
 
         this.app.post(
@@ -146,18 +220,67 @@ export class PaymentRouter {
             this.payment_new_approval.bind(this)
         );
 
+        this.app.post(
+            "/v2/payment/new/approval",
+            [
+                body("paymentId").exists(),
+                body("approval").exists().trim().toLowerCase().isIn(["true", "false"]),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_new_approval.bind(this)
+        );
+
         this.app.get("/v1/payment/item", [query("paymentId").exists()], this.payment_item.bind(this));
 
-        this.app.post("/v1/payment/cancel/open", [body("paymentId").exists()], this.payment_cancel_open.bind(this));
+        this.app.get("/v2/payment/item", [query("paymentId").exists()], this.payment_item.bind(this));
+
+        this.app.post("/v1/payment/cancel/open", [body("paymentId").exists()], this.payment_cancel_open_v1.bind(this));
+
+        this.app.post(
+            "/v2/payment/cancel/open",
+            [
+                body("paymentId").exists(),
+                body("terminalId").exists(),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_cancel_open_v2.bind(this)
+        );
 
         this.app.post(
             "/v1/payment/cancel/close",
-            [body("confirm").exists().trim().toLowerCase().isIn(["true", "false"]), body("paymentId").exists()],
-            this.payment_cancel_close.bind(this)
+            [body("paymentId").exists(), body("confirm").exists().trim().toLowerCase().isIn(["true", "false"])],
+            this.payment_cancel_close_v1.bind(this)
+        );
+
+        this.app.post(
+            "/v2/payment/cancel/close",
+            [
+                body("paymentId").exists(),
+                body("confirm").exists().trim().toLowerCase().isIn(["true", "false"]),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_cancel_close_v2.bind(this)
         );
 
         this.app.post(
             "/v1/payment/cancel/approval",
+            [
+                body("paymentId").exists(),
+                body("approval").exists().trim().toLowerCase().isIn(["true", "false"]),
+                body("signature")
+                    .exists()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.payment_cancel_approval.bind(this)
+        );
+        this.app.post(
+            "/v2/payment/cancel/approval",
             [
                 body("paymentId").exists(),
                 body("approval").exists().trim().toLowerCase().isIn(["true", "false"]),
@@ -424,11 +547,152 @@ export class PaymentRouter {
         }
     }
 
+    private async payment_new_open_internal(
+        req: express.Request,
+        res: express.Response,
+        purchaseId: string,
+        amount: BigNumber,
+        currency: string,
+        shopId: string,
+        account: string,
+        temporaryAccount: string,
+        terminalId: string
+    ) {
+        const feeRate = await this.contractManager.sideLedgerContract.getPaymentFee();
+        const rate = await this.contractManager.sideCurrencyRateContract.get(currency.toLowerCase());
+        const multiple = await this.contractManager.sideCurrencyRateContract.multiple();
+
+        let balance: BigNumber;
+        let paidPoint: BigNumber;
+        let paidValue: BigNumber;
+        let feePoint: BigNumber;
+        let feeValue: BigNumber;
+        let totalPoint: BigNumber;
+        let totalValue: BigNumber;
+
+        const contract = this.contractManager.sideLedgerContract;
+        balance = await contract.pointBalanceOf(account);
+        paidPoint = ContractUtils.zeroGWEI(amount.mul(rate).div(multiple));
+        feePoint = ContractUtils.zeroGWEI(paidPoint.mul(feeRate).div(10000));
+        totalPoint = paidPoint.add(feePoint);
+        if (totalPoint.gt(balance)) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("1511"));
+        }
+        paidValue = BigNumber.from(amount);
+        feeValue = ContractUtils.zeroGWEI(paidValue.mul(feeRate).div(10000));
+        totalValue = paidValue.add(feeValue);
+
+        const paymentId = await this.getPaymentId(account);
+        const [secret, secretLock] = ContractUtils.getSecret();
+        const item: LoyaltyPaymentTaskData = {
+            paymentId,
+            purchaseId,
+            amount,
+            currency,
+            shopId,
+            account,
+            secret,
+            secretLock,
+            paidPoint,
+            paidValue,
+            feePoint,
+            feeValue,
+            totalPoint,
+            totalValue,
+            terminalId,
+            paymentStatus: LoyaltyPaymentTaskStatus.OPENED_NEW,
+            contractStatus: ContractLoyaltyPaymentStatus.INVALID,
+            openNewTimestamp: ContractUtils.getTimeStamp(),
+            closeNewTimestamp: 0,
+            openCancelTimestamp: 0,
+            closeCancelTimestamp: 0,
+            openNewTxId: "",
+            openNewTxTime: 0,
+            openCancelTxId: "",
+            openCancelTxTime: 0,
+        };
+        await this.storage.postPayment(item);
+
+        const shopContract = this.contractManager.sideShopContract;
+        const shopInfo = await shopContract.shopOf(item.shopId);
+
+        const mobileData = await this.storage.getMobile(item.account, MobileType.USER_APP);
+
+        if (!this.config.relay.testMode && mobileData === undefined) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2008"));
+        }
+
+        if (mobileData !== undefined) {
+            // tslint:disable-next-line:one-variable-per-declaration
+            let title, shopLabel, amountLabel, pointLabel: string;
+            if (mobileData.language === "ko") {
+                title = "포인트 사용 알림";
+                shopLabel = "구매처";
+                amountLabel = "구매 금액";
+                pointLabel = "포인트 사용";
+            } else {
+                title = "Loyalty usage notification";
+                shopLabel = "Place of purchase";
+                amountLabel = "Amount";
+                pointLabel = "Points used";
+            }
+            /// 사용자에게 메세지 발송
+            const to = mobileData.token;
+            const contents: string[] = [];
+            const data = {
+                type: "new",
+                paymentId: item.paymentId,
+                timestamp: item.openNewTimestamp,
+                timeout: 30,
+            };
+            contents.push(`${shopLabel} : ${shopInfo.name}`);
+            contents.push(
+                `${amountLabel} : ${new Amount(item.amount, 18).toDisplayString(
+                    true,
+                    0
+                )} ${item.currency.toUpperCase()}`
+            );
+            contents.push(`${pointLabel} : ${new Amount(item.paidPoint, 18).toDisplayString(true, 0)} POINT`);
+
+            logger.info(`Notification - to: ${to}, title: ${title}`);
+            await this._sender.send(to, title, contents.join(", "), data);
+        }
+
+        try {
+            if (temporaryAccount !== "") await this.storage.removeAccountTemporary(temporaryAccount);
+        } catch (_) {
+            //
+        }
+
+        this.metrics.add("success", 1);
+        return res.status(200).json(
+            this.makeResponseData(0, {
+                paymentId: item.paymentId,
+                purchaseId: item.purchaseId,
+                amount: item.amount.toString(),
+                currency: item.currency,
+                shopId: item.shopId,
+                account: item.account,
+                paidPoint: item.paidPoint.toString(),
+                paidValue: item.paidValue.toString(),
+                feePoint: item.feePoint.toString(),
+                feeValue: item.feeValue.toString(),
+                totalPoint: item.totalPoint.toString(),
+                totalValue: item.totalValue.toString(),
+                paymentStatus: item.paymentStatus,
+                openNewTimestamp: item.openNewTimestamp,
+                closeNewTimestamp: item.closeNewTimestamp,
+                openCancelTimestamp: item.openCancelTimestamp,
+                closeCancelTimestamp: item.closeCancelTimestamp,
+            })
+        );
+    }
+
     /**
      * POST /v1/payment/new/open
      * @private
      */
-    private async payment_new_open(req: express.Request, res: express.Response) {
+    private async payment_new_open_v1(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/payment/new/open ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
@@ -465,133 +729,16 @@ export class PaymentRouter {
             const currency: string = String(req.body.currency).trim();
             const terminalId: string = req.body.terminalId !== undefined ? String(req.body.terminalId).trim() : "";
 
-            const feeRate = await this.contractManager.sideLedgerContract.getPaymentFee();
-            const rate = await this.contractManager.sideCurrencyRateContract.get(currency.toLowerCase());
-            const multiple = await this.contractManager.sideCurrencyRateContract.multiple();
-
-            let balance: BigNumber;
-            let paidPoint: BigNumber;
-            let paidValue: BigNumber;
-            let feePoint: BigNumber;
-            let feeValue: BigNumber;
-            let totalPoint: BigNumber;
-            let totalValue: BigNumber;
-
-            const contract = this.contractManager.sideLedgerContract;
-            balance = await contract.pointBalanceOf(account);
-            paidPoint = ContractUtils.zeroGWEI(amount.mul(rate).div(multiple));
-            feePoint = ContractUtils.zeroGWEI(paidPoint.mul(feeRate).div(10000));
-            totalPoint = paidPoint.add(feePoint);
-            if (totalPoint.gt(balance)) {
-                return res.status(200).json(ResponseMessage.getErrorMessage("1511"));
-            }
-            paidValue = BigNumber.from(amount);
-            feeValue = ContractUtils.zeroGWEI(paidValue.mul(feeRate).div(10000));
-            totalValue = paidValue.add(feeValue);
-
-            const paymentId = await this.getPaymentId(account);
-            const [secret, secretLock] = ContractUtils.getSecret();
-            const item: LoyaltyPaymentTaskData = {
-                paymentId,
+            await this.payment_new_open_internal(
+                req,
+                res,
                 purchaseId,
                 amount,
                 currency,
                 shopId,
                 account,
-                secret,
-                secretLock,
-                paidPoint,
-                paidValue,
-                feePoint,
-                feeValue,
-                totalPoint,
-                totalValue,
-                terminalId,
-                paymentStatus: LoyaltyPaymentTaskStatus.OPENED_NEW,
-                contractStatus: ContractLoyaltyPaymentStatus.INVALID,
-                openNewTimestamp: ContractUtils.getTimeStamp(),
-                closeNewTimestamp: 0,
-                openCancelTimestamp: 0,
-                closeCancelTimestamp: 0,
-                openNewTxId: "",
-                openNewTxTime: 0,
-                openCancelTxId: "",
-                openCancelTxTime: 0,
-            };
-            await this.storage.postPayment(item);
-
-            const shopContract = this.contractManager.sideShopContract;
-            const shopInfo = await shopContract.shopOf(item.shopId);
-
-            const mobileData = await this.storage.getMobile(item.account, MobileType.USER_APP);
-
-            if (!this.config.relay.testMode && mobileData === undefined) {
-                return res.status(200).json(ResponseMessage.getErrorMessage("2008"));
-            }
-
-            if (mobileData !== undefined) {
-                // tslint:disable-next-line:one-variable-per-declaration
-                let title, shopLabel, amountLabel, pointLabel: string;
-                if (mobileData.language === "ko") {
-                    title = "포인트 사용 알림";
-                    shopLabel = "구매처";
-                    amountLabel = "구매 금액";
-                    pointLabel = "포인트 사용";
-                } else {
-                    title = "Loyalty usage notification";
-                    shopLabel = "Place of purchase";
-                    amountLabel = "Amount";
-                    pointLabel = "Points used";
-                }
-                /// 사용자에게 메세지 발송
-                const to = mobileData.token;
-                const contents: string[] = [];
-                const data = {
-                    type: "new",
-                    paymentId: item.paymentId,
-                    timestamp: item.openNewTimestamp,
-                    timeout: 30,
-                };
-                contents.push(`${shopLabel} : ${shopInfo.name}`);
-                contents.push(
-                    `${amountLabel} : ${new Amount(item.amount, 18).toDisplayString(
-                        true,
-                        0
-                    )} ${item.currency.toUpperCase()}`
-                );
-                contents.push(`${pointLabel} : ${new Amount(item.paidPoint, 18).toDisplayString(true, 0)} POINT`);
-
-                logger.info(`Notification - to: ${to}, title: ${title}`);
-                await this._sender.send(to, title, contents.join(", "), data);
-            }
-
-            try {
-                if (temporaryAccount !== "") await this.storage.removeAccountTemporary(temporaryAccount);
-            } catch (_) {
-                //
-            }
-
-            this.metrics.add("success", 1);
-            return res.status(200).json(
-                this.makeResponseData(0, {
-                    paymentId: item.paymentId,
-                    purchaseId: item.purchaseId,
-                    amount: item.amount.toString(),
-                    currency: item.currency,
-                    shopId: item.shopId,
-                    account: item.account,
-                    paidPoint: item.paidPoint.toString(),
-                    paidValue: item.paidValue.toString(),
-                    feePoint: item.feePoint.toString(),
-                    feeValue: item.feeValue.toString(),
-                    totalPoint: item.totalPoint.toString(),
-                    totalValue: item.totalValue.toString(),
-                    paymentStatus: item.paymentStatus,
-                    openNewTimestamp: item.openNewTimestamp,
-                    closeNewTimestamp: item.closeNewTimestamp,
-                    openCancelTimestamp: item.openCancelTimestamp,
-                    closeCancelTimestamp: item.closeCancelTimestamp,
-                })
+                temporaryAccount,
+                terminalId
             );
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
@@ -602,196 +749,80 @@ export class PaymentRouter {
     }
 
     /**
-     * POST /v1/payment/new/approval
+     * POST /v2/payment/new/open
      * @private
      */
-    private async payment_new_approval(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/payment/new/approval ${req.ip}:${JSON.stringify(req.body)}`);
+    private async payment_new_open_v2(req: express.Request, res: express.Response) {
+        logger.http(`POST /v2/payment/new/open ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
         }
 
-        const signerItem = await this.getRelaySigner();
+        const shopId: string = String(req.body.shopId).trim();
+        if (shopId.substring(0, 6) !== this.config.relay.allowedShopIdPrefix) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("3072"));
+        }
+
         try {
-            const paymentId: string = String(req.body.paymentId).trim();
-            const approval: boolean = String(req.body.approval).trim().toLowerCase() === "true";
+            const originalAccount: string = String(req.body.account).trim();
+            let account: string = originalAccount;
+            let temporaryAccount: string = "";
+            if (ContractUtils.isTemporaryAccount(originalAccount)) {
+                const realAccount = await this.storage.getRealAccountOnTemporary(originalAccount);
+                if (realAccount === undefined) return res.status(200).json(ResponseMessage.getErrorMessage("2004"));
+
+                temporaryAccount = originalAccount;
+                account = realAccount;
+            }
+
+            const purchaseId: string = String(req.body.purchaseId).trim();
+            const amount: BigNumber = BigNumber.from(req.body.amount);
+            const currency: string = String(req.body.currency).trim();
+            const terminalId: string = req.body.terminalId !== undefined ? String(req.body.terminalId).trim() : "";
             const signature: string = String(req.body.signature).trim();
 
-            const item = await this.storage.getPayment(paymentId);
-            if (item === undefined) {
-                return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
-            } else {
-                if (
-                    item.paymentStatus !== LoyaltyPaymentTaskStatus.OPENED_NEW &&
-                    item.paymentStatus !== LoyaltyPaymentTaskStatus.APPROVED_NEW_FAILED_TX &&
-                    item.paymentStatus !== LoyaltyPaymentTaskStatus.APPROVED_NEW_REVERTED_TX
-                ) {
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2020"));
-                }
+            const message = ContractUtils.getOpenNewPaymentMessage(
+                purchaseId,
+                amount,
+                currency,
+                shopId,
+                originalAccount,
+                terminalId
+            );
+            const signer = ContractUtils.getAddressOfSigner(message, signature);
 
-                if (
-                    !ContractUtils.verifyLoyaltyNewPayment(
-                        item.paymentId,
-                        item.purchaseId,
-                        item.amount,
-                        item.currency,
-                        item.shopId,
-                        await this.contractManager.sideLedgerContract.nonceOf(item.account),
-                        item.account,
-                        signature,
-                        this.contractManager.sideChainId
-                    )
-                ) {
-                    return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
-                }
-
-                if (ContractUtils.getTimeStamp() - item.openNewTimestamp > this.config.relay.paymentTimeoutSecond) {
-                    const data = ResponseMessage.getErrorMessage("7000");
-
-                    await this.storage.postCallBackOfPayment(
-                        TaskResultType.NEW,
-                        TaskResultCode.TIMEOUT,
-                        data.error.message,
-                        item
-                    );
-                    await this.sendTaskResult(
-                        TaskResultType.NEW,
-                        TaskResultCode.TIMEOUT,
-                        data.error.message,
-                        ContractUtils.getCallBackResponseOfPayment(item)
-                    );
-                    return res.status(200).json(data);
-                }
-
-                const contract = this.contractManager.sideLoyaltyConsumerContract;
-                const loyaltyPaymentData = await contract.loyaltyPaymentOf(paymentId);
-                if (approval) {
-                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
-                        try {
-                            const tx = await contract.connect(signerItem.signer).openNewLoyaltyPayment({
-                                paymentId: item.paymentId,
-                                purchaseId: item.purchaseId,
-                                amount: item.amount,
-                                currency: item.currency.toLowerCase(),
-                                shopId: item.shopId,
-                                account: item.account,
-                                signature,
-                                secretLock: item.secretLock,
-                            });
-
-                            item.openNewTxId = tx.hash;
-                            item.openNewTimestamp = ContractUtils.getTimeStamp();
-                            item.paymentStatus = LoyaltyPaymentTaskStatus.APPROVED_NEW_SENT_TX;
-                            await this.storage.updateOpenNewTx(
-                                item.paymentId,
-                                item.openNewTxId,
-                                item.openNewTimestamp,
-                                item.paymentStatus
-                            );
-
-                            this.metrics.add("success", 1);
-                            return res.status(200).json(
-                                this.makeResponseData(0, {
-                                    paymentId: item.paymentId,
-                                    purchaseId: item.purchaseId,
-                                    amount: item.amount.toString(),
-                                    currency: item.currency,
-                                    shopId: item.shopId,
-                                    account: item.account,
-                                    paymentStatus: item.paymentStatus,
-                                    txHash: tx.hash,
-                                })
-                            );
-                        } catch (error) {
-                            item.paymentStatus = LoyaltyPaymentTaskStatus.APPROVED_NEW_FAILED_TX;
-                            await this.storage.forcedUpdatePaymentStatus(item.paymentId, item.paymentStatus);
-                            const msg = ResponseMessage.getEVMErrorMessage(error);
-                            logger.error(`POST /v1/payment/new/approval : ${msg.error.message}`);
-                            return res.status(200).json(msg);
-                        }
-                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.OPENED_PAYMENT) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.REPLY_COMPLETED_NEW;
-                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2025"));
-                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_PAYMENT) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.CLOSED_NEW;
-                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
-                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.FAILED_PAYMENT) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_NEW;
-                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2027"));
-                    } else {
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2020"));
-                    }
-                } else {
-                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.DENIED_NEW;
-                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
-
-                        await this.storage.postCallBackOfPayment(
-                            TaskResultType.NEW,
-                            TaskResultCode.DENIED,
-                            "Denied by user",
-                            item
-                        );
-                        await this.sendTaskResult(
-                            TaskResultType.NEW,
-                            TaskResultCode.DENIED,
-                            "Denied by user",
-                            ContractUtils.getCallBackResponseOfPayment(item)
-                        );
-
-                        this.metrics.add("success", 1);
-                        return res.status(200).json(
-                            this.makeResponseData(0, {
-                                paymentId: item.paymentId,
-                                purchaseId: item.purchaseId,
-                                amount: item.amount.toString(),
-                                currency: item.currency,
-                                shopId: item.shopId,
-                                account: item.account,
-                                terminalId: item.terminalId,
-                                paymentStatus: item.paymentStatus,
-                            })
-                        );
-                    } else {
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2028"));
-                    }
-                }
+            if (!this.config.relay.isPaymentSigner(signer)) {
+                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
             }
+            logger.http(`POST /v2/payment/new/open signer: ${signer}`);
+
+            await this.payment_new_open_internal(
+                req,
+                res,
+                purchaseId,
+                amount,
+                currency,
+                shopId,
+                account,
+                temporaryAccount,
+                terminalId
+            );
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/payment/new/approval : ${msg.error.message}`);
+            logger.error(`POST /v2/payment/new/open : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(msg);
-        } finally {
-            this.releaseRelaySigner(signerItem);
         }
     }
 
-    /**
-     * POST /v1/payment/new/close
-     * @private
-     */
-    private async payment_new_close(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/payment/new/close ${req.ip}:${JSON.stringify(req.body)}`);
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
-        }
-
-        let accessKey = req.get("Authorization");
-        if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
-        if (accessKey !== this.config.relay.accessKey) {
-            return res.json(ResponseMessage.getErrorMessage("2002"));
-        }
-
-        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
-        const paymentId: string = String(req.body.paymentId).trim();
+    private async payment_new_close_internal(
+        req: express.Request,
+        res: express.Response,
+        paymentId: string,
+        confirm: boolean
+    ) {
         const item = await this.storage.getPayment(paymentId);
         if (item === undefined) {
             return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
@@ -984,6 +1015,228 @@ export class PaymentRouter {
     }
 
     /**
+     * POST /v1/payment/new/close
+     * @private
+     */
+    private async payment_new_close_v1(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/new/close ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        let accessKey = req.get("Authorization");
+        if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
+        if (accessKey !== this.config.relay.accessKey) {
+            return res.json(ResponseMessage.getErrorMessage("2002"));
+        }
+
+        const paymentId: string = String(req.body.paymentId).trim();
+        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
+
+        await this.payment_new_close_internal(req, res, paymentId, confirm);
+    }
+
+    /**
+     * POST /v2/payment/new/close
+     * @private
+     */
+    private async payment_new_close_v2(req: express.Request, res: express.Response) {
+        logger.http(`POST /v2/payment/new/close ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const paymentId: string = String(req.body.paymentId).trim();
+        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
+        const signature: string = String(req.body.signature).trim();
+
+        const message = ContractUtils.getCloseNewPaymentMessage(paymentId, confirm);
+        const signer = ContractUtils.getAddressOfSigner(message, signature);
+
+        if (!this.config.relay.isPaymentSigner(signer)) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+        }
+        logger.http(`POST /v2/payment/new/close signer: ${signer}`);
+
+        await this.payment_new_close_internal(req, res, paymentId, confirm);
+    }
+
+    /**
+     * POST /v1/payment/new/approval
+     * @private
+     */
+    private async payment_new_approval(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/new/approval ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const signerItem = await this.getRelaySigner();
+        try {
+            const paymentId: string = String(req.body.paymentId).trim();
+            const approval: boolean = String(req.body.approval).trim().toLowerCase() === "true";
+            const signature: string = String(req.body.signature).trim();
+
+            const item = await this.storage.getPayment(paymentId);
+            if (item === undefined) {
+                return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
+            } else {
+                if (
+                    item.paymentStatus !== LoyaltyPaymentTaskStatus.OPENED_NEW &&
+                    item.paymentStatus !== LoyaltyPaymentTaskStatus.APPROVED_NEW_FAILED_TX &&
+                    item.paymentStatus !== LoyaltyPaymentTaskStatus.APPROVED_NEW_REVERTED_TX
+                ) {
+                    return res.status(200).json(ResponseMessage.getErrorMessage("2020"));
+                }
+
+                if (
+                    !ContractUtils.verifyLoyaltyNewPayment(
+                        item.paymentId,
+                        item.purchaseId,
+                        item.amount,
+                        item.currency,
+                        item.shopId,
+                        await this.contractManager.sideLedgerContract.nonceOf(item.account),
+                        item.account,
+                        signature,
+                        this.contractManager.sideChainId
+                    )
+                ) {
+                    return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+                }
+
+                if (ContractUtils.getTimeStamp() - item.openNewTimestamp > this.config.relay.paymentTimeoutSecond) {
+                    const data = ResponseMessage.getErrorMessage("7000");
+
+                    await this.storage.postCallBackOfPayment(
+                        TaskResultType.NEW,
+                        TaskResultCode.TIMEOUT,
+                        data.error.message,
+                        item
+                    );
+                    await this.sendTaskResult(
+                        TaskResultType.NEW,
+                        TaskResultCode.TIMEOUT,
+                        data.error.message,
+                        ContractUtils.getCallBackResponseOfPayment(item)
+                    );
+                    return res.status(200).json(data);
+                }
+
+                const contract = this.contractManager.sideLoyaltyConsumerContract;
+                const loyaltyPaymentData = await contract.loyaltyPaymentOf(paymentId);
+                if (approval) {
+                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
+                        try {
+                            const tx = await contract.connect(signerItem.signer).openNewLoyaltyPayment({
+                                paymentId: item.paymentId,
+                                purchaseId: item.purchaseId,
+                                amount: item.amount,
+                                currency: item.currency.toLowerCase(),
+                                shopId: item.shopId,
+                                account: item.account,
+                                signature,
+                                secretLock: item.secretLock,
+                            });
+
+                            item.openNewTxId = tx.hash;
+                            item.openNewTimestamp = ContractUtils.getTimeStamp();
+                            item.paymentStatus = LoyaltyPaymentTaskStatus.APPROVED_NEW_SENT_TX;
+                            await this.storage.updateOpenNewTx(
+                                item.paymentId,
+                                item.openNewTxId,
+                                item.openNewTimestamp,
+                                item.paymentStatus
+                            );
+
+                            this.metrics.add("success", 1);
+                            return res.status(200).json(
+                                this.makeResponseData(0, {
+                                    paymentId: item.paymentId,
+                                    purchaseId: item.purchaseId,
+                                    amount: item.amount.toString(),
+                                    currency: item.currency,
+                                    shopId: item.shopId,
+                                    account: item.account,
+                                    paymentStatus: item.paymentStatus,
+                                    txHash: tx.hash,
+                                })
+                            );
+                        } catch (error) {
+                            item.paymentStatus = LoyaltyPaymentTaskStatus.APPROVED_NEW_FAILED_TX;
+                            await this.storage.forcedUpdatePaymentStatus(item.paymentId, item.paymentStatus);
+                            const msg = ResponseMessage.getEVMErrorMessage(error);
+                            logger.error(`POST /v1/payment/new/approval : ${msg.error.message}`);
+                            return res.status(200).json(msg);
+                        }
+                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.OPENED_PAYMENT) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.REPLY_COMPLETED_NEW;
+                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2025"));
+                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_PAYMENT) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.CLOSED_NEW;
+                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
+                    } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.FAILED_PAYMENT) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_NEW;
+                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2027"));
+                    } else {
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2020"));
+                    }
+                } else {
+                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.DENIED_NEW;
+                        await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
+
+                        await this.storage.postCallBackOfPayment(
+                            TaskResultType.NEW,
+                            TaskResultCode.DENIED,
+                            "Denied by user",
+                            item
+                        );
+                        await this.sendTaskResult(
+                            TaskResultType.NEW,
+                            TaskResultCode.DENIED,
+                            "Denied by user",
+                            ContractUtils.getCallBackResponseOfPayment(item)
+                        );
+
+                        this.metrics.add("success", 1);
+                        return res.status(200).json(
+                            this.makeResponseData(0, {
+                                paymentId: item.paymentId,
+                                purchaseId: item.purchaseId,
+                                amount: item.amount.toString(),
+                                currency: item.currency,
+                                shopId: item.shopId,
+                                account: item.account,
+                                terminalId: item.terminalId,
+                                paymentStatus: item.paymentStatus,
+                            })
+                        );
+                    } else {
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2028"));
+                    }
+                }
+            }
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/payment/new/approval : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        } finally {
+            this.releaseRelaySigner(signerItem);
+        }
+    }
+
+    /**
      * GET /v1/payment/item
      * @private
      */
@@ -1032,134 +1285,47 @@ export class PaymentRouter {
         }
     }
 
-    /**
-     * 결제 / 결제정보를 제공한다
-     * POST /v1/payment/cancel/open
-     * @private
-     */
-    private async payment_cancel_open(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/payment/cancel/open ${req.ip}:${JSON.stringify(req.body)}`);
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
-        }
-
-        try {
-            let accessKey = req.get("Authorization");
-            if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
-            if (accessKey !== this.config.relay.accessKey) {
-                return res.json(ResponseMessage.getErrorMessage("2002"));
+    private async payment_cancel_open_internal(
+        req: express.Request,
+        res: express.Response,
+        paymentId: string,
+        terminalId: string
+    ) {
+        const item = await this.storage.getPayment(paymentId);
+        if (item === undefined) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
+        } else {
+            if (
+                !(
+                    item.paymentStatus === LoyaltyPaymentTaskStatus.CLOSED_NEW ||
+                    item.paymentStatus === LoyaltyPaymentTaskStatus.DENIED_CANCEL ||
+                    item.paymentStatus === LoyaltyPaymentTaskStatus.FAILED_CANCEL
+                )
+            ) {
+                return res.status(200).json(ResponseMessage.getErrorMessage("2022"));
             }
 
-            const paymentId: string = String(req.body.paymentId).trim();
-            const terminalId: string = req.body.terminalId !== undefined ? String(req.body.terminalId).trim() : "";
-            const item = await this.storage.getPayment(paymentId);
-            if (item === undefined) {
-                return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
-            } else {
-                if (
-                    !(
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.CLOSED_NEW ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.DENIED_CANCEL ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.FAILED_CANCEL
-                    )
-                ) {
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2022"));
+            item.terminalId = terminalId;
+            await this.storage.updateTerminalId(item.paymentId, item.terminalId);
+
+            item.paymentStatus = LoyaltyPaymentTaskStatus.OPENED_CANCEL;
+            item.openCancelTimestamp = ContractUtils.getTimeStamp();
+            await this.storage.updateOpenCancelTimestamp(item.paymentId, item.paymentStatus, item.openCancelTimestamp);
+            [item.secret, item.secretLock] = ContractUtils.getSecret();
+            await this.storage.updateSecret(item.paymentId, item.secret, item.secretLock);
+
+            const shopContract = this.contractManager.sideShopContract;
+            const shopInfo = await shopContract.shopOf(item.shopId);
+
+            let hasDelegator: boolean = false;
+            if (shopInfo.delegator !== AddressZero) {
+                const wallet = await this.storage.getDelegator(shopInfo.account, this.config.relay.encryptKey);
+                if (wallet !== undefined && wallet.address.toLowerCase() === shopInfo.delegator.toLowerCase()) {
+                    hasDelegator = true;
                 }
+            }
 
-                item.terminalId = terminalId;
-                await this.storage.updateTerminalId(item.paymentId, item.terminalId);
-
-                item.paymentStatus = LoyaltyPaymentTaskStatus.OPENED_CANCEL;
-                item.openCancelTimestamp = ContractUtils.getTimeStamp();
-                await this.storage.updateOpenCancelTimestamp(
-                    item.paymentId,
-                    item.paymentStatus,
-                    item.openCancelTimestamp
-                );
-                [item.secret, item.secretLock] = ContractUtils.getSecret();
-                await this.storage.updateSecret(item.paymentId, item.secret, item.secretLock);
-
-                const shopContract = this.contractManager.sideShopContract;
-                const shopInfo = await shopContract.shopOf(item.shopId);
-
-                let hasDelegator: boolean = false;
-                if (shopInfo.delegator !== AddressZero) {
-                    const wallet = await this.storage.getDelegator(shopInfo.account, this.config.relay.encryptKey);
-                    if (wallet !== undefined && wallet.address.toLowerCase() === shopInfo.delegator.toLowerCase()) {
-                        hasDelegator = true;
-                    }
-                }
-
-                if (hasDelegator) {
-                    this.metrics.add("success", 1);
-                    return res.status(200).json(
-                        this.makeResponseData(0, {
-                            paymentId: item.paymentId,
-                            purchaseId: item.purchaseId,
-                            amount: item.amount.toString(),
-                            currency: item.currency,
-                            shopId: item.shopId,
-                            account: item.account,
-                            paidPoint: item.paidPoint.toString(),
-                            paidValue: item.paidValue.toString(),
-                            feePoint: item.feePoint.toString(),
-                            feeValue: item.feeValue.toString(),
-                            totalPoint: item.totalPoint.toString(),
-                            totalValue: item.totalValue.toString(),
-                            terminalId: item.terminalId,
-                            paymentStatus: item.paymentStatus,
-                            openNewTimestamp: item.openNewTimestamp,
-                            closeNewTimestamp: item.closeNewTimestamp,
-                            openCancelTimestamp: item.openCancelTimestamp,
-                            closeCancelTimestamp: item.closeCancelTimestamp,
-                        })
-                    );
-                }
-
-                const mobileData = await this.storage.getMobile(shopInfo.account, MobileType.SHOP_APP);
-
-                if (!this.config.relay.testMode && mobileData === undefined) {
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2005"));
-                }
-
-                if (mobileData !== undefined) {
-                    /// 상점주에게 메세지 발송
-                    // tslint:disable-next-line:one-variable-per-declaration
-                    let title, shopLabel, amountLabel, pointLabel: string;
-                    if (mobileData.language === "ko") {
-                        title = "마일리지 사용 취소 알림";
-                        shopLabel = "구매처";
-                        amountLabel = "구매 금액";
-                        pointLabel = "포인트 사용";
-                    } else {
-                        title = "Loyalty cancellation notification";
-                        shopLabel = "Place of purchase";
-                        amountLabel = "Amount";
-                        pointLabel = "Points used";
-                    }
-                    const to = mobileData.token;
-                    const contents: string[] = [];
-                    const data = {
-                        type: "cancel",
-                        paymentId: item.paymentId,
-                        timestamp: item.openCancelTimestamp,
-                        timeout: 30,
-                    };
-                    contents.push(`${shopLabel} : ${shopInfo.name}`);
-                    contents.push(
-                        `${amountLabel} : ${new Amount(item.amount, 18).toDisplayString(
-                            true,
-                            0
-                        )} ${item.currency.toUpperCase()}`
-                    );
-                    contents.push(`${pointLabel} : ${new Amount(item.paidPoint, 18).toDisplayString(true, 0)} POINT`);
-
-                    logger.info(`Notification - to: ${to}, title: ${title}`);
-                    await this._sender.send(to, title, contents.join(", "), data);
-                }
-
+            if (hasDelegator) {
                 this.metrics.add("success", 1);
                 return res.status(200).json(
                     this.makeResponseData(0, {
@@ -1184,12 +1350,389 @@ export class PaymentRouter {
                     })
                 );
             }
+
+            const mobileData = await this.storage.getMobile(shopInfo.account, MobileType.SHOP_APP);
+
+            if (!this.config.relay.testMode && mobileData === undefined) {
+                return res.status(200).json(ResponseMessage.getErrorMessage("2005"));
+            }
+
+            if (mobileData !== undefined) {
+                /// 상점주에게 메세지 발송
+                // tslint:disable-next-line:one-variable-per-declaration
+                let title, shopLabel, amountLabel, pointLabel: string;
+                if (mobileData.language === "ko") {
+                    title = "마일리지 사용 취소 알림";
+                    shopLabel = "구매처";
+                    amountLabel = "구매 금액";
+                    pointLabel = "포인트 사용";
+                } else {
+                    title = "Loyalty cancellation notification";
+                    shopLabel = "Place of purchase";
+                    amountLabel = "Amount";
+                    pointLabel = "Points used";
+                }
+                const to = mobileData.token;
+                const contents: string[] = [];
+                const data = {
+                    type: "cancel",
+                    paymentId: item.paymentId,
+                    timestamp: item.openCancelTimestamp,
+                    timeout: 30,
+                };
+                contents.push(`${shopLabel} : ${shopInfo.name}`);
+                contents.push(
+                    `${amountLabel} : ${new Amount(item.amount, 18).toDisplayString(
+                        true,
+                        0
+                    )} ${item.currency.toUpperCase()}`
+                );
+                contents.push(`${pointLabel} : ${new Amount(item.paidPoint, 18).toDisplayString(true, 0)} POINT`);
+
+                logger.info(`Notification - to: ${to}, title: ${title}`);
+                await this._sender.send(to, title, contents.join(", "), data);
+            }
+
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    paymentId: item.paymentId,
+                    purchaseId: item.purchaseId,
+                    amount: item.amount.toString(),
+                    currency: item.currency,
+                    shopId: item.shopId,
+                    account: item.account,
+                    paidPoint: item.paidPoint.toString(),
+                    paidValue: item.paidValue.toString(),
+                    feePoint: item.feePoint.toString(),
+                    feeValue: item.feeValue.toString(),
+                    totalPoint: item.totalPoint.toString(),
+                    totalValue: item.totalValue.toString(),
+                    terminalId: item.terminalId,
+                    paymentStatus: item.paymentStatus,
+                    openNewTimestamp: item.openNewTimestamp,
+                    closeNewTimestamp: item.closeNewTimestamp,
+                    openCancelTimestamp: item.openCancelTimestamp,
+                    closeCancelTimestamp: item.closeCancelTimestamp,
+                })
+            );
+        }
+    }
+
+    /**
+     * 결제 / 취소결제를 시작한다.
+     * POST /v1/payment/cancel/open
+     * @private
+     */
+    private async payment_cancel_open_v1(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/cancel/open ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            let accessKey = req.get("Authorization");
+            if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
+            if (accessKey !== this.config.relay.accessKey) {
+                return res.json(ResponseMessage.getErrorMessage("2002"));
+            }
+
+            const paymentId: string = String(req.body.paymentId).trim();
+            const terminalId: string = req.body.terminalId !== undefined ? String(req.body.terminalId).trim() : "";
+            await this.payment_cancel_open_internal(req, res, paymentId, terminalId);
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
             logger.error(`POST /v1/payment/cancel/open : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(msg);
         }
+    }
+
+    /**
+     * 결제 / 취소결제를 시작한다.
+     * POST /v2/payment/cancel/open
+     * @private
+     */
+    private async payment_cancel_open_v2(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/cancel/open ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const paymentId: string = String(req.body.paymentId).trim();
+            const terminalId: string = String(req.body.terminalId).trim();
+            const signature: string = String(req.body.signature).trim();
+
+            const message = ContractUtils.getOpenCancelPaymentMessage(paymentId, terminalId);
+            const signer = ContractUtils.getAddressOfSigner(message, signature);
+
+            if (!this.config.relay.isPaymentSigner(signer)) {
+                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+            }
+            logger.http(`POST /v2/payment/cancel/open signer: ${signer}`);
+
+            await this.payment_cancel_open_internal(req, res, paymentId, terminalId);
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/payment/cancel/open : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        }
+    }
+
+    private async payment_cancel_close_internal(
+        req: express.Request,
+        res: express.Response,
+        paymentId: string,
+        confirm: boolean
+    ) {
+        const item = await this.storage.getPayment(paymentId);
+        if (item === undefined) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
+        } else {
+            const signerItem = await this.getRelaySigner();
+            try {
+                const contract = this.contractManager.sideLoyaltyConsumerContract;
+                const loyaltyPaymentData = await contract.loyaltyPaymentOf(paymentId);
+                if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_PAYMENT) {
+                    if (item.paymentStatus === LoyaltyPaymentTaskStatus.DENIED_CANCEL) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                        await this.storage.updateCloseCancelTimestamp(
+                            item.paymentId,
+                            item.paymentStatus,
+                            item.closeCancelTimestamp
+                        );
+
+                        this.metrics.add("success", 1);
+                        res.status(200).json(
+                            this.makeResponseData(0, {
+                                paymentId: item.paymentId,
+                                purchaseId: item.purchaseId,
+                                amount: item.amount.toString(),
+                                currency: item.currency,
+                                shopId: item.shopId,
+                                account: item.account,
+                                paidPoint: item.paidPoint.toString(),
+                                paidValue: item.paidValue.toString(),
+                                feePoint: item.feePoint.toString(),
+                                feeValue: item.feeValue.toString(),
+                                totalPoint: item.totalPoint.toString(),
+                                totalValue: item.totalValue.toString(),
+                                terminalId: item.terminalId,
+                                paymentStatus: item.paymentStatus,
+                                openNewTimestamp: item.openNewTimestamp,
+                                closeNewTimestamp: item.closeNewTimestamp,
+                                openCancelTimestamp: item.openCancelTimestamp,
+                                closeCancelTimestamp: item.closeCancelTimestamp,
+                            })
+                        );
+                    } else if (
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.OPENED_CANCEL ||
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_FAILED_TX ||
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_SENT_TX ||
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_CONFIRMED_TX ||
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_REVERTED_TX
+                    ) {
+                        const timeout = this.config.relay.paymentTimeoutSecond - 5;
+                        if (ContractUtils.getTimeStamp() - item.openCancelTimestamp > timeout) {
+                            item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                            item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                            await this.storage.updateCloseCancelTimestamp(
+                                item.paymentId,
+                                item.paymentStatus,
+                                item.closeCancelTimestamp
+                            );
+                            this.metrics.add("success", 1);
+                            return res.status(200).json(
+                                this.makeResponseData(0, {
+                                    paymentId: item.paymentId,
+                                    purchaseId: item.purchaseId,
+                                    amount: item.amount.toString(),
+                                    currency: item.currency,
+                                    shopId: item.shopId,
+                                    account: item.account,
+                                    paidPoint: item.paidPoint.toString(),
+                                    paidValue: item.paidValue.toString(),
+                                    feePoint: item.feePoint.toString(),
+                                    feeValue: item.feeValue.toString(),
+                                    totalPoint: item.totalPoint.toString(),
+                                    totalValue: item.totalValue.toString(),
+                                    terminalId: item.terminalId,
+                                    paymentStatus: item.paymentStatus,
+                                    openNewTimestamp: item.openNewTimestamp,
+                                    closeNewTimestamp: item.closeNewTimestamp,
+                                    openCancelTimestamp: item.openCancelTimestamp,
+                                    closeCancelTimestamp: item.closeCancelTimestamp,
+                                })
+                            );
+                        } else {
+                            return res.status(200).json(ResponseMessage.getErrorMessage("2030"));
+                        }
+                    } else if (
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.CLOSED_CANCEL ||
+                        item.paymentStatus === LoyaltyPaymentTaskStatus.FAILED_CANCEL
+                    ) {
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                        await this.storage.updateCloseCancelTimestamp(
+                            item.paymentId,
+                            item.paymentStatus,
+                            item.closeCancelTimestamp
+                        );
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2029"));
+                    } else {
+                        return res.status(200).json(ResponseMessage.getErrorMessage("2024"));
+                    }
+                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.OPENED_CANCEL) {
+                    try {
+                        const tx = await contract
+                            .connect(signerItem.signer)
+                            .closeCancelLoyaltyPayment(item.paymentId, item.secret, confirm);
+
+                        const event = await this.waitPaymentLoyalty(contract, tx);
+                        if (event !== undefined) {
+                            item.paymentStatus = confirm
+                                ? LoyaltyPaymentTaskStatus.CLOSED_CANCEL
+                                : LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                            item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                            this.updateEvent(event, item);
+                            await this.storage.updatePayment(item);
+
+                            this.metrics.add("success", 1);
+                            return res.status(200).json(
+                                this.makeResponseData(0, {
+                                    paymentId: item.paymentId,
+                                    purchaseId: item.purchaseId,
+                                    amount: item.amount.toString(),
+                                    currency: item.currency,
+                                    shopId: item.shopId,
+                                    account: item.account,
+                                    paidPoint: item.paidPoint.toString(),
+                                    paidValue: item.paidValue.toString(),
+                                    feePoint: item.feePoint.toString(),
+                                    feeValue: item.feeValue.toString(),
+                                    totalPoint: item.totalPoint.toString(),
+                                    totalValue: item.totalValue.toString(),
+                                    terminalId: item.terminalId,
+                                    paymentStatus: item.paymentStatus,
+                                    openNewTimestamp: item.openNewTimestamp,
+                                    closeNewTimestamp: item.closeNewTimestamp,
+                                    openCancelTimestamp: item.openCancelTimestamp,
+                                    closeCancelTimestamp: item.closeCancelTimestamp,
+                                })
+                            );
+                        } else {
+                            res.status(200).json(ResponseMessage.getErrorMessage("5000"));
+                        }
+                    } catch (error) {
+                        const msg = ResponseMessage.getEVMErrorMessage(error);
+                        logger.error(`POST /v1/payment/cancel/close : ${msg.error.message}`);
+                        return res.status(200).json(msg);
+                    }
+                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_CANCEL) {
+                    item.paymentStatus = LoyaltyPaymentTaskStatus.CLOSED_CANCEL;
+                    item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                    await this.storage.updateCloseCancelTimestamp(
+                        item.paymentId,
+                        item.paymentStatus,
+                        item.closeCancelTimestamp
+                    );
+                    return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
+                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.FAILED_PAYMENT) {
+                    item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                    item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                    await this.storage.updateCloseCancelTimestamp(
+                        item.paymentId,
+                        item.paymentStatus,
+                        item.closeCancelTimestamp
+                    );
+                    return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
+                } else {
+                    logger.warn(
+                        `POST /v1/payment/cancel/close : contractStatus : ${loyaltyPaymentData.status} : ${item.contractStatus}`
+                    );
+                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
+                        item.contractStatus = ContractLoyaltyPaymentStatus.FAILED_CANCEL;
+                        await this.storage.updatePaymentContractStatus(item.paymentId, item.contractStatus);
+
+                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
+                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
+                        await this.storage.updateCloseCancelTimestamp(
+                            item.paymentId,
+                            item.paymentStatus,
+                            item.closeCancelTimestamp
+                        );
+                    }
+                    return res.status(200).json(ResponseMessage.getErrorMessage("2024"));
+                }
+            } catch (error: any) {
+                const msg = ResponseMessage.getEVMErrorMessage(error);
+                logger.error(`POST /v1/payment/cancel/close : ${msg.error.message}`);
+                this.metrics.add("failure", 1);
+                return res.status(200).json(msg);
+            } finally {
+                this.releaseRelaySigner(signerItem);
+            }
+        }
+    }
+
+    /**
+     * 결제 / 취소결제를 종료한다.
+     * POST /v1/payment/cancel/close
+     * @private
+     */
+    private async payment_cancel_close_v1(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/cancel/close ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        let accessKey = req.get("Authorization");
+        if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
+        if (accessKey !== this.config.relay.accessKey) {
+            return res.json(ResponseMessage.getErrorMessage("2002"));
+        }
+
+        const paymentId: string = String(req.body.paymentId).trim();
+        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
+
+        await this.payment_cancel_close_internal(req, res, paymentId, confirm);
+    }
+
+    /**
+     * 결제 / 취소결제를 종료한다.
+     * POST /v2/payment/cancel/close
+     * @private
+     */
+    private async payment_cancel_close_v2(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/payment/cancel/close ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const paymentId: string = String(req.body.paymentId).trim();
+        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
+        const signature: string = String(req.body.signature).trim();
+
+        const message = ContractUtils.getCloseCancelPaymentMessage(paymentId, confirm);
+        const signer = ContractUtils.getAddressOfSigner(message, signature);
+
+        if (!this.config.relay.isPaymentSigner(signer)) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+        }
+        logger.http(`POST /v2/payment/cancel/close signer: ${signer}`);
+
+        await this.payment_cancel_close_internal(req, res, paymentId, confirm);
     }
 
     /**
@@ -1374,218 +1917,6 @@ export class PaymentRouter {
             } catch (error: any) {
                 const msg = ResponseMessage.getEVMErrorMessage(error);
                 logger.error(`POST /v1/payment/cancel/approval : ${msg.error.message}`);
-                this.metrics.add("failure", 1);
-                return res.status(200).json(msg);
-            } finally {
-                this.releaseRelaySigner(signerItem);
-            }
-        }
-    }
-
-    /**
-     * 결제 / 결제정보를 제공한다
-     * POST /v1/payment/cancel/close
-     * @private
-     */
-    private async payment_cancel_close(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/payment/cancel/close ${req.ip}:${JSON.stringify(req.body)}`);
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
-        }
-
-        let accessKey = req.get("Authorization");
-        if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
-        if (accessKey !== this.config.relay.accessKey) {
-            return res.json(ResponseMessage.getErrorMessage("2002"));
-        }
-
-        const confirm: boolean = String(req.body.confirm).trim().toLowerCase() === "true";
-        const paymentId: string = String(req.body.paymentId).trim();
-        const item = await this.storage.getPayment(paymentId);
-        if (item === undefined) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2003"));
-        } else {
-            const signerItem = await this.getRelaySigner();
-            try {
-                const contract = this.contractManager.sideLoyaltyConsumerContract;
-                const loyaltyPaymentData = await contract.loyaltyPaymentOf(paymentId);
-                if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_PAYMENT) {
-                    if (item.paymentStatus === LoyaltyPaymentTaskStatus.DENIED_CANCEL) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                        await this.storage.updateCloseCancelTimestamp(
-                            item.paymentId,
-                            item.paymentStatus,
-                            item.closeCancelTimestamp
-                        );
-
-                        this.metrics.add("success", 1);
-                        res.status(200).json(
-                            this.makeResponseData(0, {
-                                paymentId: item.paymentId,
-                                purchaseId: item.purchaseId,
-                                amount: item.amount.toString(),
-                                currency: item.currency,
-                                shopId: item.shopId,
-                                account: item.account,
-                                paidPoint: item.paidPoint.toString(),
-                                paidValue: item.paidValue.toString(),
-                                feePoint: item.feePoint.toString(),
-                                feeValue: item.feeValue.toString(),
-                                totalPoint: item.totalPoint.toString(),
-                                totalValue: item.totalValue.toString(),
-                                terminalId: item.terminalId,
-                                paymentStatus: item.paymentStatus,
-                                openNewTimestamp: item.openNewTimestamp,
-                                closeNewTimestamp: item.closeNewTimestamp,
-                                openCancelTimestamp: item.openCancelTimestamp,
-                                closeCancelTimestamp: item.closeCancelTimestamp,
-                            })
-                        );
-                    } else if (
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.OPENED_CANCEL ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_FAILED_TX ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_SENT_TX ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_CONFIRMED_TX ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.APPROVED_CANCEL_REVERTED_TX
-                    ) {
-                        const timeout = this.config.relay.paymentTimeoutSecond - 5;
-                        if (ContractUtils.getTimeStamp() - item.openCancelTimestamp > timeout) {
-                            item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                            item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                            await this.storage.updateCloseCancelTimestamp(
-                                item.paymentId,
-                                item.paymentStatus,
-                                item.closeCancelTimestamp
-                            );
-                            this.metrics.add("success", 1);
-                            return res.status(200).json(
-                                this.makeResponseData(0, {
-                                    paymentId: item.paymentId,
-                                    purchaseId: item.purchaseId,
-                                    amount: item.amount.toString(),
-                                    currency: item.currency,
-                                    shopId: item.shopId,
-                                    account: item.account,
-                                    paidPoint: item.paidPoint.toString(),
-                                    paidValue: item.paidValue.toString(),
-                                    feePoint: item.feePoint.toString(),
-                                    feeValue: item.feeValue.toString(),
-                                    totalPoint: item.totalPoint.toString(),
-                                    totalValue: item.totalValue.toString(),
-                                    terminalId: item.terminalId,
-                                    paymentStatus: item.paymentStatus,
-                                    openNewTimestamp: item.openNewTimestamp,
-                                    closeNewTimestamp: item.closeNewTimestamp,
-                                    openCancelTimestamp: item.openCancelTimestamp,
-                                    closeCancelTimestamp: item.closeCancelTimestamp,
-                                })
-                            );
-                        } else {
-                            return res.status(200).json(ResponseMessage.getErrorMessage("2030"));
-                        }
-                    } else if (
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.CLOSED_CANCEL ||
-                        item.paymentStatus === LoyaltyPaymentTaskStatus.FAILED_CANCEL
-                    ) {
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                        await this.storage.updateCloseCancelTimestamp(
-                            item.paymentId,
-                            item.paymentStatus,
-                            item.closeCancelTimestamp
-                        );
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2029"));
-                    } else {
-                        return res.status(200).json(ResponseMessage.getErrorMessage("2024"));
-                    }
-                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.OPENED_CANCEL) {
-                    try {
-                        const tx = await contract
-                            .connect(signerItem.signer)
-                            .closeCancelLoyaltyPayment(item.paymentId, item.secret, confirm);
-
-                        const event = await this.waitPaymentLoyalty(contract, tx);
-                        if (event !== undefined) {
-                            item.paymentStatus = confirm
-                                ? LoyaltyPaymentTaskStatus.CLOSED_CANCEL
-                                : LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                            item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                            this.updateEvent(event, item);
-                            await this.storage.updatePayment(item);
-
-                            this.metrics.add("success", 1);
-                            return res.status(200).json(
-                                this.makeResponseData(0, {
-                                    paymentId: item.paymentId,
-                                    purchaseId: item.purchaseId,
-                                    amount: item.amount.toString(),
-                                    currency: item.currency,
-                                    shopId: item.shopId,
-                                    account: item.account,
-                                    paidPoint: item.paidPoint.toString(),
-                                    paidValue: item.paidValue.toString(),
-                                    feePoint: item.feePoint.toString(),
-                                    feeValue: item.feeValue.toString(),
-                                    totalPoint: item.totalPoint.toString(),
-                                    totalValue: item.totalValue.toString(),
-                                    terminalId: item.terminalId,
-                                    paymentStatus: item.paymentStatus,
-                                    openNewTimestamp: item.openNewTimestamp,
-                                    closeNewTimestamp: item.closeNewTimestamp,
-                                    openCancelTimestamp: item.openCancelTimestamp,
-                                    closeCancelTimestamp: item.closeCancelTimestamp,
-                                })
-                            );
-                        } else {
-                            res.status(200).json(ResponseMessage.getErrorMessage("5000"));
-                        }
-                    } catch (error) {
-                        const msg = ResponseMessage.getEVMErrorMessage(error);
-                        logger.error(`POST /v1/payment/cancel/close : ${msg.error.message}`);
-                        return res.status(200).json(msg);
-                    }
-                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.CLOSED_CANCEL) {
-                    item.paymentStatus = LoyaltyPaymentTaskStatus.CLOSED_CANCEL;
-                    item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                    await this.storage.updateCloseCancelTimestamp(
-                        item.paymentId,
-                        item.paymentStatus,
-                        item.closeCancelTimestamp
-                    );
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
-                } else if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.FAILED_PAYMENT) {
-                    item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                    item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                    await this.storage.updateCloseCancelTimestamp(
-                        item.paymentId,
-                        item.paymentStatus,
-                        item.closeCancelTimestamp
-                    );
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2026"));
-                } else {
-                    logger.warn(
-                        `POST /v1/payment/cancel/close : contractStatus : ${loyaltyPaymentData.status} : ${item.contractStatus}`
-                    );
-                    if (loyaltyPaymentData.status === ContractLoyaltyPaymentStatus.INVALID) {
-                        item.contractStatus = ContractLoyaltyPaymentStatus.FAILED_CANCEL;
-                        await this.storage.updatePaymentContractStatus(item.paymentId, item.contractStatus);
-
-                        item.paymentStatus = LoyaltyPaymentTaskStatus.FAILED_CANCEL;
-                        item.closeCancelTimestamp = ContractUtils.getTimeStamp();
-                        await this.storage.updateCloseCancelTimestamp(
-                            item.paymentId,
-                            item.paymentStatus,
-                            item.closeCancelTimestamp
-                        );
-                    }
-                    return res.status(200).json(ResponseMessage.getErrorMessage("2024"));
-                }
-            } catch (error: any) {
-                const msg = ResponseMessage.getEVMErrorMessage(error);
-                logger.error(`POST /v1/payment/cancel/close : ${msg.error.message}`);
                 this.metrics.add("failure", 1);
                 return res.status(200).json(msg);
             } finally {

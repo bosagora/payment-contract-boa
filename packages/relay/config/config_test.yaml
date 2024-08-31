@@ -97,6 +97,8 @@ relay:
   bridgeActiveStatus: true
   allowedShopIdPrefix: "0x0001"
   initialBalanceOfProvider: 50000
+  paymentSigners:
+    - "0xBd8a48B11a576150E8772D6E9B658c60317CAdbc"
 
 contracts:
   sideChain:
