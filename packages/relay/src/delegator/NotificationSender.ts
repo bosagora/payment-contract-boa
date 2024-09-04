@@ -42,7 +42,7 @@ export class NotificationSender implements INotificationSender {
             body,
             data,
         });
-        const expo = new Expo({ accessToken: this.config.relay.expoAccessToken });
+        const expo = new Expo({ accessToken: this.config.relay.expoAccessToken, useFcmV1: true });
         const chunks = expo.chunkPushNotifications(messages);
         const tickets = [];
         for (const chunk of chunks) {
