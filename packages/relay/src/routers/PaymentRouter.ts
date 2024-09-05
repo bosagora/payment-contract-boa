@@ -680,6 +680,7 @@ export class PaymentRouter {
                 totalPoint: item.totalPoint.toString(),
                 totalValue: item.totalValue.toString(),
                 paymentStatus: item.paymentStatus,
+                terminalId: item.terminalId,
                 openNewTimestamp: item.openNewTimestamp,
                 closeNewTimestamp: item.closeNewTimestamp,
                 openCancelTimestamp: item.openCancelTimestamp,
@@ -1164,6 +1165,7 @@ export class PaymentRouter {
                                     currency: item.currency,
                                     shopId: item.shopId,
                                     account: item.account,
+                                    terminalId: item.terminalId,
                                     paymentStatus: item.paymentStatus,
                                     txHash: tx.hash,
                                 })
