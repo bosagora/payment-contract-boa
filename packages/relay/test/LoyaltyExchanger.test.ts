@@ -18,13 +18,11 @@ import { solidity } from "ethereum-waffle";
 
 import fs from "fs";
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
 
 import { Wallet } from "ethers";
 import { ethers } from "hardhat";
-
-// tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
 
 chai.use(solidity);
 

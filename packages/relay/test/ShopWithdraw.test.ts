@@ -21,7 +21,6 @@ import path from "path";
 import URI from "urijs";
 import { URL } from "url";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 
 chai.use(solidity);

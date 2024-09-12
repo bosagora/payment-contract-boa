@@ -14,10 +14,8 @@ import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
-
-// tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
 
 chai.use(solidity);
 

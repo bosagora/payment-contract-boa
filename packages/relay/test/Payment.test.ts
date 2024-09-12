@@ -11,17 +11,7 @@ import { GraphStorage } from "../src/storage/GraphStorage";
 import { RelayStorage } from "../src/storage/RelayStorage";
 import { LoyaltyPaymentTaskStatus } from "../src/types";
 import { ContractUtils, LoyaltyNetworkID } from "../src/utils/ContractUtils";
-import {
-    BIP20DelegatedTransfer,
-    CurrencyRate,
-    Ledger,
-    LoyaltyConsumer,
-    LoyaltyExchanger,
-    LoyaltyProvider,
-    PhoneLinkCollection,
-    Shop,
-    Validator,
-} from "../typechain-types";
+import { Ledger, LoyaltyProvider, Shop } from "../typechain-types";
 import { Deployments } from "./helper/Deployments";
 import { FakerCallbackServer } from "./helper/FakerCallbackServer";
 import { getPurchaseId, TestClient, TestServer } from "./helper/Utility";
@@ -30,15 +20,13 @@ import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 
 import * as assert from "assert";
-import { BigNumber, Wallet } from "ethers";
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-
-// tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
+import { Wallet } from "@ethersproject/wallet";
 
 chai.use(solidity);
 

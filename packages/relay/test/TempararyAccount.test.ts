@@ -19,15 +19,13 @@ import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
 
 import * as assert from "assert";
-import { BigNumber, Wallet } from "ethers";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
-// tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
+import { Wallet } from "@ethersproject/wallet";
 
 chai.use(solidity);
 

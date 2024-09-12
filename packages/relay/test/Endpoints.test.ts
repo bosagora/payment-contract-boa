@@ -3,6 +3,7 @@ import "@nomiclabs/hardhat-waffle";
 
 import { Amount } from "../src/common/Amount";
 import { Config } from "../src/common/Config";
+import { ContractManager } from "../src/contract/ContractManager";
 import { GraphStorage } from "../src/storage/GraphStorage";
 import { RelayStorage } from "../src/storage/RelayStorage";
 import { ContractUtils, LoyaltyNetworkID } from "../src/utils/ContractUtils";
@@ -23,16 +24,14 @@ import chai, { expect } from "chai";
 import { solidity } from "ethereum-waffle";
 
 import * as path from "path";
+import URI from "urijs";
 import { URL } from "url";
 
 import { Wallet } from "ethers";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
-import { ContractManager } from "../src/contract/ContractManager";
 
 // tslint:disable-next-line:no-var-requires
-const URI = require("urijs");
 
 chai.use(solidity);
 
