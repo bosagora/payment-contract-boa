@@ -51,11 +51,12 @@ export class TaskRouter {
     }
 
     public async registerRoutes() {
-        this.app.get("/v1/tasks/:sequence", [param("sequence").exists()], this.tasks.bind(this));
+        this.app.get("/v1/task/list/:sequence", [param("sequence").exists()], this.task_list.bind(this));
+        this.app.get("/v1/task/sequence/latest", [], this.task_sequence.bind(this));
     }
 
-    private async tasks(req: express.Request, res: express.Response) {
-        logger.http(`GET /v1/tasks/items/:sequence ${req.ip}:${JSON.stringify(req.params)}`);
+    private async task_list(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/task/list/:sequence ${req.ip}:${JSON.stringify(req.params)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -80,7 +81,28 @@ export class TaskRouter {
             }
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`GET /v1/tasks/items/:sequence : ${msg.error.message}`);
+            logger.error(`GET /v1/tasks/list/:sequence : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
+        }
+    }
+
+    private async task_sequence(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/task/sequence/latest ${req.ip}:${JSON.stringify(req.params)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const value = String(req.params.sequence);
+            const sequence = await this.storage.readCallBackLatestSequence();
+            this.metrics.add("success", 1);
+            return res.status(200).json(this.makeResponseData(0, { sequence }));
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`GET /v1/tasks/sequence/latest : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }

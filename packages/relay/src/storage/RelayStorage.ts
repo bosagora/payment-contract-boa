@@ -1136,4 +1136,21 @@ export class RelayStorage extends Storage {
                 });
         });
     }
+
+    public readCallBackLatestSequence(): Promise<bigint> {
+        return new Promise<bigint>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "read_latest_sequence", {})
+                .then((result) => {
+                    if (result.rows.length === 0) {
+                        resolve(BigInt(0));
+                    } else {
+                        resolve(BigInt(result.rows[0].sequence));
+                    }
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
 }
