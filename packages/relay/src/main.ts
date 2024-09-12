@@ -5,6 +5,7 @@ import { DefaultServer } from "./DefaultServer";
 import { ApprovalScheduler } from "./scheduler/ApprovalScheduler";
 import { CloseScheduler } from "./scheduler/CloseScheduler";
 import { DelegatorApprovalScheduler } from "./scheduler/DelegatorApprovalScheduler";
+import { MetricsCertifierScheduler } from "./scheduler/MetricsCertifierScheduler";
 import { MetricsScheduler } from "./scheduler/MetricsScheduler";
 import { Scheduler } from "./scheduler/Scheduler";
 import { StorePurchaseScheduler } from "./scheduler/StorePurchaseScheduler";
@@ -49,13 +50,17 @@ async function main() {
         if (scheduler && scheduler.enable) {
             schedulers.push(new StorePurchaseScheduler(scheduler.expression));
         }
-        scheduler = config.scheduler.getScheduler("delegatorApproval");
+        scheduler = config.scheduler.getScheduler("delegator_approval");
         if (scheduler && scheduler.enable) {
             schedulers.push(new DelegatorApprovalScheduler(scheduler.expression));
         }
         scheduler = config.scheduler.getScheduler("metrics");
         if (scheduler && scheduler.enable) {
             schedulers.push(new MetricsScheduler(scheduler.expression));
+        }
+        scheduler = config.scheduler.getScheduler("metrics_certifier");
+        if (scheduler && scheduler.enable) {
+            schedulers.push(new MetricsCertifierScheduler(scheduler.expression));
         }
     }
 
