@@ -67,7 +67,7 @@ describe("Test of LoyaltyBridge", function () {
             deployments.getContractAddress("MainChainLoyaltyBridge") || "";
         config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-        config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+        config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
         config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
 
         client = new TestClient({

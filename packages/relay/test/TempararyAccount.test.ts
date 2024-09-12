@@ -194,7 +194,7 @@ describe("Test of Server", function () {
                 deployments.getContractAddress("MainChainLoyaltyBridge") || "";
             config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.callbackEndpoint = "http://127.0.0.1:3400/callback";
             config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
 

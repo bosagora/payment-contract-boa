@@ -14,7 +14,7 @@ describe("Test of Config", () => {
         assert.strictEqual(config.server.address, "127.0.0.1");
         assert.strictEqual(config.server.port.toString(), "3000");
         assert.strictEqual(config.logging.level, "debug");
-        assert.deepStrictEqual(config.relay.managerKeys, [
+        assert.deepStrictEqual(config.relay.certifiers, [
             "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
         ]);
         assert.strictEqual(config.contracts.sideChain.tokenAddress, "0x898Bf21a9e1fF51d3F1248E0A253f6A58C3a736a");

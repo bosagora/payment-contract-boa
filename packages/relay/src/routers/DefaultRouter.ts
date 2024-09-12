@@ -59,7 +59,7 @@ export class DefaultRouter {
     private async getMetrics(req: express.Request, res: express.Response) {
         res.set("Content-Type", this.metrics.contentType());
         this.metrics.add("status", 1);
-        for (const elem of this.config.relay.managerKeys) {
+        for (const elem of this.config.relay.certifiers) {
             const wallet = new Wallet(elem, this.contractManager.sideChainProvider);
             const balance = (await wallet.getBalance()).div(BigNumber.from(1_000_000_000)).toNumber();
             this.metrics.gaugeLabels("certifier_balance", { address: wallet.address }, balance);

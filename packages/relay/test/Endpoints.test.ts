@@ -178,7 +178,7 @@ describe("Test of Server", function () {
                 deployments.getContractAddress("MainChainLoyaltyBridge") || "";
             config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
 
             client = new TestClient({
@@ -275,7 +275,7 @@ describe("Test of Server", function () {
             config.contracts.sideChain.loyaltyExchangerAddress = exchangerContract.address;
             config.contracts.sideChain.currencyRateAddress = currencyRateContract.address;
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
         });
 
@@ -468,7 +468,7 @@ describe("Test of Server", function () {
                 deployments.getContractAddress("MainChainLoyaltyBridge") || "";
             config.contracts.mainChain.chainBridgeAddress = deployments.getContractAddress("MainChainBridge") || "";
 
-            config.relay.managerKeys = deployments.accounts.certifiers.map((m) => m.privateKey);
+            config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
         });
 
