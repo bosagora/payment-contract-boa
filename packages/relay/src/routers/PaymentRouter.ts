@@ -650,11 +650,17 @@ export class PaymentRouter {
                 if (ContractUtils.getTimeStamp() - item.openNewTimestamp > this.config.relay.paymentTimeoutSecond) {
                     const data = ResponseMessage.getErrorMessage("7000");
 
-                    await this.sendPaymentResult(
+                    await this.storage.postCallBackOfPayment(
                         TaskResultType.NEW,
                         TaskResultCode.TIMEOUT,
                         data.error.message,
-                        this.getCallBackResponse(item)
+                        item
+                    );
+                    await this.sendTaskResult(
+                        TaskResultType.NEW,
+                        TaskResultCode.TIMEOUT,
+                        data.error.message,
+                        ContractUtils.getCallBackResponseOfPayment(item)
                     );
                     return res.status(200).json(data);
                 }
@@ -725,11 +731,17 @@ export class PaymentRouter {
                         item.paymentStatus = LoyaltyPaymentTaskStatus.DENIED_NEW;
                         await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
 
-                        await this.sendPaymentResult(
+                        await this.storage.postCallBackOfPayment(
                             TaskResultType.NEW,
                             TaskResultCode.DENIED,
                             "Denied by user",
-                            this.getCallBackResponse(item)
+                            item
+                        );
+                        await this.sendTaskResult(
+                            TaskResultType.NEW,
+                            TaskResultCode.DENIED,
+                            "Denied by user",
+                            ContractUtils.getCallBackResponseOfPayment(item)
                         );
 
                         this.metrics.add("success", 1);
@@ -1253,11 +1265,17 @@ export class PaymentRouter {
                 if (ContractUtils.getTimeStamp() - item.openCancelTimestamp > this.config.relay.paymentTimeoutSecond) {
                     const msg = ResponseMessage.getErrorMessage("7000");
 
-                    await this.sendPaymentResult(
+                    await this.storage.postCallBackOfPayment(
                         TaskResultType.CANCEL,
                         TaskResultCode.TIMEOUT,
                         msg.error.message,
-                        this.getCallBackResponse(item)
+                        item
+                    );
+                    await this.sendTaskResult(
+                        TaskResultType.CANCEL,
+                        TaskResultCode.TIMEOUT,
+                        msg.error.message,
+                        ContractUtils.getCallBackResponseOfPayment(item)
                     );
 
                     return res.status(200).json(msg);
@@ -1323,11 +1341,17 @@ export class PaymentRouter {
                         item.paymentStatus = LoyaltyPaymentTaskStatus.DENIED_CANCEL;
                         await this.storage.updatePaymentStatus(item.paymentId, item.paymentStatus);
 
-                        await this.sendPaymentResult(
+                        await this.storage.postCallBackOfPayment(
                             TaskResultType.CANCEL,
                             TaskResultCode.DENIED,
                             "Denied by user",
-                            this.getCallBackResponse(item)
+                            item
+                        );
+                        await this.sendTaskResult(
+                            TaskResultType.CANCEL,
+                            TaskResultCode.DENIED,
+                            "Denied by user",
+                            ContractUtils.getCallBackResponseOfPayment(item)
                         );
 
                         this.metrics.add("success", 1);
@@ -1570,25 +1594,6 @@ export class PaymentRouter {
         }
     }
 
-    private getCallBackResponse(item: LoyaltyPaymentTaskData): any {
-        return {
-            paymentId: item.paymentId,
-            purchaseId: item.purchaseId,
-            amount: item.amount.toString(),
-            currency: item.currency,
-            shopId: item.shopId,
-            account: item.account,
-            paidPoint: item.paidPoint.toString(),
-            paidValue: item.paidValue.toString(),
-            feePoint: item.feePoint.toString(),
-            feeValue: item.feeValue.toString(),
-            totalPoint: item.totalPoint.toString(),
-            totalValue: item.totalValue.toString(),
-            terminalId: item.terminalId,
-            paymentStatus: item.paymentStatus,
-        };
-    }
-
     private updateEvent(event: ContractLoyaltyPaymentEvent, item: LoyaltyPaymentTaskData): void {
         if (item.paymentId !== event.paymentId) return;
         item.purchaseId = event.purchaseId;
@@ -1634,12 +1639,7 @@ export class PaymentRouter {
         } else return undefined;
     }
 
-    private async sendPaymentResult(
-        type: TaskResultType,
-        code: TaskResultCode,
-        message: string,
-        data: PaymentResultData
-    ) {
+    private async sendTaskResult(type: TaskResultType, code: TaskResultCode, message: string, data: PaymentResultData) {
         try {
             const client = new HTTPClient();
             const res = await client.post(this.config.relay.callbackEndpoint, {
@@ -1652,9 +1652,9 @@ export class PaymentRouter {
             logger.info(JSON.stringify(res.data));
         } catch (error) {
             if (error instanceof Error) {
-                logger.error(`sendPaymentResult : ${error.message}`);
+                logger.error(`sendTaskResult : ${error.message}`);
             } else {
-                logger.error(`sendPaymentResult : ${JSON.stringify(error)}`);
+                logger.error(`sendTaskResult : ${JSON.stringify(error)}`);
             }
         }
     }

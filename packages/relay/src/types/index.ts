@@ -336,3 +336,31 @@ export enum ActionInShop {
     USED = 2,
     REFUNDED = 3,
 }
+
+export interface IPaymentTaskCallback {
+    paymentId: string;
+    purchaseId: string;
+    amount: string;
+    currency: string;
+    shopId: string;
+    account: string;
+    paidPoint: string;
+    paidValue: string;
+    feePoint: string;
+    feeValue: string;
+    totalPoint: string;
+    totalValue: string;
+    terminalId: string;
+    paymentStatus: LoyaltyPaymentTaskStatus;
+}
+
+export interface IShopTaskCallback {
+    taskId: string;
+    shopId: string;
+    name: string;
+    currency: string;
+    status: ContractShopStatus;
+    account: string;
+    terminalId: string;
+    taskStatus: ShopTaskStatus;
+}

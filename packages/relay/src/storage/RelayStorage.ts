@@ -17,6 +17,7 @@ import {
     MobileData,
     ShopTaskData,
     ShopTaskStatus,
+    TaskResultCode,
     TaskResultType,
 } from "../types";
 import { ContractUtils } from "../utils/ContractUtils";
@@ -40,6 +41,8 @@ export class RelayStorage extends Storage {
         MybatisMapper.createMapper([path.resolve(Utils.getInitCWD(), "src/storage/mapper/purchase.xml")]);
         MybatisMapper.createMapper([path.resolve(Utils.getInitCWD(), "src/storage/mapper/delegator.xml")]);
         MybatisMapper.createMapper([path.resolve(Utils.getInitCWD(), "src/storage/mapper/temporary_accounts.xml")]);
+        MybatisMapper.createMapper([path.resolve(Utils.getInitCWD(), "src/storage/mapper/register_provider.xml")]);
+        MybatisMapper.createMapper([path.resolve(Utils.getInitCWD(), "src/storage/mapper/task_callback.xml")]);
         await this.createTables();
     }
 
@@ -1011,6 +1014,121 @@ export class RelayStorage extends Storage {
             })
                 .then(() => {
                     return resolve();
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public postCallBackOfPayment(
+        resultType: TaskResultType,
+        resultCode: TaskResultCode,
+        resultMessage: string,
+        data: LoyaltyPaymentTaskData
+    ): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "post", {
+                type: resultType,
+                code: resultCode,
+                message: resultMessage,
+                contents: JSON.stringify(ContractUtils.getCallBackResponseOfPayment(data)),
+            })
+                .then(() => {
+                    return resolve();
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public postCallBackOfShop(
+        resultType: TaskResultType,
+        resultCode: TaskResultCode,
+        resultMessage: string,
+        data: ShopTaskData
+    ): Promise<void> {
+        return new Promise<void>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "post", {
+                type: resultType,
+                code: resultCode,
+                message: resultMessage,
+                contents: JSON.stringify(ContractUtils.getCallBackResponseOfTask(data)),
+            })
+                .then(() => {
+                    return resolve();
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public readCallBack(sequence: bigint): Promise<any[]> {
+        return new Promise<any[]>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "read", { sequence: sequence.toString() })
+                .then((result) => {
+                    resolve(
+                        result.rows.map((m) => {
+                            return {
+                                sequence: m.sequence,
+                                type: m.type,
+                                code: m.code,
+                                message: m.message,
+                                data: JSON.parse(m.contents.replace(/[\\]/gi, "")),
+                            };
+                        })
+                    );
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public readCallBackDefault(): Promise<any[]> {
+        return new Promise<any[]>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "read_default", {})
+                .then((result) => {
+                    resolve(
+                        result.rows.map((m) => {
+                            return {
+                                sequence: m.sequence,
+                                type: m.type,
+                                code: m.code,
+                                message: m.message,
+                                data: JSON.parse(m.contents.replace(/[\\]/gi, "")),
+                            };
+                        })
+                    );
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public readCallBackLatest(): Promise<any[]> {
+        return new Promise<any[]>(async (resolve, reject) => {
+            this.queryForMapper("task_callback", "read_latest", {})
+                .then((result) => {
+                    resolve(
+                        result.rows.map((m) => {
+                            return {
+                                sequence: m.sequence,
+                                type: m.type,
+                                code: m.code,
+                                message: m.message,
+                                data: JSON.parse(m.contents.replace(/[\\]/gi, "")),
+                            };
+                        })
+                    );
                 })
                 .catch((reason) => {
                     if (reason instanceof Error) return reject(reason);
