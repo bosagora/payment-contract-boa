@@ -65,10 +65,13 @@ scheduler:
     - name: purchase
       enable: true
       expression: "*/1 * * * * *"
-    - name: delegatorApproval
+    - name: delegator_approval
       enable: true
       expression: "*/5 * * * * *"
     - name: metrics
+      enable: true
+      expression: "*/5 * * * * *"
+    - name: metrics_certifier
       enable: true
       expression: "*/5 * * * * *"
 
