@@ -199,6 +199,7 @@ export class DatabaseConfig implements IDatabaseConfig {
 
 export class RelayConfig implements IRelayConfig {
     public certifiers: string[];
+    public paymentSigners: string[];
     public accessKey: string;
     public callbackAccessKey: string;
     public callbackEndpoint: string;
@@ -217,6 +218,7 @@ export class RelayConfig implements IRelayConfig {
         const defaults = RelayConfig.defaultValue();
 
         this.certifiers = defaults.certifiers;
+        this.paymentSigners = defaults.paymentSigners;
         this.accessKey = defaults.accessKey;
         this.callbackAccessKey = defaults.callbackAccessKey;
         this.callbackEndpoint = defaults.callbackEndpoint;
@@ -241,6 +243,7 @@ export class RelayConfig implements IRelayConfig {
                 process.env.CERTIFIER04 || "",
                 process.env.CERTIFIER01 || "",
             ],
+            paymentSigners: [],
             accessKey: process.env.ACCESS_SECRET || "",
             callbackAccessKey: process.env.CALLBACK_ACCESS_KEY || "",
             callbackEndpoint: process.env.CALLBACK_ENDPOINT || "",
@@ -259,6 +262,7 @@ export class RelayConfig implements IRelayConfig {
 
     public readFromObject(config: IRelayConfig) {
         if (config.certifiers !== undefined) this.certifiers = config.certifiers;
+        if (config.paymentSigners !== undefined) this.paymentSigners = config.paymentSigners;
         if (config.accessKey !== undefined) this.accessKey = config.accessKey;
         if (config.callbackAccessKey !== undefined) this.callbackAccessKey = config.callbackAccessKey;
         if (config.callbackEndpoint !== undefined) this.callbackEndpoint = config.callbackEndpoint;
@@ -274,6 +278,11 @@ export class RelayConfig implements IRelayConfig {
         if (config.allowedShopIdPrefix !== undefined) this.allowedShopIdPrefix = config.allowedShopIdPrefix;
         if (config.initialBalanceOfProvider !== undefined)
             this.initialBalanceOfProvider = config.initialBalanceOfProvider;
+    }
+
+    public isPaymentSigner(account: string): boolean {
+        const acc = account.toLowerCase();
+        return this.paymentSigners.find((m) => m.toLowerCase() === acc) !== undefined;
     }
 }
 
@@ -486,6 +495,7 @@ export interface ILoggingConfig {
 
 export interface IRelayConfig {
     certifiers: string[];
+    paymentSigners: string[];
     accessKey: string;
     callbackAccessKey: string;
     callbackEndpoint: string;
