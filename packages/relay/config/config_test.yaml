@@ -94,11 +94,13 @@ relay:
   relayEndpoint: "${RELAY_ENDPOINT}"
   encryptKey: "${RELAY_ENCRYPT_KEY}"
   testMode: ${RELAY_TEST_MODE}
-  bridgeActiveStatus: true
   allowedShopIdPrefix: "0x0001"
   initialBalanceOfProvider: 50000
   paymentSigners:
     - "0xBd8a48B11a576150E8772D6E9B658c60317CAdbc"
+  supportChainBridge: true
+  supportLoyaltyBridge: true
+  supportExchange: true
 
 contracts:
   sideChain:

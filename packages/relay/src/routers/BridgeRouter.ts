@@ -128,7 +128,7 @@ export class BridgeRouter {
     private async bridge_withdraw(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/bridge/withdraw ${req.ip}:${JSON.stringify(req.body)}`);
 
-        if (!this.config.relay.bridgeActiveStatus) {
+        if (!this.config.relay.supportChainBridge) {
             return res.status(200).json(ResponseMessage.getErrorMessage("3001"));
         }
 
@@ -183,7 +183,7 @@ export class BridgeRouter {
     private async bridge_deposit(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/bridge/deposit ${req.ip}:${JSON.stringify(req.body)}`);
 
-        if (!this.config.relay.bridgeActiveStatus) {
+        if (!this.config.relay.supportChainBridge) {
             return res.status(200).json(ResponseMessage.getErrorMessage("3001"));
         }
 
