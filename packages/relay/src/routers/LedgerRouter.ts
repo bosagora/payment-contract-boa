@@ -223,6 +223,10 @@ export class LedgerRouter {
     private async exchangePointToToken(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/ledger/exchangePointToToken ${req.ip}:${JSON.stringify(req.body)}`);
 
+        if (!this.config.relay.supportExchange) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("3003"));
+        }
+
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
@@ -619,8 +623,8 @@ export class LedgerRouter {
     private async ledger_withdraw_via_bridge(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/ledger/withdraw_via_bridge ${req.ip}:${JSON.stringify(req.body)}`);
 
-        if (!this.config.relay.bridgeActiveStatus) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("3001"));
+        if (!this.config.relay.supportLoyaltyBridge) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("3002"));
         }
 
         const errors = validationResult(req);
@@ -674,8 +678,8 @@ export class LedgerRouter {
     private async ledger_deposit_via_bridge(req: express.Request, res: express.Response) {
         logger.http(`POST /v1/ledger/deposit_via_bridge ${req.ip}:${JSON.stringify(req.body)}`);
 
-        if (!this.config.relay.bridgeActiveStatus) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("3001"));
+        if (!this.config.relay.supportLoyaltyBridge) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("3002"));
         }
 
         const errors = validationResult(req);

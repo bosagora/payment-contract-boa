@@ -463,7 +463,7 @@ export class TokenRouter {
             const tokenSymbol = await this.contractManager.sideTokenContract.symbol();
             const precision = tokenSymbol === "ACC" ? 2 : 0;
             const equivalentCurrency = tokenSymbol === "ACC" ? "PHP" : "KRW";
-            const language = tokenSymbol === "ACC" ? "en" : "kr";
+            const language = tokenSymbol === "ACC" ? "en" : "ko";
             this.metrics.add("success", 1);
             return res.status(200).json(
                 this.makeResponseData(0, {
@@ -475,6 +475,11 @@ export class TokenRouter {
                         equivalentCurrency,
                     },
                     language,
+                    support: {
+                        chainBridge: this.config.relay.supportChainBridge,
+                        loyaltyBridge: this.config.relay.supportLoyaltyBridge,
+                        exchange: this.config.relay.supportExchange,
+                    },
                 })
             );
         } catch (error: any) {

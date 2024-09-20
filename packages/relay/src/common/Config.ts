@@ -210,9 +210,11 @@ export class RelayConfig implements IRelayConfig {
     public relayEndpoint: string;
     public encryptKey: string;
     public testMode: boolean;
-    public bridgeActiveStatus: boolean;
     public allowedShopIdPrefix: string;
     public initialBalanceOfProvider: number;
+    public supportChainBridge: boolean;
+    public supportLoyaltyBridge: boolean;
+    public supportExchange: boolean;
 
     constructor() {
         const defaults = RelayConfig.defaultValue();
@@ -229,9 +231,11 @@ export class RelayConfig implements IRelayConfig {
         this.relayEndpoint = defaults.relayEndpoint;
         this.encryptKey = defaults.encryptKey;
         this.testMode = defaults.testMode;
-        this.bridgeActiveStatus = defaults.bridgeActiveStatus;
         this.allowedShopIdPrefix = defaults.allowedShopIdPrefix;
         this.initialBalanceOfProvider = defaults.initialBalanceOfProvider;
+        this.supportChainBridge = defaults.supportChainBridge;
+        this.supportLoyaltyBridge = defaults.supportLoyaltyBridge;
+        this.supportExchange = defaults.supportExchange;
     }
 
     public static defaultValue(): IRelayConfig {
@@ -254,9 +258,11 @@ export class RelayConfig implements IRelayConfig {
             relayEndpoint: "",
             encryptKey: "",
             testMode: false,
-            bridgeActiveStatus: true,
             allowedShopIdPrefix: "0x0001",
             initialBalanceOfProvider: 50000,
+            supportChainBridge: true,
+            supportLoyaltyBridge: true,
+            supportExchange: true,
         };
     }
 
@@ -273,11 +279,15 @@ export class RelayConfig implements IRelayConfig {
         if (config.relayEndpoint !== undefined) this.relayEndpoint = config.relayEndpoint;
         if (config.encryptKey !== undefined) this.encryptKey = config.encryptKey;
         if (config.testMode !== undefined) this.testMode = config.testMode.toString().toLowerCase() === "true";
-        if (config.bridgeActiveStatus !== undefined)
-            this.bridgeActiveStatus = config.bridgeActiveStatus.toString().toLowerCase() === "true";
         if (config.allowedShopIdPrefix !== undefined) this.allowedShopIdPrefix = config.allowedShopIdPrefix;
         if (config.initialBalanceOfProvider !== undefined)
             this.initialBalanceOfProvider = config.initialBalanceOfProvider;
+        if (config.supportChainBridge !== undefined)
+            this.supportChainBridge = config.supportChainBridge.toString().toLowerCase() === "true";
+        if (config.supportLoyaltyBridge !== undefined)
+            this.supportLoyaltyBridge = config.supportLoyaltyBridge.toString().toLowerCase() === "true";
+        if (config.supportExchange !== undefined)
+            this.supportExchange = config.supportExchange.toString().toLowerCase() === "true";
     }
 
     public isPaymentSigner(account: string): boolean {
@@ -506,9 +516,11 @@ export interface IRelayConfig {
     relayEndpoint: string;
     encryptKey: string;
     testMode: boolean;
-    bridgeActiveStatus: boolean;
     allowedShopIdPrefix: string;
     initialBalanceOfProvider: number;
+    supportChainBridge: boolean;
+    supportLoyaltyBridge: boolean;
+    supportExchange: boolean;
 }
 
 export interface IContractsConfig {
