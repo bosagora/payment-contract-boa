@@ -6130,6 +6130,14 @@ loyalty-tokens@~2.1.1:
     "@openzeppelin/contracts" "^4.9.5"
     multisig-wallet-contracts "^2.0.0"
 
+loyalty-tokens@~2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/loyalty-tokens/-/loyalty-tokens-2.3.0.tgz#424cee3ae5af57360eb6810be402139a6f6edcec"
+  integrity sha512-Q1QajaAsHPuIAKrjIvKzbpWOlShxXDT7pXTT/ywo974UaLRbl6RswuLEZnLip2ZfsdbI4Lmx7i/1sp6cTgmxnA==
+  dependencies:
+    "@openzeppelin/contracts" "^4.9.5"
+    multisig-wallet-contracts "^2.0.0"
+
 lru-cache@^5.1.1:
   version "5.1.1"
   resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-5.1.1.tgz"
