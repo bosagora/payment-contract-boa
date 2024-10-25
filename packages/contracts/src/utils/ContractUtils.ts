@@ -7,7 +7,7 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 // tslint:disable-next-line:no-implicit-dependencies
 import { arrayify, BytesLike } from "@ethersproject/bytes";
 // tslint:disable-next-line:no-implicit-dependencies
-import { AddressZero } from "@ethersproject/constants";
+import { AddressZero, HashZero } from "@ethersproject/constants";
 // tslint:disable-next-line:no-implicit-dependencies
 import { ContractReceipt, ContractTransaction } from "@ethersproject/contracts";
 // tslint:disable-next-line:no-implicit-dependencies
@@ -705,6 +705,75 @@ export class ContractUtils {
             ]
         );
         return signer.signMessage(arrayify(keccak256(encodedData)));
+    }
+
+    public static getSetSettlementManagerMessage(
+        shopId: BytesLike,
+        managerId: BytesLike,
+        nonce: BigNumberish,
+        chainId?: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            ["SetSettlementManager", shopId, managerId, chainId ? chainId : hre.ethers.provider.network.chainId, nonce]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getRemoveSettlementManagerMessage(
+        shopId: BytesLike,
+        nonce: BigNumberish,
+        chainId?: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            [
+                "RemoveSettlementManager",
+                shopId,
+                HashZero,
+                chainId ? chainId : hre.ethers.provider.network.chainId,
+                nonce,
+            ]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCollectSettlementAmountMessage(
+        managerShopId: BytesLike,
+        clientShopId: BytesLike,
+        nonce: BigNumberish,
+        chainId?: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            [
+                "CollectSettlementAmount",
+                managerShopId,
+                clientShopId,
+                chainId ? chainId : hre.ethers.provider.network.chainId,
+                nonce,
+            ]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCollectSettlementAmountMultiClientMessage(
+        managerShopId: BytesLike,
+        clientShopIds: BytesLike[],
+        nonce: BigNumberish,
+        chainId?: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32[]", "uint256", "uint256"],
+            [
+                "CollectSettlementAmountMultiClient",
+                managerShopId,
+                clientShopIds,
+                chainId ? chainId : hre.ethers.provider.network.chainId,
+                nonce,
+            ]
+        );
+        return arrayify(keccak256(encodedResult));
     }
 
     public static async signMessage(signer: Signer, message: Uint8Array): Promise<string> {

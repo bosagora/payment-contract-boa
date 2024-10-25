@@ -55,6 +55,21 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         uint256 balanceToken
     );
 
+    event SetSettlementManager(bytes32 shopId, bytes32 managerShopId);
+    event RemovedSettlementManager(bytes32 shopId, bytes32 managerShopId);
+    event CollectedSettlementAmount(
+        bytes32 clientId,
+        address clientAccount,
+        string clientCurrency,
+        uint256 clientAmount,
+        uint256 clientTotal,
+        bytes32 managerId,
+        address managerAccount,
+        string managerCurrency,
+        uint256 managerAmount,
+        uint256 managerTotal
+    );
+
     /// @notice 생성자
     function initialize(
         address _currencyRate,
@@ -124,6 +139,7 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
             delegator: address(0x0),
             providedAmount: 0,
             usedAmount: 0,
+            collectedAmount: 0,
             refundedAmount: 0,
             status: ShopStatus.ACTIVE,
             itemIndex: items.length,
@@ -132,6 +148,9 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         items.push(_shopId);
         shops[_shopId] = data;
         shopIdByAddress[_account].push(_shopId);
+
+        ShopSettlementData storage settlementData = settlements[_shopId];
+        settlementData.manager = bytes32(0x0);
 
         nonce[_account]++;
 
@@ -337,7 +356,9 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         bytes32 _shopId
     ) external view override returns (uint256 refundableAmount, uint256 refundableToken) {
         ShopData memory shop = shops[_shopId];
-        uint256 settlementAmount = (shop.usedAmount > shop.providedAmount) ? shop.usedAmount - shop.providedAmount : 0;
+        uint256 settlementAmount = (shop.collectedAmount + shop.usedAmount > shop.providedAmount)
+            ? shop.collectedAmount + shop.usedAmount - shop.providedAmount
+            : 0;
         refundableAmount = (settlementAmount > shop.refundedAmount) ? settlementAmount - shop.refundedAmount : 0;
         refundableToken = currencyRate.convertCurrencyToToken(refundableAmount, shops[_shopId].currency);
     }
@@ -352,9 +373,12 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
         require(shops[_shopId].account == _account, "1050");
         require(_amount % 1 gwei == 0, "1030");
+        require(settlements[_shopId].manager == bytes32(0x0), "1552");
 
         ShopData memory shop = shops[_shopId];
-        uint256 settlementAmount = (shop.usedAmount > shop.providedAmount) ? shop.usedAmount - shop.providedAmount : 0;
+        uint256 settlementAmount = (shop.collectedAmount + shop.usedAmount > shop.providedAmount)
+            ? shop.collectedAmount + shop.usedAmount - shop.providedAmount
+            : 0;
         uint256 refundableAmount = (settlementAmount > shop.refundedAmount)
             ? settlementAmount - shop.refundedAmount
             : 0;
@@ -373,9 +397,207 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         emit Refunded(_shopId, _account, _amount, refundedTotal, currency, amountToken, balanceToken);
     }
 
-    /// @notice nonce를  리턴한다
+    /// @notice nonce 를  리턴한다
     /// @param _account 지갑주소
     function nonceOf(address _account) external view override returns (uint256) {
         return nonce[_account];
+    }
+
+    /// @notice 정산관리자를 지정한다
+    /// @param _managerShopId 정산관리자의 상점아이디
+    /// @param _shopId 클라이언트의 상점아이디
+    /// @param _signature 서명
+    /// @dev 중계서버를 통해서 호출됩니다.
+    function setSettlementManager(bytes32 _shopId, bytes32 _managerShopId, bytes calldata _signature) external {
+        require(_shopId != bytes32(0x0), "1223");
+        require(_managerShopId != bytes32(0x0), "1223");
+        require(_shopId != _managerShopId, "1224");
+        require(shops[_shopId].status != ShopStatus.INVALID, "1201");
+        require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
+        address account = shops[_shopId].account;
+        bytes32 dataHash = keccak256(
+            abi.encode("SetSettlementManager", _shopId, _managerShopId, block.chainid, nonce[account])
+        );
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
+
+        // 정산관리자에 클라이언트를 추가한다.
+        ShopSettlementData storage settlementData = settlements[_managerShopId];
+        if (settlementData.clientValues[_shopId].states == SettlementClientStates.INVALID) {
+            settlementData.clientValues[_shopId] = SettlementClientData({
+                index: settlementData.clients.length,
+                states: SettlementClientStates.ACTIVE
+            });
+            settlementData.clients.push(_shopId);
+        }
+        // 정산클라이언트의 정보에 정산관리자를 설정한다
+        ShopSettlementData storage clientSettlementData = settlements[_shopId];
+        clientSettlementData.manager = _managerShopId;
+
+        nonce[account]++;
+
+        emit SetSettlementManager(_shopId, _managerShopId);
+    }
+
+    /// @notice 정산관리자를 제거한다
+    /// @param _shopId 클라이언트의 상점아이디
+    /// @dev 중계서버를 통해서 호출됩니다.
+    function removeSettlementManager(bytes32 _shopId, bytes calldata _signature) external {
+        require(_shopId != bytes32(0x0), "1223");
+        require(shops[_shopId].status != ShopStatus.INVALID, "1201");
+        address account = shops[_shopId].account;
+        bytes32 dataHash = keccak256(
+            abi.encode("RemoveSettlementManager", _shopId, bytes32(0x0), block.chainid, nonce[account])
+        );
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
+
+        // 정산클라이언트의 정보에 정산관리자를 제거한다
+        ShopSettlementData storage clientSettlementData = settlements[_shopId];
+        bytes32 managerShopId = clientSettlementData.manager;
+        clientSettlementData.manager = bytes32(0x0);
+
+        // 정산관리자에서 클라이언트를 제거한다.
+        if (managerShopId != bytes32(0x0)) {
+            ShopSettlementData storage settlementData = settlements[managerShopId];
+            if (settlementData.clientValues[_shopId].states == SettlementClientStates.ACTIVE) {
+                uint256 idx = settlementData.clientValues[_shopId].index;
+                uint256 last = settlementData.clients.length - 1;
+                settlementData.clients[idx] = settlementData.clients[last];
+                settlementData.clientValues[settlementData.clients[idx]].index = idx;
+                settlementData.clientValues[_shopId].states = SettlementClientStates.INVALID;
+                settlementData.clients.pop();
+            }
+        }
+
+        nonce[account]++;
+
+        emit RemovedSettlementManager(_shopId, managerShopId);
+    }
+
+    /// @notice 정산관리자의 상점아이디를 리턴한다
+    function settlementManagerOf(bytes32 _shopId) external view override returns (bytes32) {
+        return settlements[_shopId].manager;
+    }
+
+    function getSettlementClientLength(bytes32 _managerShopId) external view returns (uint256) {
+        require(_managerShopId != bytes32(0x0), "1223");
+        require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
+        return settlements[_managerShopId].clients.length;
+    }
+
+    function getSettlementClientList(
+        bytes32 _managerShopId,
+        uint256 startIndex,
+        uint256 endIndex
+    ) external view returns (bytes32[] memory) {
+        require(_managerShopId != bytes32(0x0), "1223");
+        require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
+        uint256 length = settlements[_managerShopId].clients.length;
+        uint256 first;
+        uint256 last;
+        if (startIndex <= endIndex) {
+            first = (startIndex <= length - 1) ? startIndex : length;
+            last = (endIndex <= length) ? endIndex : length;
+        } else {
+            first = (endIndex <= length - 1) ? endIndex : length;
+            last = (startIndex <= length) ? startIndex : length;
+        }
+        bytes32[] memory res = new bytes32[](last - first);
+        for (uint256 idx = first; idx < last; idx++) {
+            res[idx - first] = settlements[_managerShopId].clients[idx];
+        }
+        return res;
+    }
+
+    function collectSettlementAmount(
+        bytes32 _managerShopId,
+        bytes32 _clientShopId,
+        bytes calldata _signature
+    ) external {
+        require(_managerShopId != bytes32(0x0), "1223");
+        require(_clientShopId != bytes32(0x0), "1223");
+        require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
+        require(shops[_clientShopId].status != ShopStatus.INVALID, "1201");
+        require(settlements[_clientShopId].manager == _managerShopId, "1553");
+        require(
+            settlements[_managerShopId].clientValues[_clientShopId].states == SettlementClientStates.ACTIVE,
+            "1554"
+        );
+
+        address account = shops[_managerShopId].account;
+        bytes32 dataHash = keccak256(
+            abi.encode("CollectSettlementAmount", _managerShopId, _clientShopId, block.chainid, nonce[account])
+        );
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
+
+        nonce[account]++;
+
+        _collectSettlementAmount(_managerShopId, _clientShopId);
+    }
+
+    function collectSettlementAmountMultiClient(
+        bytes32 _managerShopId,
+        bytes32[] calldata _clientShopIds,
+        bytes calldata _signature
+    ) external {
+        require(_managerShopId != bytes32(0x0), "1223");
+        require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
+
+        address account = shops[_managerShopId].account;
+        bytes32 dataHash = keccak256(
+            abi.encode(
+                "CollectSettlementAmountMultiClient",
+                _managerShopId,
+                _clientShopIds,
+                block.chainid,
+                nonce[account]
+            )
+        );
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
+
+        nonce[account]++;
+
+        for (uint256 idx = 0; idx < _clientShopIds.length; idx++) {
+            bytes32 clientShopId = _clientShopIds[idx];
+            if (shops[clientShopId].status == ShopStatus.INVALID) continue;
+            if (settlements[clientShopId].manager != _managerShopId) continue;
+            if (settlements[_managerShopId].clientValues[clientShopId].states != SettlementClientStates.ACTIVE)
+                continue;
+            _collectSettlementAmount(_managerShopId, clientShopId);
+        }
+    }
+
+    function _collectSettlementAmount(bytes32 _managerShopId, bytes32 _clientShopId) internal {
+        ShopData storage managerShop = shops[_managerShopId];
+        ShopData storage clientShop = shops[_clientShopId];
+
+        uint256 settlementAmount = (clientShop.collectedAmount + clientShop.usedAmount > clientShop.providedAmount)
+            ? clientShop.collectedAmount + clientShop.usedAmount - clientShop.providedAmount
+            : 0;
+        uint256 refundableAmount = (settlementAmount > clientShop.refundedAmount)
+            ? settlementAmount - clientShop.refundedAmount
+            : 0;
+
+        if (refundableAmount > 0) {
+            clientShop.refundedAmount += refundableAmount;
+            uint256 managerAmount = currencyRate.convertCurrency(
+                refundableAmount,
+                clientShop.currency,
+                managerShop.currency
+            );
+            managerShop.collectedAmount += managerAmount;
+
+            emit CollectedSettlementAmount(
+                clientShop.shopId,
+                clientShop.account,
+                clientShop.currency,
+                refundableAmount,
+                clientShop.refundedAmount,
+                managerShop.shopId,
+                managerShop.account,
+                managerShop.currency,
+                managerAmount,
+                managerShop.collectedAmount
+            );
+        }
     }
 }
