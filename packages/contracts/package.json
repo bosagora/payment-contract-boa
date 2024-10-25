@@ -1,6 +1,6 @@
 {
     "name": "acc-contracts-v2",
-    "version": "2.8.0",
+    "version": "2.9.0",
     "description": "Smart contracts that decentralized loyalty systems",
     "files": [
         "**/*.sol"
@@ -71,7 +71,7 @@
         "@openzeppelin/contracts-upgradeable": "^4.9.5",
         "@openzeppelin/hardhat-upgrades": "^1.28.0",
         "acc-bridge-contracts-v2": "~2.5.0",
-        "loyalty-tokens": "~2.3.0",
+        "loyalty-tokens": "~2.1.1",
         "multisig-wallet-contracts": "~2.0.0"
     }
 }

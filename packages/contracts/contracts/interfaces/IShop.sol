@@ -8,6 +8,7 @@ interface IShop {
         ACTIVE,
         INACTIVE
     }
+
     struct ShopData {
         bytes32 shopId; // 상점 아이디
         string name; // 상점 이름
@@ -16,10 +17,27 @@ interface IShop {
         address delegator; // 위임자의 지갑주소
         uint256 providedAmount; // 제공된 결제통화의 총량
         uint256 usedAmount; // 사용된 결제통화의 총량
+        uint256 collectedAmount; // 정산관리자에 의해 수집된 결제통화의 총량
         uint256 refundedAmount; // 정산된 결제통화의 총량
         ShopStatus status;
         uint256 itemIndex;
         uint256 accountIndex;
+    }
+
+    enum SettlementClientStates {
+        INVALID,
+        ACTIVE
+    }
+
+    struct SettlementClientData {
+        uint256 index;
+        SettlementClientStates states;
+    }
+
+    struct ShopSettlementData {
+        bytes32 manager;
+        bytes32[] clients;
+        mapping(bytes32 => SettlementClientData) clientValues;
     }
 
     function setLedger(address _contractAddress) external;
@@ -41,4 +59,6 @@ interface IShop {
     function refundableOf(bytes32 _shopId) external view returns (uint256 refundableAmount, uint256 refundableToken);
 
     function nonceOf(address _account) external view returns (uint256);
+
+    function settlementManagerOf(bytes32 _shopId) external view returns (bytes32);
 }

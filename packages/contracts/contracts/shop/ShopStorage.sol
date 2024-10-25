@@ -10,6 +10,7 @@ import "../interfaces/ILedger.sol";
 contract ShopStorage {
     mapping(bytes32 => IShop.ShopData) internal shops;
     mapping(address => bytes32[]) internal shopIdByAddress;
+    mapping(bytes32 => IShop.ShopSettlementData) internal settlements;
 
     bytes32[] internal items;
 
