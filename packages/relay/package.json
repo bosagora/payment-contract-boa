@@ -59,6 +59,7 @@
     },
     "dependencies": {
         "@ethersproject/bignumber": "^5.7.0",
+        "@ethersproject/bytes": "^5.7.0",
         "@ethersproject/constants": "^5.7.0",
         "@ethersproject/wallet": "^5.7.0",
         "@ethersproject/experimental": "^5.7.0",
@@ -70,7 +71,7 @@
         "@typechain/ethers-v5": "^10.1.0",
         "@typechain/hardhat": "^6.1.2",
         "acc-bridge-contracts-v2": "~2.5.0",
-        "acc-contracts-v2": "~2.8.0",
+        "acc-contracts-v2": "~2.9.0",
         "argparse": "^2.0.1",
         "assert": "^2.0.0",
         "axios": "^1.6.7",
