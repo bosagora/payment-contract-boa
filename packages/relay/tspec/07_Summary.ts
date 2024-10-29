@@ -80,7 +80,7 @@ export type Summary1ApiSpec = Tspec.DefineApiSpec<{
                                  * Technical representatives to provide point
                                  * @example "0x0000000000000000000000000000000000000000"
                                  */
-                                assistant: string;
+                                agent: string;
                             };
                             ledger: {
                                 point: {

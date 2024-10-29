@@ -67,7 +67,7 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     event RegisteredProvider(address provider);
     event UnregisteredProvider(address provider);
 
-    event RegisteredAssistant(address provider, address assistant);
+    event RegisteredProvisioningAgent(address account, address agent);
 
     struct ManagementAddresses {
         address system;
@@ -497,33 +497,33 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         protocolFeeAccount = _account;
     }
 
-    function registerProvider(address _provider) external {
+    function registerProvider(address _account) external {
         require(_msgSender() == owner(), "1050");
-        providers[_provider] = true;
-        emit RegisteredProvider(_provider);
+        providers[_account] = true;
+        emit RegisteredProvider(_account);
     }
 
-    function unregisterProvider(address _provider) external {
+    function unregisterProvider(address _account) external {
         require(_msgSender() == owner(), "1050");
-        providers[_provider] = false;
-        emit UnregisteredProvider(_provider);
-    }
-
-    function registerAssistant(address _provider, address _assistant, bytes calldata _signature) external {
-        require(providers[_provider], "1054");
-        bytes32 dataHash = keccak256(abi.encode(_provider, _assistant, block.chainid, nonce[_provider]));
-        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _provider, "1501");
-        assistants[_provider] = _assistant;
-        nonce[_provider]++;
-
-        emit RegisteredAssistant(_provider, _assistant);
+        providers[_account] = false;
+        emit UnregisteredProvider(_account);
     }
 
     function isProvider(address _account) external view override returns (bool) {
         return providers[_account];
     }
 
-    function assistantOf(address _account) external view override returns (address) {
-        return assistants[_account];
+    function registerProvisioningAgent(address _account, address _agent, bytes calldata _signature) external {
+        require(providers[_account], "1054");
+        bytes32 dataHash = keccak256(abi.encode(_account, _agent, block.chainid, nonce[_account]));
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
+        provisioningAgents[_account] = _agent;
+        nonce[_account]++;
+
+        emit RegisteredProvisioningAgent(_account, _agent);
+    }
+
+    function provisioningAgentOf(address _account) external view override returns (address) {
+        return provisioningAgents[_account];
     }
 }

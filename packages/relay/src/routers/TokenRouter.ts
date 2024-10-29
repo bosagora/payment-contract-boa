@@ -510,7 +510,7 @@ export class TokenRouter {
             }
 
             const isProvider = await this.contractManager.sideLedgerContract.isProvider(account);
-            const assistant = await this.contractManager.sideLedgerContract.assistantOf(account);
+            const agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(account);
 
             const symbol = await this.contractManager.sideTokenContract.symbol();
             const name = await this.contractManager.sideTokenContract.name();
@@ -557,7 +557,7 @@ export class TokenRouter {
                     },
                     provider: {
                         enable: isProvider,
-                        assistant,
+                        agent,
                     },
                     ledger: {
                         point: { balance: pointBalance.toString(), value: pointValue.toString() },

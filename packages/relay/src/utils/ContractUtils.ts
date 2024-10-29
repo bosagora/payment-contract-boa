@@ -775,15 +775,15 @@ export class ContractUtils {
         return arrayify(keccak256(encodedResult));
     }
 
-    public static getRegisterAssistanceMessage(
-        provider: string,
-        assistance: string,
+    public static getRegisterAgentMessage(
+        account: string,
+        agent: string,
         nonce: BigNumberish,
         chainId: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
             ["address", "address", "uint256", "uint256"],
-            [provider, assistance, chainId, nonce]
+            [account, agent, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }

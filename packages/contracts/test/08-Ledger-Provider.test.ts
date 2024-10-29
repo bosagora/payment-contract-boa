@@ -356,9 +356,9 @@ describe("Test for Ledger", () => {
         });
 
         it("Register Assistance", async () => {
-            expect(await ledgerContract.assistantOf(deployments.accounts.users[0].address)).equal(AddressZero);
+            expect(await ledgerContract.provisioningAgentOf(deployments.accounts.users[0].address)).equal(AddressZero);
             const nonce = await ledgerContract.nonceOf(deployments.accounts.users[0].address);
-            const message = ContractUtils.getRegisterAssistanceMessage(
+            const message = ContractUtils.getRegisterAgentMessage(
                 deployments.accounts.users[0].address,
                 deployments.accounts.users[2].address,
                 nonce,
@@ -368,29 +368,29 @@ describe("Test for Ledger", () => {
             await expect(
                 ledgerContract
                     .connect(deployments.accounts.deployer)
-                    .registerAssistant(
+                    .registerProvisioningAgent(
                         deployments.accounts.users[0].address,
                         deployments.accounts.users[2].address,
                         signature
                     )
             )
-                .emit(ledgerContract, "RegisteredAssistant")
+                .emit(ledgerContract, "RegisteredProvisioningAgent")
                 .withNamedArgs({
-                    provider: deployments.accounts.users[0].address,
-                    assistant: deployments.accounts.users[2].address,
+                    account: deployments.accounts.users[0].address,
+                    agent: deployments.accounts.users[2].address,
                 });
 
-            expect(await ledgerContract.assistantOf(deployments.accounts.users[0].address)).equal(
+            expect(await ledgerContract.provisioningAgentOf(deployments.accounts.users[0].address)).equal(
                 deployments.accounts.users[2].address
             );
         });
 
-        it("Provide point - assistance", async () => {
+        it("Provide point - agent", async () => {
             const providePoint = Amount.make(100, 18).value;
-            const assistance = deployments.accounts.users[2];
+            const agent = deployments.accounts.users[2];
             const provider = deployments.accounts.users[0];
             const receiver = deployments.accounts.users[3];
-            const nonce = await ledgerContract.nonceOf(assistance.address);
+            const nonce = await ledgerContract.nonceOf(agent.address);
             const message = ContractUtils.getProvidePointToAddressMessage(
                 provider.address,
                 receiver.address,
@@ -398,7 +398,7 @@ describe("Test for Ledger", () => {
                 nonce,
                 hre.ethers.provider.network.chainId
             );
-            const signature = await ContractUtils.signMessage(assistance, message);
+            const signature = await ContractUtils.signMessage(agent, message);
             await expect(
                 providerContract
                     .connect(deployments.accounts.certifiers[0])
