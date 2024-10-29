@@ -141,22 +141,22 @@ export class ProviderRouter {
         );
 
         this.app.post(
-            "/v1/provider/assistant/register",
+            "/v1/provider/agent/register",
             [
                 body("provider").exists().trim().isEthereumAddress(),
-                body("assistant").exists().trim().isEthereumAddress(),
+                body("agent").exists().trim().isEthereumAddress(),
                 body("signature")
                     .exists()
                     .trim()
                     .matches(/^(0x)[0-9a-f]{130}$/i),
             ],
-            this.provider_assistant_register.bind(this)
+            this.provider_agent_register.bind(this)
         );
 
         this.app.get(
-            "/v1/provider/assistant/:provider",
+            "/v1/provider/agent/:provider",
             [param("provider").exists().trim().isEthereumAddress()],
-            this.provider_assistant.bind(this)
+            this.provider_agent.bind(this)
         );
     }
 
@@ -269,10 +269,10 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
-            if (assistant === AddressZero) assistant = provider;
+            let agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
+            if (agent === AddressZero) agent = provider;
 
-            const nonce = await this.contractManager.sideLedgerContract.nonceOf(assistant);
+            const nonce = await this.contractManager.sideLedgerContract.nonceOf(agent);
             const message = ContractUtils.getProvidePointToAddressMessage(
                 provider,
                 receiver,
@@ -280,7 +280,7 @@ export class ProviderRouter {
                 nonce,
                 this.contractManager.sideChainId
             );
-            if (!ContractUtils.verifyMessage(assistant, message, signature))
+            if (!ContractUtils.verifyMessage(agent, message, signature))
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
             const tx = await this.contractManager.sideLoyaltyProviderContract
                 .connect(signerItem.signer)
@@ -312,10 +312,10 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
-            if (assistant === AddressZero) assistant = provider;
+            let agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
+            if (agent === AddressZero) agent = provider;
 
-            const nonce = await this.contractManager.sideLedgerContract.nonceOf(assistant);
+            const nonce = await this.contractManager.sideLedgerContract.nonceOf(agent);
             const message = ContractUtils.getProvidePointToPhoneMessage(
                 provider,
                 receiver,
@@ -323,7 +323,7 @@ export class ProviderRouter {
                 nonce,
                 this.contractManager.sideChainId
             );
-            if (!ContractUtils.verifyMessage(assistant, message, signature))
+            if (!ContractUtils.verifyMessage(agent, message, signature))
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
             const tx = await this.contractManager.sideLoyaltyProviderContract
                 .connect(signerItem.signer)
@@ -340,8 +340,8 @@ export class ProviderRouter {
         }
     }
 
-    private async provider_assistant_register(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/provider/assistant/register ${req.ip}:${JSON.stringify(req.body)}`);
+    private async provider_agent_register(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/provider/agent/register ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -351,13 +351,13 @@ export class ProviderRouter {
         const signerItem = await this.getRelaySigner(this.contractManager.sideChainProvider);
         try {
             const provider: string = String(req.body.provider).trim();
-            const assistant: string = String(req.body.assistant).trim();
+            const agent: string = String(req.body.agent).trim();
             const signature: string = String(req.body.signature).trim();
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(provider);
-            const message = ContractUtils.getRegisterAssistanceMessage(
+            const message = ContractUtils.getRegisterAgentMessage(
                 provider,
-                assistant,
+                agent,
                 nonce,
                 this.contractManager.sideChainId
             );
@@ -365,12 +365,12 @@ export class ProviderRouter {
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
             const tx = await this.contractManager.sideLedgerContract
                 .connect(signerItem.signer)
-                .registerAssistant(provider, assistant, signature);
+                .registerProvisioningAgent(provider, agent, signature);
             this.metrics.add("success", 1);
-            return res.status(200).json(this.makeResponseData(0, { provider, assistant, txHash: tx.hash }));
+            return res.status(200).json(this.makeResponseData(0, { provider, agent, txHash: tx.hash }));
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/provider/assistant/register : ${msg.error.message}`);
+            logger.error(`POST /v1/provider/agent/register : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         } finally {
@@ -378,8 +378,8 @@ export class ProviderRouter {
         }
     }
 
-    private async provider_assistant(req: express.Request, res: express.Response) {
-        logger.http(`GET /v1/provider/assistant/:provider ${req.ip}:${JSON.stringify(req.params)}`);
+    private async provider_agent(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/provider/agent/:provider ${req.ip}:${JSON.stringify(req.params)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -388,12 +388,12 @@ export class ProviderRouter {
 
         try {
             const provider: string = String(req.params.provider).trim();
-            const assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
+            const agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
             this.metrics.add("success", 1);
-            return res.status(200).json(this.makeResponseData(0, { provider, assistant }));
+            return res.status(200).json(this.makeResponseData(0, { provider, agent }));
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`GET /v1/provider/assistant/:account : ${msg.error.message}`);
+            logger.error(`GET /v1/provider/agent/:account : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }

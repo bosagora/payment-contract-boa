@@ -4,9 +4,9 @@ import { ResultCode } from "./types";
 export type ProviderApiSpec = Tspec.DefineApiSpec<{
     tags: ["Loyalty Point Provider"];
     paths: {
-        "/v1/provider/assistant/{provider}": {
+        "/v1/provider/agent/{provider}": {
             get: {
-                summary: "Provides the assistant's information";
+                summary: "Provides the agent's information";
                 path: {
                     /**
                      * Wallet address of the provider
@@ -28,15 +28,10 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                              */
                             provider: string;
                             /**
-                             * Wallet address of the assistant
+                             * Wallet address of the agent
                              * @example "0x3FE8D00143bd0eAd2397D48ba0E31E5E1268dBfb"
                              */
-                            assistant: string;
-                            /**
-                             * Hash of transaction
-                             * @example "0xe5502185d39057bd82e6dde675821b87313570df77d3e23d8e5712bd5f3fa6b6"
-                             */
-                            txHash: string;
+                            agent: string;
                         };
                         error?: {
                             /**
@@ -49,9 +44,9 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                 };
             };
         };
-        "/v1/provider/assistant/register": {
+        "/v1/provider/agent/register": {
             post: {
-                summary: "Register the provider's assistant. The assistant can only process the instructions of the point transfer";
+                summary: "Register the provider's agent. The agent can only process the instructions of the point transfer";
                 body: {
                     /**
                      * Wallet address of the provider
@@ -59,12 +54,12 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                      */
                     provider: string;
                     /**
-                     * Wallet address of the assistant
+                     * Wallet address of the agent
                      * @example "0x3FE8D00143bd0eAd2397D48ba0E31E5E1268dBfb"
                      */
-                    assistant: string;
+                    agent: string;
                     /**
-                     * Signature of provider or assistant
+                     * Signature of provider or agent
                      * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
                      */
                     signature: string;
@@ -83,10 +78,15 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                              */
                             provider: string;
                             /**
-                             * Wallet address of the assistant
+                             * Wallet address of the agent
                              * @example "0x3FE8D00143bd0eAd2397D48ba0E31E5E1268dBfb"
                              */
-                            assistant: string;
+                            agent: string;
+                            /**
+                             * Hash of transaction
+                             * @example "0xe5502185d39057bd82e6dde675821b87313570df77d3e23d8e5712bd5f3fa6b6"
+                             */
+                            txHash: string;
                         };
                         error?: {
                             /**
@@ -206,7 +206,7 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                      */
                     amount: string;
                     /**
-                     * Signature of provider or assistant
+                     * Signature of provider or agent
                      * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
                      */
                     signature: string;
@@ -271,7 +271,7 @@ export type ProviderApiSpec = Tspec.DefineApiSpec<{
                      */
                     amount: string;
                     /**
-                     * Signature of provider or assistant
+                     * Signature of provider or agent
                      * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
                      */
                     signature: string;

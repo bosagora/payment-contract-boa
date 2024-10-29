@@ -115,7 +115,7 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(false);
-        expect(response.data.data.provider.assistant).to.deep.equal(AddressZero);
+        expect(response.data.data.provider.agent).to.deep.equal(AddressZero);
     });
 
     it("Register Provide", async () => {
@@ -136,7 +136,7 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(true);
-        expect(response.data.data.provider.assistant).to.deep.equal(AddressZero);
+        expect(response.data.data.provider.agent).to.deep.equal(AddressZero);
     });
 
     it("Balance of Provider", async () => {
@@ -221,26 +221,26 @@ describe("Test of LoyaltyProvider", function () {
         );
     });
 
-    it("Register assistant", async () => {
+    it("Register agent", async () => {
         const provider = deployments.accounts.users[0];
         const response1 = await client.get(
-            URI(serverURL).directory(`/v1/provider/assistant/${provider.address}`).toString()
+            URI(serverURL).directory(`/v1/provider/agent/${provider.address}`).toString()
         );
         expect(response1.data.data.provider).to.deep.equal(provider.address);
-        expect(response1.data.data.assistant).to.deep.equal(AddressZero);
+        expect(response1.data.data.agent).to.deep.equal(AddressZero);
 
-        const assistant = deployments.accounts.users[1];
+        const agent = deployments.accounts.users[1];
         const nonce = await contractManager.sideLedgerContract.nonceOf(provider.address);
-        const message = ContractUtils.getRegisterAssistanceMessage(
+        const message = ContractUtils.getRegisterAgentMessage(
             provider.address,
-            assistant.address,
+            agent.address,
             nonce,
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(provider, message);
-        const response2 = await client.post(URI(serverURL).directory(`/v1/provider/assistant/register`).toString(), {
+        const response2 = await client.post(URI(serverURL).directory(`/v1/provider/agent/register`).toString(), {
             provider: provider.address,
-            assistant: assistant.address,
+            agent: agent.address,
             signature,
         });
         expect(response2.data.code).to.equal(0);
@@ -248,10 +248,10 @@ describe("Test of LoyaltyProvider", function () {
         expect(response2.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
         const response3 = await client.get(
-            URI(serverURL).directory(`/v1/provider/assistant/${provider.address}`).toString()
+            URI(serverURL).directory(`/v1/provider/agent/${provider.address}`).toString()
         );
         expect(response3.data.data.provider).to.deep.equal(provider.address);
-        expect(response3.data.data.assistant).to.deep.equal(assistant.address);
+        expect(response3.data.data.agent).to.deep.equal(agent.address);
     });
 
     it("Check Summary of Account", async () => {
@@ -260,18 +260,18 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(true);
-        expect(response.data.data.provider.assistant).to.deep.equal(deployments.accounts.users[1].address);
+        expect(response.data.data.provider.agent).to.deep.equal(deployments.accounts.users[1].address);
     });
 
     it("Provide Point for Address by Assistant", async () => {
         const provider = deployments.accounts.users[0];
-        const assistant = deployments.accounts.users[1];
+        const agent = deployments.accounts.users[1];
         const receiver = deployments.accounts.users[2];
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.pointBalanceOf(receiver.address);
         const pointAmount = Amount.make(10, 18).value;
         const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
-        const nonce = await contractManager.sideLedgerContract.nonceOf(assistant.address);
+        const nonce = await contractManager.sideLedgerContract.nonceOf(agent.address);
         const message = ContractUtils.getProvidePointToAddressMessage(
             provider.address,
             receiver.address,
@@ -279,7 +279,7 @@ describe("Test of LoyaltyProvider", function () {
             nonce,
             contractManager.sideChainId
         );
-        const signature = await ContractUtils.signMessage(assistant, message);
+        const signature = await ContractUtils.signMessage(agent, message);
         const response = await client.post(URI(serverURL).directory("/v1/provider/send/account").toString(), {
             provider: provider.address,
             receiver: receiver.address,
@@ -303,12 +303,12 @@ describe("Test of LoyaltyProvider", function () {
         const phoneNumber = "+82 10-1000-9000";
         const phoneHash = ContractUtils.getPhoneHash(phoneNumber);
         const provider = deployments.accounts.users[0];
-        const assistant = deployments.accounts.users[1];
+        const agent = deployments.accounts.users[1];
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.unPayablePointBalanceOf(phoneHash);
         const pointAmount = Amount.make(10, 18).value;
         const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
-        const nonce = await contractManager.sideLedgerContract.nonceOf(assistant.address);
+        const nonce = await contractManager.sideLedgerContract.nonceOf(agent.address);
         const message = ContractUtils.getProvidePointToPhoneMessage(
             provider.address,
             phoneHash,
@@ -316,7 +316,7 @@ describe("Test of LoyaltyProvider", function () {
             nonce,
             contractManager.sideChainId
         );
-        const signature = await ContractUtils.signMessage(assistant, message);
+        const signature = await ContractUtils.signMessage(agent, message);
         const response = await client.post(URI(serverURL).directory("/v1/provider/send/phoneHash").toString(), {
             provider: provider.address,
             receiver: phoneHash,
