@@ -10,14 +10,13 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 import { BigNumber, ethers } from "ethers";
 import express from "express";
 import { body, param, validationResult } from "express-validator";
 import { BOACoin } from "../common/Amount";
 
-export class ProviderRouter {
+export class ProvisionRouter {
     private web_service: WebService;
     private readonly config: Config;
     private readonly contractManager: ContractManager;
@@ -86,7 +85,7 @@ export class ProviderRouter {
 
     public async registerRoutes() {
         this.app.post(
-            "/v1/provider/register",
+            "/v1/provision/register",
             [
                 body("provider").exists().trim().isEthereumAddress(),
                 body("signature")
@@ -94,23 +93,23 @@ export class ProviderRouter {
                     .trim()
                     .matches(/^(0x)[0-9a-f]{130}$/i),
             ],
-            this.provider_register.bind(this)
+            this.provision_register.bind(this)
         );
 
         this.app.get(
-            "/v1/provider/balance/:provider",
+            "/v1/provision/balance/:provider",
             [param("provider").exists().trim().isEthereumAddress()],
-            this.provider_balance.bind(this)
+            this.provision_balance.bind(this)
         );
 
         this.app.get(
-            "/v1/provider/status/:provider",
+            "/v1/provision/status/:provider",
             [param("provider").exists().trim().isEthereumAddress()],
-            this.provider_status.bind(this)
+            this.provision_status.bind(this)
         );
 
         this.app.post(
-            "/v1/provider/send/account",
+            "/v1/provision/send/account",
             [
                 body("provider").exists().trim().isEthereumAddress(),
                 body("receiver").exists().trim().isEthereumAddress(),
@@ -120,11 +119,11 @@ export class ProviderRouter {
                     .trim()
                     .matches(/^(0x)[0-9a-f]{130}$/i),
             ],
-            this.provider_send_account.bind(this)
+            this.provision_send_account.bind(this)
         );
 
         this.app.post(
-            "/v1/provider/send/phoneHash",
+            "/v1/provision/send/phoneHash",
             [
                 body("provider").exists().trim().isEthereumAddress(),
                 body("receiver")
@@ -137,31 +136,12 @@ export class ProviderRouter {
                     .trim()
                     .matches(/^(0x)[0-9a-f]{130}$/i),
             ],
-            this.provider_send_phone_hash.bind(this)
-        );
-
-        this.app.post(
-            "/v1/provider/agent/register",
-            [
-                body("provider").exists().trim().isEthereumAddress(),
-                body("agent").exists().trim().isEthereumAddress(),
-                body("signature")
-                    .exists()
-                    .trim()
-                    .matches(/^(0x)[0-9a-f]{130}$/i),
-            ],
-            this.provider_agent_register.bind(this)
-        );
-
-        this.app.get(
-            "/v1/provider/agent/:provider",
-            [param("provider").exists().trim().isEthereumAddress()],
-            this.provider_agent.bind(this)
+            this.provision_send_phone_hash.bind(this)
         );
     }
 
-    private async provider_register(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/provider/register ${req.ip}:${JSON.stringify(req.body)}`);
+    private async provision_register(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/provision/register ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -190,7 +170,7 @@ export class ProviderRouter {
             return res.status(200).json(this.makeResponseData(0, { provider }));
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/provider/register : ${msg.error.message}`);
+            logger.error(`POST /v1/provision/register : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         } finally {
@@ -198,8 +178,8 @@ export class ProviderRouter {
         }
     }
 
-    private async provider_balance(req: express.Request, res: express.Response) {
-        logger.http(`GET /v1/provider/balance/:provider ${req.ip}:${JSON.stringify(req.params)}`);
+    private async provision_balance(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/provision/balance/:provider ${req.ip}:${JSON.stringify(req.params)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -222,14 +202,14 @@ export class ProviderRouter {
             );
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`GET /v1/provider/balance/:provider : ${msg.error.message}`);
+            logger.error(`GET /v1/provision/balance/:provider : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }
     }
 
-    private async provider_status(req: express.Request, res: express.Response) {
-        logger.http(`GET /v1/provider/status/:provider ${req.ip}:${JSON.stringify(req.params)}`);
+    private async provision_status(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/provision/status/:provider ${req.ip}:${JSON.stringify(req.params)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -248,14 +228,14 @@ export class ProviderRouter {
             );
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`GET /v1/provider/status/:provider : ${msg.error.message}`);
+            logger.error(`GET /v1/provision/status/:provider : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }
     }
 
-    private async provider_send_account(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/provider/send/account ${req.ip}:${JSON.stringify(req.body)}`);
+    private async provision_send_account(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/provision/send/account ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -269,7 +249,7 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
+            let agent = await this.contractManager.sideLedgerContract.provisionAgentOf(provider);
             if (agent === AddressZero) agent = provider;
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(agent);
@@ -289,7 +269,7 @@ export class ProviderRouter {
             return res.status(200).json(this.makeResponseData(0, { provider, receiver, amount, txHash: tx.hash }));
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/provider/send/account : ${msg.error.message}`);
+            logger.error(`POST /v1/provision/send/account : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         } finally {
@@ -297,8 +277,8 @@ export class ProviderRouter {
         }
     }
 
-    private async provider_send_phone_hash(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/provider/send/phoneHash ${req.ip}:${JSON.stringify(req.body)}`);
+    private async provision_send_phone_hash(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/provision/send/phoneHash ${req.ip}:${JSON.stringify(req.body)}`);
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -312,7 +292,7 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
+            let agent = await this.contractManager.sideLedgerContract.provisionAgentOf(provider);
             if (agent === AddressZero) agent = provider;
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(agent);
@@ -332,70 +312,11 @@ export class ProviderRouter {
             return res.status(200).json(this.makeResponseData(0, { provider, receiver, amount, txHash: tx.hash }));
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/provider/send/phoneHash : ${msg.error.message}`);
+            logger.error(`POST /v1/provision/send/phoneHash : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         } finally {
             this.releaseRelaySigner(signerItem);
-        }
-    }
-
-    private async provider_agent_register(req: express.Request, res: express.Response) {
-        logger.http(`POST /v1/provider/agent/register ${req.ip}:${JSON.stringify(req.body)}`);
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
-        }
-
-        const signerItem = await this.getRelaySigner(this.contractManager.sideChainProvider);
-        try {
-            const provider: string = String(req.body.provider).trim();
-            const agent: string = String(req.body.agent).trim();
-            const signature: string = String(req.body.signature).trim();
-
-            const nonce = await this.contractManager.sideLedgerContract.nonceOf(provider);
-            const message = ContractUtils.getRegisterAgentMessage(
-                provider,
-                agent,
-                nonce,
-                this.contractManager.sideChainId
-            );
-            if (!ContractUtils.verifyMessage(provider, message, signature))
-                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
-            const tx = await this.contractManager.sideLedgerContract
-                .connect(signerItem.signer)
-                .registerProvisioningAgent(provider, agent, signature);
-            this.metrics.add("success", 1);
-            return res.status(200).json(this.makeResponseData(0, { provider, agent, txHash: tx.hash }));
-        } catch (error: any) {
-            const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`POST /v1/provider/agent/register : ${msg.error.message}`);
-            this.metrics.add("failure", 1);
-            return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
-        } finally {
-            this.releaseRelaySigner(signerItem);
-        }
-    }
-
-    private async provider_agent(req: express.Request, res: express.Response) {
-        logger.http(`GET /v1/provider/agent/:provider ${req.ip}:${JSON.stringify(req.params)}`);
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
-        }
-
-        try {
-            const provider: string = String(req.params.provider).trim();
-            const agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(provider);
-            this.metrics.add("success", 1);
-            return res.status(200).json(this.makeResponseData(0, { provider, agent }));
-        } catch (error: any) {
-            const msg = ResponseMessage.getEVMErrorMessage(error);
-            logger.error(`GET /v1/provider/agent/:account : ${msg.error.message}`);
-            this.metrics.add("failure", 1);
-            return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }
     }
 }

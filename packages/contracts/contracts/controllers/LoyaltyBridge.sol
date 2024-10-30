@@ -88,29 +88,64 @@ contract LoyaltyBridge is LoyaltyBridgeStorage, Initializable, OwnableUpgradeabl
         require(_tokenId == tokenId, "1713");
         require(_account != systemAccount, "1053");
 
-        bytes32 dataHash = keccak256(
-            abi.encode(
-                block.chainid,
-                address(tokenContract),
-                _account,
-                address(this),
-                _amount,
-                ledgerContract.nonceOf(_account),
-                _expiry
-            )
+        address account = _account;
+        uint256 amount = _amount;
+        uint256 expiry = _expiry;
+        address signer;
+        address recurve1 = ECDSA.recover(
+            ECDSA.toEthSignedMessageHash(
+                keccak256(
+                    abi.encode(
+                        block.chainid,
+                        address(tokenContract),
+                        account,
+                        address(this),
+                        amount,
+                        ledgerContract.nonceOf(account),
+                        expiry
+                    )
+                )
+            ),
+            _signature
         );
-        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
-        require(_expiry > block.timestamp, "1506");
-        require(ledgerContract.tokenBalanceOf(_account) >= _amount, "1511");
-        require(_amount % 1 gwei == 0, "1030");
-        require(_amount > protocolFee, "1031");
 
-        ledgerContract.transferToken(_account, address(this), _amount);
-        ledgerContract.increaseNonce(_account);
+        if (recurve1 == account) {
+            signer = account;
+        } else {
+            address agent = ledgerContract.withdrawalAgentOf(account);
+            require(agent != address(0x0), "1501");
 
-        DepositData memory data = DepositData({ tokenId: _tokenId, account: _account, amount: _amount });
+            address recurve2 = ECDSA.recover(
+                ECDSA.toEthSignedMessageHash(
+                    keccak256(
+                        abi.encode(
+                            block.chainid,
+                            address(tokenContract),
+                            account,
+                            address(this),
+                            amount,
+                            ledgerContract.nonceOf(agent),
+                            expiry
+                        )
+                    )
+                ),
+                _signature
+            );
+            require(recurve2 == agent, "1501");
+            signer = agent;
+        }
+
+        require(expiry > block.timestamp, "1506");
+        require(ledgerContract.tokenBalanceOf(account) >= amount, "1511");
+        require(amount % 1 gwei == 0, "1030");
+        require(amount > protocolFee, "1031");
+
+        ledgerContract.transferToken(account, address(this), amount);
+        ledgerContract.increaseNonce(account);
+
+        DepositData memory data = DepositData({ tokenId: _tokenId, account: account, amount: amount });
         deposits[_depositId] = data;
-        emit BridgeDeposited(_tokenId, _depositId, _account, _amount, ledgerContract.tokenBalanceOf(_account));
+        emit BridgeDeposited(_tokenId, _depositId, account, amount, ledgerContract.tokenBalanceOf(account));
     }
 
     /// @notice 브리지에서 자금을 인출합니다. 검증자들의 합의가 완료되면 인출이 됩니다.

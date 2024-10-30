@@ -367,13 +367,31 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
     /// @param _shopId 상점아이디
     /// @param _amount 인출금
     /// @dev 중계서버를 통해서 상점주의 서명을 가지고 호출됩니다.
-    function refund(bytes32 _shopId, address _account, uint256 _amount, bytes calldata _signature) external virtual {
+    function refund(bytes32 _shopId, uint256 _amount, bytes calldata _signature) external virtual {
         require(shops[_shopId].status == ShopStatus.ACTIVE, "1202");
-        bytes32 dataHash = keccak256(abi.encode(_shopId, _account, _amount, block.chainid, nonce[_account]));
-        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
-        require(shops[_shopId].account == _account, "1050");
         require(_amount % 1 gwei == 0, "1030");
-        require(settlements[_shopId].manager == bytes32(0x0), "1552");
+
+        address signer;
+        address shopOwner = shops[_shopId].account;
+
+        address recurve1 = ECDSA.recover(
+            ECDSA.toEthSignedMessageHash(keccak256(abi.encode(_shopId, _amount, block.chainid, nonce[shopOwner]))),
+            _signature
+        );
+
+        if (recurve1 == shopOwner) {
+            signer = shopOwner;
+        } else {
+            address agent = ledgerContract.refundAgentOf(shopOwner);
+            require(agent != address(0x0), "1501");
+
+            address recurve2 = ECDSA.recover(
+                ECDSA.toEthSignedMessageHash(keccak256(abi.encode(_shopId, _amount, block.chainid, nonce[agent]))),
+                _signature
+            );
+            require(recurve2 == agent, "1501");
+            signer = agent;
+        }
 
         ShopData memory shop = shops[_shopId];
         uint256 settlementAmount = (shop.collectedAmount + shop.usedAmount > shop.providedAmount)
@@ -385,16 +403,16 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
 
         require(_amount <= refundableAmount, "1220");
 
-        uint256 amountToken = currencyRate.convertCurrencyToToken(_amount, shops[_shopId].currency);
-        ledgerContract.refund(_account, _amount, shops[_shopId].currency, amountToken, _shopId);
+        uint256 amountToken = currencyRate.convertCurrencyToToken(_amount, shop.currency);
+        ledgerContract.refund(shopOwner, _amount, shop.currency, amountToken, shop.shopId);
 
-        shops[_shopId].refundedAmount += _amount;
-        nonce[_account]++;
+        shops[shop.shopId].refundedAmount += _amount;
+        nonce[signer]++;
 
-        uint256 balanceToken = ledgerContract.tokenBalanceOf(_account);
-        uint256 refundedTotal = shops[_shopId].refundedAmount;
-        string memory currency = shops[_shopId].currency;
-        emit Refunded(_shopId, _account, _amount, refundedTotal, currency, amountToken, balanceToken);
+        uint256 balanceToken = ledgerContract.tokenBalanceOf(shopOwner);
+        uint256 refundedTotal = shops[shop.shopId].refundedAmount;
+        string memory currency = shop.currency;
+        emit Refunded(_shopId, shopOwner, _amount, refundedTotal, currency, amountToken, balanceToken);
     }
 
     /// @notice nonce 를  리턴한다
@@ -523,13 +541,48 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
             "1554"
         );
 
-        address account = shops[_managerShopId].account;
-        bytes32 dataHash = keccak256(
-            abi.encode("CollectSettlementAmount", _managerShopId, _clientShopId, block.chainid, nonce[account])
+        address sender;
+        address shopOwner = shops[_managerShopId].account;
+        address recurve1 = ECDSA.recover(
+            ECDSA.toEthSignedMessageHash(
+                keccak256(
+                    abi.encode(
+                        "CollectSettlementAmount",
+                        _managerShopId,
+                        _clientShopId,
+                        block.chainid,
+                        nonce[shopOwner]
+                    )
+                )
+            ),
+            _signature
         );
-        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
 
-        nonce[account]++;
+        if (recurve1 == shopOwner) {
+            sender = shopOwner;
+        } else {
+            address agent = ledgerContract.refundAgentOf(shopOwner);
+            require(agent != address(0x0), "1501");
+
+            address recurve2 = ECDSA.recover(
+                ECDSA.toEthSignedMessageHash(
+                    keccak256(
+                        abi.encode(
+                            "CollectSettlementAmount",
+                            _managerShopId,
+                            _clientShopId,
+                            block.chainid,
+                            nonce[agent]
+                        )
+                    )
+                ),
+                _signature
+            );
+            require(recurve2 == agent, "1501");
+            sender = agent;
+        }
+
+        nonce[sender]++;
 
         _collectSettlementAmount(_managerShopId, _clientShopId);
     }
@@ -542,19 +595,49 @@ contract Shop is ShopStorage, Initializable, OwnableUpgradeable, UUPSUpgradeable
         require(_managerShopId != bytes32(0x0), "1223");
         require(shops[_managerShopId].status != ShopStatus.INVALID, "1201");
 
-        address account = shops[_managerShopId].account;
-        bytes32 dataHash = keccak256(
-            abi.encode(
-                "CollectSettlementAmountMultiClient",
-                _managerShopId,
-                _clientShopIds,
-                block.chainid,
-                nonce[account]
-            )
-        );
-        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == account, "1501");
+        address sender;
+        address shopOwner = shops[_managerShopId].account;
 
-        nonce[account]++;
+        address recurve1 = ECDSA.recover(
+            ECDSA.toEthSignedMessageHash(
+                keccak256(
+                    abi.encode(
+                        "CollectSettlementAmountMultiClient",
+                        _managerShopId,
+                        _clientShopIds,
+                        block.chainid,
+                        nonce[shopOwner]
+                    )
+                )
+            ),
+            _signature
+        );
+
+        if (recurve1 == shopOwner) {
+            sender = shopOwner;
+        } else {
+            address agent = ledgerContract.refundAgentOf(shopOwner);
+            require(agent != address(0x0), "1501");
+
+            address recurve2 = ECDSA.recover(
+                ECDSA.toEthSignedMessageHash(
+                    keccak256(
+                        abi.encode(
+                            "CollectSettlementAmountMultiClient",
+                            _managerShopId,
+                            _clientShopIds,
+                            block.chainid,
+                            nonce[agent]
+                        )
+                    )
+                ),
+                _signature
+            );
+            require(recurve2 == agent, "1501");
+            sender = agent;
+        }
+
+        nonce[sender]++;
 
         for (uint256 idx = 0; idx < _clientShopIds.length; idx++) {
             bytes32 clientShopId = _clientShopIds[idx];

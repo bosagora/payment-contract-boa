@@ -10,9 +10,9 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import express from "express";
 import { body, param, validationResult } from "express-validator";
 import { BOACoin } from "../common/Amount";
@@ -510,7 +510,8 @@ export class TokenRouter {
             }
 
             const isProvider = await this.contractManager.sideLedgerContract.isProvider(account);
-            const agent = await this.contractManager.sideLedgerContract.provisioningAgentOf(account);
+            const provisionAgent = await this.contractManager.sideLedgerContract.provisionAgentOf(account);
+            const withdrawalAgent = await this.contractManager.sideLedgerContract.withdrawalAgentOf(account);
 
             const symbol = await this.contractManager.sideTokenContract.symbol();
             const name = await this.contractManager.sideTokenContract.name();
@@ -557,7 +558,10 @@ export class TokenRouter {
                     },
                     provider: {
                         enable: isProvider,
-                        agent,
+                    },
+                    agent: {
+                        provision: provisionAgent,
+                        withdrawal: withdrawalAgent,
                     },
                     ledger: {
                         point: { balance: pointBalance.toString(), value: pointValue.toString() },
@@ -646,6 +650,11 @@ export class TokenRouter {
             );
             const defaultCurrencySymbol = await this.contractManager.sideCurrencyRateContract.defaultSymbol();
 
+            const refundAgent = await this.contractManager.sideLedgerContract.refundAgentOf(account);
+            const withdrawalAgent = await this.contractManager.sideLedgerContract.withdrawalAgentOf(account);
+
+            const settlementManager = await this.contractManager.sideShopContract.settlementManagerOf(shopId);
+
             this.metrics.add("success", 1);
             return res.status(200).json(
                 this.makeResponseData(0, {
@@ -664,6 +673,13 @@ export class TokenRouter {
                             symbol: defaultCurrencySymbol,
                             value: pointAmount.toString(),
                         },
+                    },
+                    settlement: {
+                        manager: settlementManager,
+                    },
+                    agent: {
+                        refund: refundAgent,
+                        withdrawal: withdrawalAgent,
                     },
                     ledger: {
                         point: { balance: pointBalance.toString(), value: pointValue.toString() },

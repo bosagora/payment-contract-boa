@@ -10,9 +10,9 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 import { PhoneNumberFormat, PhoneNumberUtil } from "google-libphonenumber";

@@ -61,9 +61,6 @@ describe("Test for Shop", () => {
     let providerContract: LoyaltyProvider;
     let ledgerContract: Ledger;
 
-    const multiple = BigNumber.from(1000000000);
-    const price = BigNumber.from(150).mul(multiple);
-
     let client: TestClient;
     let server: TestServer;
     let storage: RelayStorage;
@@ -529,7 +526,6 @@ describe("Test for Shop", () => {
                 const nonce = await shopContract.nonceOf(shop.wallet.address);
                 const message = ContractUtils.getShopRefundMessage(
                     shop.shopId,
-                    shop.wallet.address,
                     amount2,
                     nonce,
                     contractManager.sideChainId
@@ -1151,7 +1147,6 @@ describe("Test for Shop", () => {
                 const nonce = await shopContract.nonceOf(managerShop.wallet.address);
                 const message = ContractUtils.getShopRefundMessage(
                     managerShop.shopId,
-                    managerShop.wallet.address,
                     sumExpected,
                     nonce,
                     contractManager.sideChainId

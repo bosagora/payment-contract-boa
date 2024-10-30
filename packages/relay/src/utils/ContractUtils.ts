@@ -248,14 +248,13 @@ export class ContractUtils {
 
     public static getShopRefundMessage(
         shopId: BytesLike,
-        account: string,
         amount: BigNumberish,
         nonce: BigNumberish,
         chainId: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
-            ["bytes32", "address", "uint256", "uint256", "uint256"],
-            [shopId, account, amount, chainId, nonce]
+            ["bytes32", "uint256", "uint256", "uint256"],
+            [shopId, amount, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }

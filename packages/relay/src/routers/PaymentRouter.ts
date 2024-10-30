@@ -24,9 +24,10 @@ import { ResponseMessage } from "../utils/Errors";
 import { HTTPClient } from "../utils/Utils";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { BigNumber, ContractTransaction, ethers } from "ethers";
+import { ContractTransaction } from "@ethersproject/contracts";
+import { ethers } from "ethers";
 import express from "express";
 import { body, query, validationResult } from "express-validator";
 

@@ -67,7 +67,9 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     event RegisteredProvider(address provider);
     event UnregisteredProvider(address provider);
 
-    event RegisteredProvisioningAgent(address account, address agent);
+    event RegisteredProvisionAgent(address account, address agent);
+    event RegisteredRefundAgent(address account, address agent);
+    event RegisteredWithdrawalAgent(address account, address agent);
 
     struct ManagementAddresses {
         address system;
@@ -513,17 +515,42 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         return providers[_account];
     }
 
-    function registerProvisioningAgent(address _account, address _agent, bytes calldata _signature) external {
-        require(providers[_account], "1054");
+    function registerProvisionAgent(address _account, address _agent, bytes calldata _signature) external {
         bytes32 dataHash = keccak256(abi.encode(_account, _agent, block.chainid, nonce[_account]));
         require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
-        provisioningAgents[_account] = _agent;
+        provisionAgents[_account] = _agent;
         nonce[_account]++;
 
-        emit RegisteredProvisioningAgent(_account, _agent);
+        emit RegisteredProvisionAgent(_account, _agent);
     }
 
-    function provisioningAgentOf(address _account) external view override returns (address) {
-        return provisioningAgents[_account];
+    function provisionAgentOf(address _account) external view override returns (address) {
+        return provisionAgents[_account];
+    }
+
+    function registerRefundAgent(address _account, address _agent, bytes calldata _signature) external {
+        bytes32 dataHash = keccak256(abi.encode(_account, _agent, block.chainid, nonce[_account]));
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
+        refundAgents[_account] = _agent;
+        nonce[_account]++;
+
+        emit RegisteredRefundAgent(_account, _agent);
+    }
+
+    function refundAgentOf(address _account) external view override returns (address) {
+        return refundAgents[_account];
+    }
+
+    function registerWithdrawalAgent(address _account, address _agent, bytes calldata _signature) external {
+        bytes32 dataHash = keccak256(abi.encode(_account, _agent, block.chainid, nonce[_account]));
+        require(ECDSA.recover(ECDSA.toEthSignedMessageHash(dataHash), _signature) == _account, "1501");
+        withdrawalAgents[_account] = _agent;
+        nonce[_account]++;
+
+        emit RegisteredWithdrawalAgent(_account, _agent);
+    }
+
+    function withdrawalAgentOf(address _account) external view override returns (address) {
+        return withdrawalAgents[_account];
     }
 }

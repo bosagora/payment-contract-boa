@@ -190,7 +190,7 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                     )
                 );
                 address recover = ECDSA.recover(ECDSA.toEthSignedMessageHash(purchaseDataHash), data.signature);
-                address agent = ledgerContract.provisioningAgentOf(data.sender);
+                address agent = ledgerContract.provisionAgentOf(data.sender);
                 if ((agent == address(0x0)) && (recover != data.sender)) continue;
                 if ((agent != address(0x0)) && (recover != agent)) continue;
 
@@ -285,7 +285,7 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
         if (recurve1 == _provider) {
             sender = _provider;
         } else {
-            address agent = ledgerContract.provisioningAgentOf(_provider);
+            address agent = ledgerContract.provisionAgentOf(_provider);
             require(agent != address(0x0), "1501");
 
             address recurve2 = ECDSA.recover(
@@ -331,7 +331,7 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
         if (recurve1 == _provider) {
             sender = _provider;
         } else {
-            address agent = ledgerContract.provisioningAgentOf(_provider);
+            address agent = ledgerContract.provisionAgentOf(_provider);
             require(agent != address(0x0), "1501");
 
             address recurve2 = ECDSA.recover(

@@ -356,7 +356,7 @@ describe("Test for Ledger", () => {
         });
 
         it("Register Assistance", async () => {
-            expect(await ledgerContract.provisioningAgentOf(deployments.accounts.users[0].address)).equal(AddressZero);
+            expect(await ledgerContract.provisionAgentOf(deployments.accounts.users[0].address)).equal(AddressZero);
             const nonce = await ledgerContract.nonceOf(deployments.accounts.users[0].address);
             const message = ContractUtils.getRegisterAgentMessage(
                 deployments.accounts.users[0].address,
@@ -368,19 +368,19 @@ describe("Test for Ledger", () => {
             await expect(
                 ledgerContract
                     .connect(deployments.accounts.deployer)
-                    .registerProvisioningAgent(
+                    .registerProvisionAgent(
                         deployments.accounts.users[0].address,
                         deployments.accounts.users[2].address,
                         signature
                     )
             )
-                .emit(ledgerContract, "RegisteredProvisioningAgent")
+                .emit(ledgerContract, "RegisteredProvisionAgent")
                 .withNamedArgs({
                     account: deployments.accounts.users[0].address,
                     agent: deployments.accounts.users[2].address,
                 });
 
-            expect(await ledgerContract.provisioningAgentOf(deployments.accounts.users[0].address)).equal(
+            expect(await ledgerContract.provisionAgentOf(deployments.accounts.users[0].address)).equal(
                 deployments.accounts.users[2].address
             );
         });

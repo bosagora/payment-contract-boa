@@ -916,11 +916,11 @@ async function deployLedger(accounts: IAccount, deployment: Deployments) {
             const signature = await ContractUtils.signMessage(accounts.system, message);
             const tx = await contract
                 .connect(accounts.certifiers[0])
-                .registerProvisioningAgent(accounts.system.address, accounts.publisher.address, signature);
+                .registerProvisionAgent(accounts.system.address, accounts.publisher.address, signature);
             console.log(`Register agent address of system (tx: ${tx.hash})...`);
             // await tx.wait();
 
-            const value = await contract.provisioningAgentOf(accounts.system.address);
+            const value = await contract.provisionAgentOf(accounts.system.address);
             console.log("Assistance of System Account: ", value);
         }
     }

@@ -16,7 +16,6 @@ import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 import * as hre from "hardhat";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { ContractManager } from "../contract/ContractManager";
@@ -1222,19 +1221,13 @@ export class ShopRouter {
 
             // 서명검증
             const nonce = await this.contractManager.sideShopContract.nonceOf(account);
-            const message = ContractUtils.getShopRefundMessage(
-                shopId,
-                account,
-                amount,
-                nonce,
-                this.contractManager.sideChainId
-            );
+            const message = ContractUtils.getShopRefundMessage(shopId, amount, nonce, this.contractManager.sideChainId);
             if (!ContractUtils.verifyMessage(account, message, signature))
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
 
             const tx = await this.contractManager.sideShopContract
                 .connect(signerItem.signer)
-                .refund(shopId, account, amount, signature);
+                .refund(shopId, amount, signature);
 
             logger.http(`TxHash(/v1/shop/refund): ${tx.hash}`);
             this.metrics.add("success", 1);
@@ -1347,6 +1340,7 @@ export class ShopRouter {
                 delegator: info.delegator,
                 providedAmount: info.providedAmount.toString(),
                 usedAmount: info.usedAmount.toString(),
+                collectedAmount: info.collectedAmount.toString(),
                 refundedAmount: info.refundedAmount.toString(),
             };
             this.metrics.add("success", 1);

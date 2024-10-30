@@ -8,9 +8,7 @@ import { RelayStorage } from "../storage/RelayStorage";
 import { IStorePurchaseData, PHONE_NULL } from "../types";
 import { ResponseMessage } from "../utils/Errors";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { BigNumber } from "@ethersproject/bignumber";
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 import express from "express";
 import { body, param, validationResult } from "express-validator";

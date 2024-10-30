@@ -35,7 +35,7 @@ async function main() {
 
     const provider = new Wallet("0x70438bc3ed02b5e4b76d496625cb7c06d6b7bf4362295b16fdfe91a046d4586c"); // 0x64D111eA9763c93a003cef491941A011B8df5a49
     const receiver = ContractUtils.getPhoneHash("+82 10-9000-2000");
-    const agent = await sideLedgerContract.provisioningAgentOf(provider.address);
+    const agent = await sideLedgerContract.provisionAgentOf(provider.address);
     console.log(`agent: ${agent}`);
 
     const balance1 = await sideLedgerContract.unPayablePointBalanceOf(receiver);

@@ -6,16 +6,15 @@ import { Metrics } from "../metrics/Metrics";
 import { WebService } from "../service/WebService";
 import { GraphStorage } from "../storage/GraphStorage";
 import { RelayStorage } from "../storage/RelayStorage";
+import { ActionInLedger, ActionInShop } from "../types";
 import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 import { ethers } from "ethers";
 import express from "express";
 import { param, query, validationResult } from "express-validator";
 import { PhoneNumberFormat, PhoneNumberUtil } from "google-libphonenumber";
-import { ActionInLedger, ActionInShop } from "../types";
 
 export class HistoryRouter {
     private web_service: WebService;

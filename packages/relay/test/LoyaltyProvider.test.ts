@@ -115,7 +115,8 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(false);
-        expect(response.data.data.provider.agent).to.deep.equal(AddressZero);
+        expect(response.data.data.agent.provision).to.deep.equal(AddressZero);
+        expect(response.data.data.agent.withdrawal).to.deep.equal(AddressZero);
     });
 
     it("Register Provide", async () => {
@@ -136,14 +137,15 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(true);
-        expect(response.data.data.provider.agent).to.deep.equal(AddressZero);
+        expect(response.data.data.agent.provision).to.deep.equal(AddressZero);
+        expect(response.data.data.agent.withdrawal).to.deep.equal(AddressZero);
     });
 
     it("Balance of Provider", async () => {
         const tokenAmount = Amount.make(1000, 18).value;
         const pointAmount = await contractManager.sideCurrencyRateContract.convertTokenToPoint(tokenAmount);
         const response = await client.get(
-            URI(serverURL).directory(`/v1/provider/balance/${deployments.accounts.users[0].address}`).toString()
+            URI(serverURL).directory(`/v1/provision/balance/${deployments.accounts.users[0].address}`).toString()
         );
         expect(response.data.data.provider).to.deep.equal(deployments.accounts.users[0].address);
         expect(response.data.data.providable.token).to.deep.equal(tokenAmount);
@@ -166,7 +168,7 @@ describe("Test of LoyaltyProvider", function () {
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(provider, message);
-        const response = await client.post(URI(serverURL).directory("/v1/provider/send/account").toString(), {
+        const response = await client.post(URI(serverURL).directory("/v1/provision/send/account").toString(), {
             provider: provider.address,
             receiver: receiver.address,
             amount: pointAmount.toString(),
@@ -202,7 +204,7 @@ describe("Test of LoyaltyProvider", function () {
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(provider, message);
-        const response = await client.post(URI(serverURL).directory("/v1/provider/send/phoneHash").toString(), {
+        const response = await client.post(URI(serverURL).directory("/v1/provision/send/phoneHash").toString(), {
             provider: provider.address,
             receiver: phoneHash,
             amount: pointAmount.toString(),
@@ -224,9 +226,9 @@ describe("Test of LoyaltyProvider", function () {
     it("Register agent", async () => {
         const provider = deployments.accounts.users[0];
         const response1 = await client.get(
-            URI(serverURL).directory(`/v1/provider/agent/${provider.address}`).toString()
+            URI(serverURL).directory(`/v1/agent/provision/${provider.address}`).toString()
         );
-        expect(response1.data.data.provider).to.deep.equal(provider.address);
+        expect(response1.data.data.account).to.deep.equal(provider.address);
         expect(response1.data.data.agent).to.deep.equal(AddressZero);
 
         const agent = deployments.accounts.users[1];
@@ -238,8 +240,8 @@ describe("Test of LoyaltyProvider", function () {
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(provider, message);
-        const response2 = await client.post(URI(serverURL).directory(`/v1/provider/agent/register`).toString(), {
-            provider: provider.address,
+        const response2 = await client.post(URI(serverURL).directory(`/v1/agent/provision`).toString(), {
+            account: provider.address,
             agent: agent.address,
             signature,
         });
@@ -248,9 +250,9 @@ describe("Test of LoyaltyProvider", function () {
         expect(response2.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
         const response3 = await client.get(
-            URI(serverURL).directory(`/v1/provider/agent/${provider.address}`).toString()
+            URI(serverURL).directory(`/v1/agent/provision/${provider.address}`).toString()
         );
-        expect(response3.data.data.provider).to.deep.equal(provider.address);
+        expect(response3.data.data.account).to.deep.equal(provider.address);
         expect(response3.data.data.agent).to.deep.equal(agent.address);
     });
 
@@ -260,10 +262,11 @@ describe("Test of LoyaltyProvider", function () {
         );
 
         expect(response.data.data.provider.enable).to.deep.equal(true);
-        expect(response.data.data.provider.agent).to.deep.equal(deployments.accounts.users[1].address);
+        expect(response.data.data.agent.provision).to.deep.equal(deployments.accounts.users[1].address);
+        expect(response.data.data.agent.withdrawal).to.deep.equal(AddressZero);
     });
 
-    it("Provide Point for Address by Assistant", async () => {
+    it("Provide Point for Address by Agent", async () => {
         const provider = deployments.accounts.users[0];
         const agent = deployments.accounts.users[1];
         const receiver = deployments.accounts.users[2];
@@ -280,7 +283,7 @@ describe("Test of LoyaltyProvider", function () {
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(agent, message);
-        const response = await client.post(URI(serverURL).directory("/v1/provider/send/account").toString(), {
+        const response = await client.post(URI(serverURL).directory("/v1/provision/send/account").toString(), {
             provider: provider.address,
             receiver: receiver.address,
             amount: pointAmount.toString(),
@@ -299,7 +302,7 @@ describe("Test of LoyaltyProvider", function () {
         );
     });
 
-    it("Provide Point for Phone number by Assistant", async () => {
+    it("Provide Point for Phone number by Agent", async () => {
         const phoneNumber = "+82 10-1000-9000";
         const phoneHash = ContractUtils.getPhoneHash(phoneNumber);
         const provider = deployments.accounts.users[0];
@@ -317,7 +320,7 @@ describe("Test of LoyaltyProvider", function () {
             contractManager.sideChainId
         );
         const signature = await ContractUtils.signMessage(agent, message);
-        const response = await client.post(URI(serverURL).directory("/v1/provider/send/phoneHash").toString(), {
+        const response = await client.post(URI(serverURL).directory("/v1/provision/send/phoneHash").toString(), {
             provider: provider.address,
             receiver: phoneHash,
             amount: pointAmount.toString(),
