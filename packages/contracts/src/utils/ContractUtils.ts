@@ -173,14 +173,13 @@ export class ContractUtils {
 
     public static getShopRefundMessage(
         shopId: BytesLike,
-        account: string,
         amount: BigNumberish,
         nonce: BigNumberish,
         chainId?: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
-            ["bytes32", "address", "uint256", "uint256", "uint256"],
-            [shopId, account, amount, chainId ? chainId : hre.ethers.provider.network.chainId, nonce]
+            ["bytes32", "uint256", "uint256", "uint256"],
+            [shopId, amount, chainId ? chainId : hre.ethers.provider.network.chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }
@@ -663,15 +662,15 @@ export class ContractUtils {
         return arrayify(keccak256(encodedResult));
     }
 
-    public static getRegisterAssistanceMessage(
-        provider: string,
-        assistance: string,
+    public static getRegisterAgentMessage(
+        account: string,
+        agent: string,
         nonce: BigNumberish,
         chainId: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
             ["address", "address", "uint256", "uint256"],
-            [provider, assistance, chainId, nonce]
+            [account, agent, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }

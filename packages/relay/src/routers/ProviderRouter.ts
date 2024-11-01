@@ -10,7 +10,6 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 import { BigNumber, ethers } from "ethers";
 import express from "express";
@@ -269,7 +268,7 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
+            let assistant = await this.contractManager.sideLedgerContract.provisionAgentOf(provider);
             if (assistant === AddressZero) assistant = provider;
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(assistant);
@@ -312,7 +311,7 @@ export class ProviderRouter {
             const amount: BigNumber = BigNumber.from(req.body.amount);
             const signature: string = String(req.body.signature).trim();
 
-            let assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
+            let assistant = await this.contractManager.sideLedgerContract.provisionAgentOf(provider);
             if (assistant === AddressZero) assistant = provider;
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(assistant);
@@ -355,7 +354,7 @@ export class ProviderRouter {
             const signature: string = String(req.body.signature).trim();
 
             const nonce = await this.contractManager.sideLedgerContract.nonceOf(provider);
-            const message = ContractUtils.getRegisterAssistanceMessage(
+            const message = ContractUtils.getRegisterAgentMessage(
                 provider,
                 assistant,
                 nonce,
@@ -365,7 +364,7 @@ export class ProviderRouter {
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
             const tx = await this.contractManager.sideLedgerContract
                 .connect(signerItem.signer)
-                .registerAssistant(provider, assistant, signature);
+                .registerProvisionAgent(provider, assistant, signature);
             this.metrics.add("success", 1);
             return res.status(200).json(this.makeResponseData(0, { provider, assistant, txHash: tx.hash }));
         } catch (error: any) {
@@ -388,7 +387,7 @@ export class ProviderRouter {
 
         try {
             const provider: string = String(req.params.provider).trim();
-            const assistant = await this.contractManager.sideLedgerContract.assistantOf(provider);
+            const assistant = await this.contractManager.sideLedgerContract.provisionAgentOf(provider);
             this.metrics.add("success", 1);
             return res.status(200).json(this.makeResponseData(0, { provider, assistant }));
         } catch (error: any) {

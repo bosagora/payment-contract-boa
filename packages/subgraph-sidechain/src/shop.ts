@@ -1,13 +1,14 @@
 import {
     AddedShop as AddedShopEvent,
     ChangedShopStatus as ChangedShopStatusEvent,
+    CollectedSettlementAmount as CollectedSettlementAmountEvent,
     IncreasedProvidedAmount as IncreasedProvidedAmountEvent,
     IncreasedUsedAmount as IncreasedUsedAmountEvent,
     DecreasedUsedAmount as DecreasedUsedAmountEvent,
     UpdatedShop as UpdatedShopEvent,
     Refunded as RefundedEvent,
 } from "../generated/Shop/Shop";
-import { Shop, ShopTradeHistory } from "../generated/schema";
+import { Shop, ShopTradeHistory, CollectedSettlementAmount } from "../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
 import { AmountUnit } from "./utils";
 
@@ -189,6 +190,26 @@ export function handleRefunded(event: RefundedEvent): void {
         entity.usedAmount = BigInt.fromI32(0);
         entity.refundedAmount = event.params.refundedTotal.div(AmountUnit);
     }
+
+    entity.blockNumber = event.block.number;
+    entity.blockTimestamp = event.block.timestamp;
+    entity.transactionHash = event.transaction.hash;
+
+    entity.save();
+}
+
+export function handleCollectedSettlementAmount(event: CollectedSettlementAmountEvent): void {
+    let entity = new CollectedSettlementAmount(event.transaction.hash.concatI32(event.logIndex.toI32()));
+    entity.clientId = event.params.clientId;
+    entity.clientAccount = event.params.clientAccount;
+    entity.clientCurrency = event.params.clientCurrency;
+    entity.clientAmount = event.params.clientAmount.div(AmountUnit);
+    entity.clientTotal = event.params.clientTotal.div(AmountUnit);
+    entity.managerId = event.params.managerId;
+    entity.managerAccount = event.params.managerAccount;
+    entity.managerCurrency = event.params.managerCurrency;
+    entity.managerAmount = event.params.managerAmount.div(AmountUnit);
+    entity.managerTotal = event.params.managerTotal.div(AmountUnit);
 
     entity.blockNumber = event.block.number;
     entity.blockTimestamp = event.block.timestamp;

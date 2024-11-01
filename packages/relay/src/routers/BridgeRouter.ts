@@ -10,7 +10,9 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-import { BigNumber, ethers } from "ethers";
+import { BigNumber } from "@ethersproject/bignumber";
+
+import { ethers } from "ethers";
 import express from "express";
 import { body, validationResult } from "express-validator";
 

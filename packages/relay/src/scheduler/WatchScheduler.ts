@@ -22,7 +22,6 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { HTTPClient } from "../utils/Utils";
 import { Scheduler } from "./Scheduler";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { ContractTransaction } from "@ethersproject/contracts";
 import { BigNumber, ethers } from "ethers";
 

@@ -6,6 +6,7 @@ import {
     IGraphShopData,
     IGraphShopHistoryData,
     IGraphTokenTransferHistoryData,
+    ISettlementAmountListData,
     IStatisticsAccountInfo,
     IStatisticsShopInfo,
 } from "../types";
@@ -435,6 +436,67 @@ export class GraphStorage extends Storage {
                 shopId,
                 actions,
             })
+                .then((result) => {
+                    if (result.rows.length > 0) {
+                        const m = result.rows[0];
+                        return resolve({
+                            totalCount: Number(m.totalCount),
+                            totalPages: Number(m.totalPages),
+                        });
+                    } else {
+                        return reject(new Error(""));
+                    }
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public getSettlementAmountList(
+        managerId: string,
+        pageNumber: number,
+        pageSize: number
+    ): Promise<ISettlementAmountListData[]> {
+        return new Promise<ISettlementAmountListData[]>(async (resolve, reject) => {
+            this.queryForMapper("shop", "getSettlementAmountList", {
+                scheme: this.scheme,
+                pageNumber,
+                pageSize,
+                managerId,
+            })
+                .then((result) => {
+                    return resolve(
+                        result.rows.map((m) => {
+                            return {
+                                clientId: "0x" + m.clientId.toString("hex"),
+                                clientAccount: "0x" + m.clientAccount.toString("hex"),
+                                clientCurrency: m.clientCurrency,
+                                clientAmount: BigNumber.from(m.clientAmount),
+                                clientTotal: BigNumber.from(m.clientTotal),
+                                managerId: "0x" + m.managerId.toString("hex"),
+                                managerAccount: "0x" + m.managerAccount.toString("hex"),
+                                managerCurrency: m.managerCurrency,
+                                managerAmount: BigNumber.from(m.managerAmount),
+                                managerTotal: BigNumber.from(m.managerTotal),
+                                blockNumber: BigNumber.from(m.blockNumber),
+                                blockTimestamp: BigNumber.from(m.blockTimestamp),
+                                transactionHash: "0x" + m.transactionHash.toString("hex"),
+                            };
+                        })
+                    );
+                })
+                .catch((reason) => {
+                    if (reason instanceof Error) return reject(reason);
+                    return reject(new Error(reason));
+                });
+        });
+    }
+
+    public getSettlementAmountPageInfo(managerId: string, pageSize: number): Promise<IGraphPageInfo> {
+        return new Promise<IGraphPageInfo>(async (resolve, reject) => {
+            this.queryForMapper("shop", "getSettlementAmountPageInfo", { scheme: this.scheme, pageSize, managerId })
                 .then((result) => {
                     if (result.rows.length > 0) {
                         const m = result.rows[0];

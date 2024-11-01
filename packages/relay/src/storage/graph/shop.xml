@@ -37,6 +37,48 @@
         FROM RowInfo;
     </select>
 
+    <select id="getSettlementAmountList">
+        WITH RawData AS (
+            SELECT *
+            FROM ${scheme}.collected_settlement_amount
+            WHERE LOWER(CONCAT('0x', ENCODE(manager_id, 'hex'))) = LOWER(#{managerId})
+            ORDER BY block_timestamp DESC, client_id
+            LIMIT ${pageSize}
+            OFFSET (${pageNumber} - 1) * ${pageSize}
+        )
+        SELECT
+            RawData.client_id as "clientId",
+            RawData.client_account as "clientAccount",
+            RawData.client_currency as "clientCurrency",
+            RawData.client_amount as "clientAmount",
+            RawData.client_total as "clientTotal",
+            RawData.manager_id as "managerId",
+            RawData.manager_account as "managerAccount",
+            RawData.manager_currency as "managerCurrency",
+            RawData.manager_amount as "managerAmount",
+            RawData.manager_total as "managerTotal",
+            RawData.block_number as "blockNumber",
+            RawData.block_timestamp as "blockTimestamp",
+            RawData.transaction_hash as "transactionHash"
+        FROM RawData;
+    </select>
+
+    <select id="getSettlementAmountPageInfo">
+        WITH RawData AS (
+            SELECT *
+            FROM ${scheme}.collected_settlement_amount
+            WHERE LOWER(CONCAT('0x', ENCODE(manager_id, 'hex'))) = LOWER(#{managerId})
+            ORDER BY block_timestamp DESC, client_id
+        ), RowInfo AS (
+            SELECT COUNT(*) AS total_count
+            FROM RawData
+        )
+        SELECT
+            RowInfo.total_count as "totalCount",
+            CEIL(CAST(RowInfo.total_count AS FLOAT) / ${pageSize}) AS "totalPages"
+        FROM RowInfo;
+    </select>
+
     <select id="getHistoryOfShop">
         WITH filtered_trades AS (
             SELECT

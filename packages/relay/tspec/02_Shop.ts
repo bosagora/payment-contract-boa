@@ -626,5 +626,320 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                 };
             };
         };
+        "/v1/shop/refund": {
+            post: {
+                summary: "";
+                body: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                    /**
+                     * Amount for refund (info. decimals are 18)
+                     * @example "100000000000000000000000"
+                     */
+                    amount: string;
+                    /**
+                     * Address of wallet
+                     * @example "0xafFe745418Ad24c272175e5B58610A8a35e2EcDa"
+                     */
+                    account: string;
+                    /**
+                     * Signature of shop owner
+                     * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
+                     */
+                    signature: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * Hash of transaction
+                             * @example "0x3798157a3f32c0ed7692f240eb83f3a3c2f6077c5ad7acf7a9a54d426d63632e"
+                             */
+                            txHash: string;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/manager/set": {
+            post: {
+                summary: "Set settlement manager of the shop(shopId)";
+                body: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                    /**
+                     * Address of wallet
+                     * @example "0xafFe745418Ad24c272175e5B58610A8a35e2EcDa"
+                     */
+                    account: string;
+                    /**
+                     * ID of settlement manager
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    managerId: string;
+                    /**
+                     * Signature of shop owner
+                     * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
+                     */
+                    signature: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * Hash of transaction
+                             * @example "0x3798157a3f32c0ed7692f240eb83f3a3c2f6077c5ad7acf7a9a54d426d63632e"
+                             */
+                            txHash: string;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/manager/remove": {
+            post: {
+                summary: "Remove settlement manager of the shop(shopId)";
+                body: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                    /**
+                     * Address of wallet
+                     * @example "0xafFe745418Ad24c272175e5B58610A8a35e2EcDa"
+                     */
+                    account: string;
+                    /**
+                     * Signature of shop owner
+                     * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
+                     */
+                    signature: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * Hash of transaction
+                             * @example "0x3798157a3f32c0ed7692f240eb83f3a3c2f6077c5ad7acf7a9a54d426d63632e"
+                             */
+                            txHash: string;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/manager/get/{shopId}": {
+            get: {
+                summary: "Provide settlement manager";
+                path: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * ID of Shop
+                             * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                             */
+                            shopId: string;
+                            /**
+                             * ID of Settlement Manager
+                             * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                             */
+                            managerId: string;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/client/length/{shopId}": {
+            get: {
+                summary: "Provide number of registered shops";
+                path: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * ID of Shop
+                             * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                             */
+                            shopId: string;
+                            /**
+                             * Number of registered shop
+                             * @example 10
+                             */
+                            length: number;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/client/list/{shopId}": {
+            get: {
+                summary: "Provide registered shops";
+                path: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * ID of Shop
+                             * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                             */
+                            shopId: string;
+                            /**
+                             * registered shops
+                             * @example 10
+                             */
+                            clients: string[];
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+        "/v1/shop/settlement/collect": {
+            post: {
+                summary: "Collect settlement amount";
+                body: {
+                    /**
+                     * ID of Shop
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    shopId: string;
+                    /**
+                     * Address of wallet
+                     * @example "0xafFe745418Ad24c272175e5B58610A8a35e2EcDa"
+                     */
+                    account: string;
+                    /**
+                     * Address of wallet
+                     * @example "0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874,0x0001be96d74202df38fd21462ffcef10dfe0fcbd7caa3947689a3903e8b6b874"
+                     */
+                    clients: string;
+                    /**
+                     * Signature of shop owner
+                     * @example "0x020d671b80fbd20466d8cb65cef79a24e3bca3fdf82e9dd89d78e7a4c4c045bd72944c20bb1d839e76ee6bb69fed61f64376c37799598b40b8c49148f3cdd88a1b"
+                     */
+                    signature: string;
+                };
+                responses: {
+                    200: {
+                        /**
+                         * Result Code
+                         * @example 0
+                         */
+                        code: ResultCode;
+                        data: {
+                            /**
+                             * Hash of transaction
+                             * @example "0x3798157a3f32c0ed7692f240eb83f3a3c2f6077c5ad7acf7a9a54d426d63632e"
+                             */
+                            txHash: string;
+                        };
+                        error?: {
+                            /**
+                             * Error Message
+                             * @example "Failed to check the validity of parameters"
+                             */
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
     };
 }>;

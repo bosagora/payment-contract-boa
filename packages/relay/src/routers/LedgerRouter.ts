@@ -10,9 +10,9 @@ import { ContractUtils } from "../utils/ContractUtils";
 import { ResponseMessage } from "../utils/Errors";
 import { Validation } from "../validation";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 import { PhoneNumberFormat, PhoneNumberUtil } from "google-libphonenumber";
@@ -642,17 +642,32 @@ export class LedgerRouter {
             const balance = await this.contractManager.sideLedgerContract.tokenBalanceOf(account);
             if (balance.lt(amount)) return res.status(200).json(ResponseMessage.getErrorMessage("1511"));
 
-            const nonce = await this.contractManager.sideLedgerContract.nonceOf(account);
-            const message = ContractUtils.getTransferMessage(
+            const nonce1 = await this.contractManager.sideLedgerContract.nonceOf(account);
+            const message1 = ContractUtils.getTransferMessage(
                 this.contractManager.sideChainId,
                 this.contractManager.sideTokenContract.address,
                 account,
                 this.contractManager.sideLoyaltyBridgeContract.address,
                 amount,
-                nonce,
+                nonce1,
                 expiry
             );
-            if (!ContractUtils.verifyMessage(account, message, signature))
+            const agent = await this.contractManager.sideLedgerContract.withdrawalAgentOf(account);
+            const nonce2 = await this.contractManager.sideLedgerContract.nonceOf(agent);
+            const message2 = ContractUtils.getTransferMessage(
+                this.contractManager.sideChainId,
+                this.contractManager.sideTokenContract.address,
+                account,
+                this.contractManager.sideLoyaltyBridgeContract.address,
+                amount,
+                nonce2,
+                expiry
+            );
+
+            if (
+                !ContractUtils.verifyMessage(account, message1, signature) &&
+                !ContractUtils.verifyMessage(agent, message2, signature)
+            )
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
 
             const tokenId = ContractUtils.getTokenId(

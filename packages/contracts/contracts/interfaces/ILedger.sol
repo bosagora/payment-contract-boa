@@ -71,5 +71,9 @@ interface ILedger {
 
     function isProvider(address _account) external view returns (bool);
 
-    function assistantOf(address _account) external view returns (address);
+    function provisionAgentOf(address _account) external view returns (address);
+
+    function refundAgentOf(address _account) external view returns (address);
+
+    function withdrawalAgentOf(address _account) external view returns (address);
 }

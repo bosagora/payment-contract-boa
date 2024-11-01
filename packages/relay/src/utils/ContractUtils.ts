@@ -9,7 +9,7 @@ import { BigNumber, BigNumberish } from "@ethersproject/bignumber";
 // tslint:disable-next-line:no-implicit-dependencies
 import { arrayify, BytesLike } from "@ethersproject/bytes";
 // tslint:disable-next-line:no-implicit-dependencies
-import { AddressZero } from "@ethersproject/constants";
+import { AddressZero, HashZero } from "@ethersproject/constants";
 // tslint:disable-next-line:no-implicit-dependencies
 import { ContractReceipt, ContractTransaction } from "@ethersproject/contracts";
 // tslint:disable-next-line:no-implicit-dependencies
@@ -248,14 +248,13 @@ export class ContractUtils {
 
     public static getShopRefundMessage(
         shopId: BytesLike,
-        account: string,
         amount: BigNumberish,
         nonce: BigNumberish,
         chainId: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
-            ["bytes32", "address", "uint256", "uint256", "uint256"],
-            [shopId, account, amount, chainId, nonce]
+            ["bytes32", "uint256", "uint256", "uint256"],
+            [shopId, amount, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }
@@ -775,15 +774,15 @@ export class ContractUtils {
         return arrayify(keccak256(encodedResult));
     }
 
-    public static getRegisterAssistanceMessage(
-        provider: string,
-        assistance: string,
+    public static getRegisterAgentMessage(
+        account: string,
+        agent: string,
         nonce: BigNumberish,
         chainId: BigNumberish
     ): Uint8Array {
         const encodedResult = defaultAbiCoder.encode(
             ["address", "address", "uint256", "uint256"],
-            [provider, assistance, chainId, nonce]
+            [account, agent, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }
@@ -828,6 +827,57 @@ export class ContractUtils {
         const encodedResult = defaultAbiCoder.encode(
             ["string", "string", "uint256"],
             ["CloseCancelPayment", paymentId, confirm ? 1 : 0]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getSetSettlementManagerMessage(
+        shopId: BytesLike,
+        managerId: BytesLike,
+        nonce: BigNumberish,
+        chainId: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            ["SetSettlementManager", shopId, managerId, chainId, nonce]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getRemoveSettlementManagerMessage(
+        shopId: BytesLike,
+        nonce: BigNumberish,
+        chainId: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            ["RemoveSettlementManager", shopId, HashZero, chainId, nonce]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCollectSettlementAmountMessage(
+        managerShopId: BytesLike,
+        clientShopId: BytesLike,
+        nonce: BigNumberish,
+        chainId: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32", "uint256", "uint256"],
+            ["CollectSettlementAmount", managerShopId, clientShopId, chainId, nonce]
+        );
+        return arrayify(keccak256(encodedResult));
+    }
+
+    public static getCollectSettlementAmountMultiClientMessage(
+        managerShopId: BytesLike,
+        clientShopIds: BytesLike[],
+        nonce: BigNumberish,
+        chainId: BigNumberish
+    ): Uint8Array {
+        const encodedResult = defaultAbiCoder.encode(
+            ["string", "bytes32", "bytes32[]", "uint256", "uint256"],
+            ["CollectSettlementAmountMultiClient", managerShopId, clientShopIds, chainId, nonce]
         );
         return arrayify(keccak256(encodedResult));
     }

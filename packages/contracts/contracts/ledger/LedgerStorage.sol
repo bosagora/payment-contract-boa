@@ -19,7 +19,9 @@ contract LedgerStorage {
     mapping(address => uint256) internal liquidity;
 
     mapping(address => bool) internal providers;
-    mapping(address => address) internal assistants;
+    mapping(address => address) internal provisionAgents;
+    mapping(address => address) internal refundAgents;
+    mapping(address => address) internal withdrawalAgents;
 
     address public systemAccount;
     address public paymentFeeAccount;

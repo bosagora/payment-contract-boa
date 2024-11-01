@@ -10,7 +10,6 @@ import { Scheduler } from "./Scheduler";
 import axios from "axios";
 import URI from "urijs";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import { AddressZero } from "@ethersproject/constants";
 
 export interface IWalletData {

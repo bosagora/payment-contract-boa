@@ -6,7 +6,6 @@ import { WebService } from "../service/WebService";
 import { RelayStorage } from "../storage/RelayStorage";
 import { ResponseMessage } from "../utils/Errors";
 
-// tslint:disable-next-line:no-implicit-dependencies
 import express from "express";
 import { param, validationResult } from "express-validator";
 

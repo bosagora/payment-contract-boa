@@ -907,7 +907,7 @@ async function deployLedger(accounts: IAccount, deployment: Deployments) {
 
         {
             const nonce = await contract.nonceOf(accounts.system.address);
-            const message = ContractUtils.getRegisterAssistanceMessage(
+            const message = ContractUtils.getRegisterAgentMessage(
                 accounts.system.address,
                 accounts.publisher.address,
                 nonce,
@@ -916,11 +916,11 @@ async function deployLedger(accounts: IAccount, deployment: Deployments) {
             const signature = await ContractUtils.signMessage(accounts.system, message);
             const tx = await contract
                 .connect(accounts.certifiers[0])
-                .registerAssistant(accounts.system.address, accounts.publisher.address, signature);
-            console.log(`Register assistant address of system (tx: ${tx.hash})...`);
+                .registerProvisionAgent(accounts.system.address, accounts.publisher.address, signature);
+            console.log(`Register agent address of system (tx: ${tx.hash})...`);
             // await tx.wait();
 
-            const value = await contract.assistantOf(accounts.system.address);
+            const value = await contract.provisionAgentOf(accounts.system.address);
             console.log("Assistance of System Account: ", value);
         }
     }

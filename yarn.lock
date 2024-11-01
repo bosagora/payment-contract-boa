@@ -349,7 +349,7 @@
   dependencies:
     "@ethersproject/bignumber" "^5.7.0"
 
-"@ethersproject/contracts@5.7.0":
+"@ethersproject/contracts@5.7.0", "@ethersproject/contracts@^5.7.0":
   version "5.7.0"
   resolved "https://registry.npmjs.org/@ethersproject/contracts/-/contracts-5.7.0.tgz"
   integrity sha512-5GJbzEU3X+d33CdfPhcyS+z8MzsTrBGk/sc+G+59+tPa9yFkl6HQ9D6L0QMgNTA9q8dT0XKxxkyp883XsQvbbg==
@@ -1931,18 +1931,6 @@ acc-bridge-contracts-v2@~2.5.0:
     "@openzeppelin/contracts-upgradeable" "^4.9.5"
     "@openzeppelin/hardhat-upgrades" "^1.28.0"
     loyalty-tokens "~2.1.1"
-
-acc-contracts-v2@~2.6.0:
-  version "2.6.0"
-  resolved "https://registry.yarnpkg.com/acc-contracts-v2/-/acc-contracts-v2-2.6.0.tgz#eb71aaae439ef3096314f83de9c244f69366d310"
-  integrity sha512-Cnyh3XGRcN8m+PTD/3O/nr28IWlPu9tszkX9lAytmQO1w/yi/NEt5C0Bu0vcuLo5DdR6K4q7FGSgC3RIq5vqAA==
-  dependencies:
-    "@openzeppelin/contracts" "^4.9.5"
-    "@openzeppelin/contracts-upgradeable" "^4.9.5"
-    "@openzeppelin/hardhat-upgrades" "^1.28.0"
-    acc-bridge-contracts-v2 "~2.5.0"
-    loyalty-tokens "~2.1.1"
-    multisig-wallet-contracts "~2.0.0"
 
 accepts@~1.3.8:
   version "1.3.8"

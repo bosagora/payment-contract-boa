@@ -364,3 +364,19 @@ export interface IShopTaskCallback {
     terminalId: string;
     taskStatus: ShopTaskStatus;
 }
+
+export interface ISettlementAmountListData {
+    clientId: string;
+    clientAccount: string;
+    clientCurrency: string;
+    clientAmount: BigNumber;
+    clientTotal: BigNumber;
+    managerId: string;
+    managerAccount: string;
+    managerCurrency: string;
+    managerAmount: BigNumber;
+    managerTotal: BigNumber;
+    blockNumber: BigNumber;
+    blockTimestamp: BigNumber;
+    transactionHash: string;
+}

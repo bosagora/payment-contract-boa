@@ -35,8 +35,8 @@ async function main() {
 
     const provider = new Wallet("0x70438bc3ed02b5e4b76d496625cb7c06d6b7bf4362295b16fdfe91a046d4586c"); // 0x64D111eA9763c93a003cef491941A011B8df5a49
     const receiver = new Wallet("0x595f911dcf0845cb1f2d0e5cec9f1ccfd62fa199ebeae215a72aa56014edbb32"); // 0xB6f69F0e9e70034ba0578C542476cC13eF739269
-    const assistant = await sideLedgerContract.assistantOf(provider.address);
-    console.log(`assistant: ${assistant}`);
+    const agent = await sideLedgerContract.provisionAgentOf(provider.address);
+    console.log(`agent: ${agent}`);
 
     const balance1 = await sideLedgerContract.pointBalanceOf(receiver.address);
     const pointAmount = Amount.make(100, 18).value;

@@ -218,6 +218,7 @@ dataSources:
         - IncreasedProvidedAmount
         - IncreasedUsedAmount
         - Refunded
+        - CollectedSettlementAmount
       abis:
         - name: Shop
           file: $DMS_OSX_MODULE/artifacts/contracts/shop/Shop.sol/Shop.json
@@ -236,6 +237,8 @@ dataSources:
           handler: handleRefunded
         - event: UpdatedShop(bytes32,string,string,address,uint8)
           handler: handleUpdatedShop
+        - event: CollectedSettlementAmount(bytes32,address,string,uint256,uint256,bytes32,address,string,uint256,uint256)
+          handler: handleCollectedSettlementAmount
       file: ./src/shop.ts
 
   - kind: ethereum

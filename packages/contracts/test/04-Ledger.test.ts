@@ -2080,17 +2080,12 @@ describe("Test for Ledger", () => {
 
             it("refund", async () => {
                 const nonce = await shopContract.nonceOf(shopData[shopIndex].wallet.address);
-                const message = ContractUtils.getShopRefundMessage(
-                    shopData[shopIndex].shopId,
-                    shopData[shopIndex].wallet.address,
-                    amount2,
-                    nonce
-                );
+                const message = ContractUtils.getShopRefundMessage(shopData[shopIndex].shopId, amount2, nonce);
                 const signature = await ContractUtils.signMessage(shopData[shopIndex].wallet, message);
                 await expect(
                     shopContract
                         .connect(shopData[shopIndex].wallet.connect(hre.ethers.provider))
-                        .refund(shop.shopId, shopData[shopIndex].wallet.address, amount2, signature)
+                        .refund(shop.shopId, amount2, signature)
                 )
                     .to.emit(shopContract, "Refunded")
                     .withNamedArgs({
@@ -2395,17 +2390,12 @@ describe("Test for Ledger", () => {
 
             it("Open Withdrawal", async () => {
                 const nonce = await shopContract.nonceOf(shopData[shopIndex].wallet.address);
-                const message = ContractUtils.getShopRefundMessage(
-                    shopData[shopIndex].shopId,
-                    shopData[shopIndex].wallet.address,
-                    amount2,
-                    nonce
-                );
+                const message = ContractUtils.getShopRefundMessage(shopData[shopIndex].shopId, amount2, nonce);
                 const signature = await ContractUtils.signMessage(shopData[shopIndex].wallet, message);
                 await expect(
                     shopContract
                         .connect(shopData[shopIndex].wallet.connect(hre.ethers.provider))
-                        .refund(shop.shopId, shopData[shopIndex].wallet.address, amount2, signature)
+                        .refund(shop.shopId, amount2, signature)
                 )
                     .to.emit(shopContract, "Refunded")
                     .withNamedArgs({
@@ -3114,7 +3104,6 @@ describe("Test for Ledger", () => {
                     const nonce = await shopContract.nonceOf(shopData[shopIndex].wallet.address);
                     const message = ContractUtils.getShopRefundMessage(
                         shopData[shopIndex].shopId,
-                        shopData[shopIndex].wallet.address,
                         expected[shopIndex],
                         nonce
                     );
@@ -3122,7 +3111,7 @@ describe("Test for Ledger", () => {
                     await expect(
                         shopContract
                             .connect(deployments.accounts.certifiers[0])
-                            .refund(shop.shopId, shopData[shopIndex].wallet.address, expected[shopIndex], signature)
+                            .refund(shop.shopId, expected[shopIndex], signature)
                     )
                         .to.emit(shopContract, "Refunded")
                         .withNamedArgs({
@@ -3647,17 +3636,12 @@ describe("Test for Ledger", () => {
 
             it("refund", async () => {
                 const nonce = await shopContract.nonceOf(managerShop.wallet.address);
-                const message = ContractUtils.getShopRefundMessage(
-                    managerShop.shopId,
-                    managerShop.wallet.address,
-                    sumExpected,
-                    nonce
-                );
+                const message = ContractUtils.getShopRefundMessage(managerShop.shopId, sumExpected, nonce);
                 const signature = await ContractUtils.signMessage(managerShop.wallet, message);
                 await expect(
                     shopContract
                         .connect(deployments.accounts.certifiers[0])
-                        .refund(managerShop.shopId, managerShop.wallet.address, sumExpected, signature)
+                        .refund(managerShop.shopId, sumExpected, signature)
                 )
                     .to.emit(shopContract, "Refunded")
                     .withNamedArgs({
@@ -4160,17 +4144,550 @@ describe("Test for Ledger", () => {
 
             it("refund", async () => {
                 const nonce = await shopContract.nonceOf(managerShop.wallet.address);
-                const message = ContractUtils.getShopRefundMessage(
-                    managerShop.shopId,
-                    managerShop.wallet.address,
-                    sumExpected,
-                    nonce
-                );
+                const message = ContractUtils.getShopRefundMessage(managerShop.shopId, sumExpected, nonce);
                 const signature = await ContractUtils.signMessage(managerShop.wallet, message);
                 await expect(
                     shopContract
                         .connect(deployments.accounts.certifiers[0])
-                        .refund(managerShop.shopId, managerShop.wallet.address, sumExpected, signature)
+                        .refund(managerShop.shopId, sumExpected, signature)
+                )
+                    .to.emit(shopContract, "Refunded")
+                    .withNamedArgs({
+                        shopId: managerShop.shopId,
+                        account: managerShop.wallet.address,
+                        refundAmount: sumExpected,
+                        amountToken,
+                    });
+            });
+
+            it("Check balance of ledger", async () => {
+                const balance = await ledgerContract.tokenBalanceOf(managerShop.wallet.address);
+                expect(balance).to.equal(amountToken);
+            });
+        });
+    });
+
+    context("Clearing for shops - Use settlement manager -- settlement agent", () => {
+        const userData: IUserData[] = [
+            {
+                phone: "08201012341001",
+                address: deployments.accounts.users[0].address,
+                privateKey: deployments.accounts.users[0].privateKey,
+            },
+            {
+                phone: "08201012341002",
+                address: deployments.accounts.users[1].address,
+                privateKey: deployments.accounts.users[1].privateKey,
+            },
+            {
+                phone: "08201012341003",
+                address: deployments.accounts.users[2].address,
+                privateKey: deployments.accounts.users[2].privateKey,
+            },
+            {
+                phone: "08201012341004",
+                address: deployments.accounts.users[3].address,
+                privateKey: deployments.accounts.users[3].privateKey,
+            },
+            {
+                phone: "08201012341005",
+                address: deployments.accounts.users[4].address,
+                privateKey: deployments.accounts.users[4].privateKey,
+            },
+        ];
+
+        const purchaseData: IPurchaseData[] = [
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 0,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 1,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 1,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 2,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 2,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 2,
+                userIndex: 0,
+            },
+            {
+                purchaseId: getPurchaseId(),
+                amount: 10000000,
+                providePercent: 1,
+                currency: "krw",
+                shopIndex: 5,
+                userIndex: 0,
+            },
+        ];
+
+        const shopData: IShopData[] = [
+            {
+                shopId: "F000100",
+                name: "Shop1",
+                currency: "krw",
+                wallet: deployments.accounts.shops[0],
+            },
+            {
+                shopId: "F000200",
+                name: "Shop2",
+                currency: "krw",
+                wallet: deployments.accounts.shops[1],
+            },
+            {
+                shopId: "F000300",
+                name: "Shop3",
+                currency: "krw",
+                wallet: deployments.accounts.shops[2],
+            },
+            {
+                shopId: "F000400",
+                name: "Shop4",
+                currency: "krw",
+                wallet: deployments.accounts.shops[3],
+            },
+            {
+                shopId: "F000500",
+                name: "Shop5",
+                currency: "krw",
+                wallet: deployments.accounts.shops[4],
+            },
+            {
+                shopId: "F000500",
+                name: "Shop6",
+                currency: "krw",
+                wallet: deployments.accounts.shops[5],
+            },
+        ];
+
+        before("Set Shop ID", async () => {
+            for (const elem of shopData) {
+                elem.shopId = ContractUtils.getShopId(elem.wallet.address, LoyaltyNetworkID.ACC_TESTNET);
+            }
+        });
+
+        before("Deploy", async () => {
+            await deployAllContract(shopData);
+        });
+
+        context("Save Purchase Data", () => {
+            it("Save Purchase Data", async () => {
+                for (const purchase of purchaseData) {
+                    const phoneHash = ContractUtils.getPhoneHash(userData[purchase.userIndex].phone);
+                    const purchaseAmount = Amount.make(purchase.amount, 18).value;
+                    const loyaltyAmount = purchaseAmount.mul(purchase.providePercent).div(100);
+                    const amt = purchaseAmount.mul(purchase.providePercent).div(100);
+                    const userAccount =
+                        userData[purchase.userIndex].address.trim() !== ""
+                            ? userData[purchase.userIndex].address.trim()
+                            : AddressZero;
+                    const purchaseParam = {
+                        purchaseId: getPurchaseId(),
+                        amount: purchaseAmount,
+                        loyalty: loyaltyAmount,
+                        currency: purchase.currency.toLowerCase(),
+                        shopId: shopData[purchase.shopIndex].shopId,
+                        account: userAccount,
+                        phone: phoneHash,
+                        sender: deployments.accounts.system.address,
+                        signature: "",
+                    };
+                    purchaseParam.signature = await ContractUtils.getPurchaseSignature(
+                        deployments.accounts.system,
+                        purchaseParam
+                    );
+                    const purchaseMessage = ContractUtils.getPurchasesMessage(0, [purchaseParam]);
+                    const signatures = await Promise.all(
+                        deployments.accounts.validators.map((m) => ContractUtils.signMessage(m, purchaseMessage))
+                    );
+                    const proposeMessage = ContractUtils.getPurchasesProposeMessage(0, [purchaseParam], signatures);
+                    const proposerSignature = await ContractUtils.signMessage(
+                        deployments.accounts.validators[0],
+                        proposeMessage
+                    );
+                    await expect(
+                        providerContract
+                            .connect(deployments.accounts.certifiers[0])
+                            .savePurchase(0, [purchaseParam], signatures, proposerSignature)
+                    )
+                        .to.emit(providerContract, "SavedPurchase")
+                        .withArgs(
+                            purchaseParam.purchaseId,
+                            purchaseParam.amount,
+                            purchaseParam.loyalty,
+                            purchaseParam.currency,
+                            purchaseParam.shopId,
+                            purchaseParam.account,
+                            purchaseParam.phone,
+                            purchaseParam.sender
+                        )
+                        .emit(ledgerContract, "ProvidedPoint")
+                        .withNamedArgs({
+                            account: userAccount,
+                            providedPoint: amt,
+                            providedValue: amt,
+                            purchaseId: purchaseParam.purchaseId,
+                        });
+                }
+            });
+
+            it("Check balances", async () => {
+                const expected: Map<string, BigNumber> = new Map<string, BigNumber>();
+                for (const purchase of purchaseData) {
+                    const purchaseAmount = Amount.make(purchase.amount, 18).value;
+                    const key =
+                        userData[purchase.userIndex].address.trim() !== ""
+                            ? userData[purchase.userIndex].address.trim()
+                            : ContractUtils.getPhoneHash(userData[purchase.userIndex].phone.trim());
+                    const oldValue = expected.get(key);
+
+                    const point = purchaseAmount.mul(purchase.providePercent).div(100);
+
+                    if (oldValue !== undefined) expected.set(key, oldValue.add(point));
+                    else expected.set(key, point);
+                }
+                for (const key of expected.keys()) {
+                    if (key.match(/^0x[A-Fa-f0-9]{64}$/i)) {
+                        expect(await ledgerContract.unPayablePointBalanceOf(key)).to.deep.equal(expected.get(key));
+                    } else {
+                        expect(await ledgerContract.pointBalanceOf(key)).to.deep.equal(expected.get(key));
+                    }
+                }
+            });
+
+            it("Check shop data", async () => {
+                const shopInfo1 = await shopContract.shopOf(shopData[0].shopId);
+                expect(shopInfo1.providedAmount).to.equal(
+                    Amount.make(10000 * 1, 18)
+                        .value.mul(1)
+                        .div(100)
+                );
+
+                const shopInfo2 = await shopContract.shopOf(shopData[1].shopId);
+                expect(shopInfo2.providedAmount).to.equal(
+                    Amount.make(10000 * 2, 18)
+                        .value.mul(1)
+                        .div(100)
+                );
+                const shopInfo3 = await shopContract.shopOf(shopData[2].shopId);
+                expect(shopInfo3.providedAmount).to.equal(
+                    Amount.make(10000 * 3, 18)
+                        .value.mul(1)
+                        .div(100)
+                );
+                const shopInfo4 = await shopContract.shopOf(shopData[3].shopId);
+                expect(shopInfo4.providedAmount).to.equal(Amount.make(0, 18).value);
+            });
+        });
+
+        context("Pay point", () => {
+            it("Pay point - Success", async () => {
+                const providedAmount = [100, 200, 300, 0].map((m) => Amount.make(m, 18).value);
+                const usedAmount = [500, 500, 500, 500].map((m) => Amount.make(m, 18).value);
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const purchase = {
+                        purchaseId: getPurchaseId(),
+                        amount: 500,
+                        providePercent: 1,
+                        currency: "krw",
+                        shopIndex,
+                        userIndex: 0,
+                    };
+
+                    const paymentId = ContractUtils.getPaymentId(
+                        deployments.accounts.users[purchase.userIndex].address,
+                        0
+                    );
+                    const purchaseAmount = Amount.make(purchase.amount, 18).value;
+                    const shop = shopData[purchase.shopIndex];
+                    const nonce = await ledgerContract.nonceOf(deployments.accounts.users[purchase.userIndex].address);
+                    const signature = await ContractUtils.signLoyaltyNewPayment(
+                        deployments.accounts.users[purchase.userIndex],
+                        paymentId,
+                        purchase.purchaseId,
+                        purchaseAmount,
+                        purchase.currency,
+                        shop.shopId,
+                        nonce
+                    );
+
+                    [secret, secretLock] = ContractUtils.getSecret();
+                    await expect(
+                        consumerContract.connect(deployments.accounts.certifiers[0]).openNewLoyaltyPayment({
+                            paymentId,
+                            purchaseId: purchase.purchaseId,
+                            amount: purchaseAmount,
+                            currency: purchase.currency.toLowerCase(),
+                            shopId: shop.shopId,
+                            account: deployments.accounts.users[purchase.userIndex].address,
+                            signature,
+                            secretLock,
+                        })
+                    ).to.emit(consumerContract, "LoyaltyPaymentEvent");
+
+                    await expect(
+                        consumerContract
+                            .connect(deployments.accounts.certifiers[0])
+                            .closeNewLoyaltyPayment(paymentId, secret, true)
+                    ).to.emit(consumerContract, "LoyaltyPaymentEvent");
+
+                    const shopInfo = await shopContract.shopOf(shop.shopId);
+                    expect(shopInfo.providedAmount).to.equal(providedAmount[shopIndex]);
+                    expect(shopInfo.usedAmount).to.equal(usedAmount[shopIndex]);
+                }
+            });
+        });
+
+        context("setSettlementManager/removeSettlementManager", () => {
+            const managerShop = shopData[4];
+            const clients: BytesLike[] = [];
+
+            it("prepare", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    clients.push(shopData[shopIndex].shopId);
+                }
+            });
+
+            it("setSettlementManager", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    const nonce = await shopContract.nonceOf(shop.wallet.address);
+                    const message = ContractUtils.getSetSettlementManagerMessage(
+                        shop.shopId,
+                        managerShop.shopId,
+                        nonce
+                    );
+                    const signature = ContractUtils.signMessage(shop.wallet, message);
+                    await expect(
+                        shopContract
+                            .connect(deployments.accounts.certifiers[0])
+                            .setSettlementManager(shop.shopId, managerShop.shopId, signature)
+                    )
+                        .to.emit(shopContract, "SetSettlementManager")
+                        .withNamedArgs({
+                            shopId: shop.shopId,
+                            managerShopId: managerShop.shopId,
+                        });
+                }
+            });
+
+            it("check manager", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    expect(await shopContract.settlementManagerOf(shop.shopId)).to.be.equal(managerShop.shopId);
+                }
+            });
+
+            it("check client", async () => {
+                expect(await shopContract.getSettlementClientLength(managerShop.shopId)).to.be.equal(clients.length);
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 0, 2)).to.deep.equal(
+                    clients.slice(0, 2)
+                );
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 1, 3)).to.deep.equal(
+                    clients.slice(1, 3)
+                );
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 0, 4)).to.deep.equal(
+                    clients.slice(0, 4)
+                );
+            });
+
+            it("removeSettlementManager", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    const nonce = await shopContract.nonceOf(shop.wallet.address);
+                    const message = ContractUtils.getRemoveSettlementManagerMessage(shop.shopId, nonce);
+                    const signature = ContractUtils.signMessage(shop.wallet, message);
+                    await expect(
+                        shopContract
+                            .connect(deployments.accounts.certifiers[0])
+                            .removeSettlementManager(shop.shopId, signature)
+                    )
+                        .to.emit(shopContract, "RemovedSettlementManager")
+                        .withNamedArgs({
+                            shopId: shop.shopId,
+                            managerShopId: managerShop.shopId,
+                        });
+                }
+            });
+
+            it("check manager", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    expect(await shopContract.settlementManagerOf(shop.shopId)).to.be.equal(HashZero);
+                }
+            });
+
+            it("check client", async () => {
+                expect(await shopContract.getSettlementClientLength(managerShop.shopId)).to.be.equal(0);
+            });
+
+            it("setSettlementManager again", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    const nonce = await shopContract.nonceOf(shop.wallet.address);
+                    const message = ContractUtils.getSetSettlementManagerMessage(
+                        shop.shopId,
+                        managerShop.shopId,
+                        nonce
+                    );
+                    const signature = ContractUtils.signMessage(shop.wallet, message);
+                    await expect(
+                        shopContract
+                            .connect(deployments.accounts.certifiers[0])
+                            .setSettlementManager(shop.shopId, managerShop.shopId, signature)
+                    )
+                        .to.emit(shopContract, "SetSettlementManager")
+                        .withNamedArgs({
+                            shopId: shop.shopId,
+                            managerShopId: managerShop.shopId,
+                        });
+                }
+            });
+
+            it("check manager", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    expect(await shopContract.settlementManagerOf(shop.shopId)).to.be.equal(managerShop.shopId);
+                }
+            });
+
+            it("check client", async () => {
+                expect(await shopContract.getSettlementClientLength(managerShop.shopId)).to.be.equal(clients.length);
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 0, 2)).to.deep.equal(
+                    clients.slice(0, 2)
+                );
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 1, 3)).to.deep.equal(
+                    clients.slice(1, 3)
+                );
+                expect(await shopContract.getSettlementClientList(managerShop.shopId, 0, 4)).to.deep.equal(
+                    clients.slice(0, 4)
+                );
+            });
+        });
+
+        context("refund", () => {
+            const managerShop = shopData[4];
+            const expected = [400, 300, 200, 500].map((m) => Amount.make(m, 18).value);
+            const sumExpected = Amount.make(1400, 18).value;
+            let amountToken: BigNumber;
+
+            it("register refund agent", async () => {
+                const refundAgent = deployments.accounts.users[0];
+                const nonce = await ledgerContract.nonceOf(managerShop.wallet.address);
+                const message = ContractUtils.getRegisterAgentMessage(
+                    managerShop.wallet.address,
+                    refundAgent.address,
+                    nonce,
+                    hre.ethers.provider.network.chainId
+                );
+                const signature = await ContractUtils.signMessage(managerShop.wallet, message);
+                await expect(
+                    ledgerContract
+                        .connect(deployments.accounts.certifiers[0])
+                        .registerRefundAgent(managerShop.wallet.address, refundAgent.address, signature)
+                )
+                    .to.emit(ledgerContract, "RegisteredRefundAgent")
+                    .withNamedArgs({
+                        account: managerShop.wallet.address,
+                        agent: refundAgent.address,
+                    });
+            });
+
+            it("Check refund agent", async () => {
+                const refundAgent = deployments.accounts.users[0];
+                const refundAgentAddress = await ledgerContract.refundAgentOf(managerShop.wallet.address);
+                expect(refundAgentAddress).to.be.equal(refundAgent.address);
+            });
+
+            it("Check refundable amount", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    const { refundableAmount, refundableToken } = await shopContract.refundableOf(shop.shopId);
+                    expect(refundableAmount).to.equal(expected[shopIndex]);
+                }
+            });
+
+            it("collectSettlementAmountMultiClient by agent", async () => {
+                const refundAgent = deployments.accounts.users[0];
+                const clientLength = await shopContract.getSettlementClientLength(managerShop.shopId);
+                const clients = await shopContract.getSettlementClientList(managerShop.shopId, 0, clientLength);
+                const nonce = await shopContract.nonceOf(refundAgent.address);
+                const message = ContractUtils.getCollectSettlementAmountMultiClientMessage(
+                    managerShop.shopId,
+                    clients,
+                    nonce
+                );
+                const signature = await ContractUtils.signMessage(refundAgent, message);
+                await expect(
+                    shopContract
+                        .connect(deployments.accounts.certifiers[0])
+                        .collectSettlementAmountMultiClient(managerShop.shopId, clients, signature)
+                )
+                    .to.emit(shopContract, "CollectedSettlementAmount")
+                    .withNamedArgs({
+                        managerId: managerShop.shopId,
+                        managerAccount: managerShop.wallet.address,
+                        managerCurrency: managerShop.currency,
+                    });
+            });
+
+            it("Check refundable amount", async () => {
+                for (let shopIndex = 0; shopIndex < 4; shopIndex++) {
+                    const shop = shopData[shopIndex];
+                    const { refundableAmount } = await shopContract.refundableOf(shop.shopId);
+                    expect(refundableAmount).to.equal(0);
+                }
+            });
+
+            it("Check refundable amount of settlement manager", async () => {
+                const { refundableAmount, refundableToken } = await shopContract.refundableOf(managerShop.shopId);
+                expect(refundableAmount).to.equal(sumExpected);
+                amountToken = BigNumber.from(refundableToken);
+            });
+
+            it("refund by agent", async () => {
+                const refundAgent = deployments.accounts.users[0];
+                const nonce = await shopContract.nonceOf(refundAgent.address);
+                const message = ContractUtils.getShopRefundMessage(managerShop.shopId, sumExpected, nonce);
+                const signature = await ContractUtils.signMessage(refundAgent, message);
+                await expect(
+                    shopContract
+                        .connect(deployments.accounts.certifiers[0])
+                        .refund(managerShop.shopId, sumExpected, signature)
                 )
                     .to.emit(shopContract, "Refunded")
                     .withNamedArgs({

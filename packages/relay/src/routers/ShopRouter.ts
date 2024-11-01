@@ -16,7 +16,7 @@ import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 import * as hre from "hardhat";
 
-// tslint:disable-next-line:no-implicit-dependencies
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 import { ContractManager } from "../contract/ContractManager";
 import { Metrics } from "../metrics/Metrics";
@@ -245,6 +245,100 @@ export class ShopRouter {
                     .matches(/^(0x)[0-9a-f]{64}$/i),
             ],
             this.shop_refundable.bind(this)
+        );
+        this.app.post(
+            "/v1/shop/settlement/manager/set",
+            [
+                body("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                body("account").exists().trim().isEthereumAddress(),
+                body("managerId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                body("signature")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.shop_settlement_manager_set.bind(this)
+        );
+        this.app.post(
+            "/v1/shop/settlement/manager/remove",
+            [
+                body("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                body("account").exists().trim().isEthereumAddress(),
+                body("signature")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.shop_settlement_manager_remove.bind(this)
+        );
+        this.app.get(
+            "/v1/shop/settlement/manager/get/:shopId",
+            [
+                param("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+            ],
+            this.shop_settlement_manager_get.bind(this)
+        );
+        this.app.get(
+            "/v1/shop/settlement/client/length/:shopId",
+            [
+                param("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+            ],
+            this.shop_settlement_client_length.bind(this)
+        );
+        this.app.get(
+            "/v1/shop/settlement/client/list/:shopId",
+            [
+                param("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                query("startIndex").exists().trim().isNumeric(),
+                query("endIndex").exists().trim().isNumeric(),
+            ],
+            this.shop_settlement_client_list.bind(this)
+        );
+        this.app.post(
+            "/v1/shop/settlement/collect",
+            [
+                body("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                body("account").exists().trim().isEthereumAddress(),
+                body("clients").exists(),
+                body("signature")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{130}$/i),
+            ],
+            this.shop_settlement_collect.bind(this)
+        );
+        this.app.get(
+            "/v1/shop/settlement/collect/history/:shopId",
+            [
+                param("shopId")
+                    .exists()
+                    .trim()
+                    .matches(/^(0x)[0-9a-f]{64}$/i),
+                query("pageNumber").exists().trim().isNumeric(),
+                query("pageSize").exists().trim().isNumeric(),
+            ],
+            this.shop_settlement_collect_history.bind(this)
         );
     }
 
@@ -1139,19 +1233,13 @@ export class ShopRouter {
 
             // 서명검증
             const nonce = await this.contractManager.sideShopContract.nonceOf(account);
-            const message = ContractUtils.getShopRefundMessage(
-                shopId,
-                account,
-                amount,
-                nonce,
-                this.contractManager.sideChainId
-            );
+            const message = ContractUtils.getShopRefundMessage(shopId, amount, nonce, this.contractManager.sideChainId);
             if (!ContractUtils.verifyMessage(account, message, signature))
                 return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
 
             const tx = await this.contractManager.sideShopContract
                 .connect(signerItem.signer)
-                .refund(shopId, account, amount, signature);
+                .refund(shopId, amount, signature);
 
             logger.http(`TxHash(/v1/shop/refund): ${tx.hash}`);
             this.metrics.add("success", 1);
@@ -1264,6 +1352,7 @@ export class ShopRouter {
                 delegator: info.delegator,
                 providedAmount: info.providedAmount.toString(),
                 usedAmount: info.usedAmount.toString(),
+                collectedAmount: info.collectedAmount.toString(),
                 refundedAmount: info.refundedAmount.toString(),
             };
             this.metrics.add("success", 1);
@@ -1302,6 +1391,298 @@ export class ShopRouter {
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
             logger.error(`GET /v1/shop/refundable/:shopId : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
+        }
+    }
+
+    /**
+     * POST /v1/shop/settlement/manager/set
+     * @private
+     */
+    private async shop_settlement_manager_set(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/shop/settlement/manager/set ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const signerItem = await this.getRelaySigner();
+        try {
+            const shopId: string = String(req.body.shopId).trim();
+            const account: string = String(req.body.account).trim();
+            const managerId: string = String(req.body.managerId).trim();
+            const signature: string = String(req.body.signature).trim();
+
+            const contract = this.contractManager.sideShopContract;
+            const message = ContractUtils.getSetSettlementManagerMessage(
+                shopId,
+                managerId,
+                await contract.nonceOf(account),
+                this.contractManager.sideChainId
+            );
+            if (!ContractUtils.verifyMessage(account, message, signature))
+                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+
+            const tx = await contract.connect(signerItem.signer).setSettlementManager(shopId, managerId, signature);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    managerId,
+                    txHash: tx.hash,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/shop/settlement/manager/set : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        } finally {
+            this.releaseRelaySigner(signerItem);
+        }
+    }
+
+    /**
+     * POST /v1/shop/settlement/manager/remove
+     * @private
+     */
+    private async shop_settlement_manager_remove(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/shop/settlement/manager/remove ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const signerItem = await this.getRelaySigner();
+        try {
+            const shopId: string = String(req.body.shopId).trim();
+            const account: string = String(req.body.account).trim();
+            const signature: string = String(req.body.signature).trim();
+
+            const contract = this.contractManager.sideShopContract;
+            const message = ContractUtils.getRemoveSettlementManagerMessage(
+                shopId,
+                await contract.nonceOf(account),
+                this.contractManager.sideChainId
+            );
+            if (!ContractUtils.verifyMessage(account, message, signature))
+                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+
+            const tx = await contract.connect(signerItem.signer).removeSettlementManager(shopId, signature);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    txHash: tx.hash,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/shop/settlement/manager/remove : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        } finally {
+            this.releaseRelaySigner(signerItem);
+        }
+    }
+
+    /**
+     * GET /v1/shop/settlement/manager/get
+     * @private
+     */
+    private async shop_settlement_manager_get(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/shop/settlement/manager/get ${req.ip}:${JSON.stringify(req.params)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const shopId: string = String(req.params.shopId).trim();
+
+            const contract = this.contractManager.sideShopContract;
+            const managerId = await contract.settlementManagerOf(shopId);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    managerId,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`GET /v1/shop/settlement/manager/get : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        }
+    }
+
+    /**
+     * GET /v1/shop/settlement/client/length
+     * @private
+     */
+    private async shop_settlement_client_length(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/shop/settlement/client/length ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const shopId: string = String(req.params.shopId).trim();
+
+            const contract = this.contractManager.sideShopContract;
+            const length = await contract.getSettlementClientLength(shopId);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    length: length.toNumber(),
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`GET /v1/shop/settlement/client/length : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        }
+    }
+
+    /**
+     * GET /v1/shop/settlement/client/list
+     * @private
+     */
+    private async shop_settlement_client_list(req: express.Request, res: express.Response) {
+        logger.http(`GET /v1/shop/settlement/client/list ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const shopId: string = String(req.params.shopId).trim();
+            const startIndex = BigNumber.from(String(req.query.startIndex).trim());
+            const endIndex = BigNumber.from(String(req.query.endIndex).trim());
+
+            const contract = this.contractManager.sideShopContract;
+            const clients = await contract.getSettlementClientList(shopId, startIndex, endIndex);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    clients,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`GET /v1/shop/settlement/client/list : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        }
+    }
+
+    /**
+     * POST /v1/shop/settlement/collect
+     * @private
+     */
+    private async shop_settlement_collect(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/shop/settlement/collect ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        const signerItem = await this.getRelaySigner();
+        try {
+            const shopId: string = String(req.body.shopId).trim();
+            const account: string = String(req.body.account).trim();
+            const clients: string[] = String(req.body.clients).trim().split(",");
+            const signature: string = String(req.body.signature).trim();
+
+            const contract = this.contractManager.sideShopContract;
+            const message = ContractUtils.getCollectSettlementAmountMultiClientMessage(
+                shopId,
+                clients,
+                await contract.nonceOf(account),
+                this.contractManager.sideChainId
+            );
+            if (!ContractUtils.verifyMessage(account, message, signature))
+                return res.status(200).json(ResponseMessage.getErrorMessage("1501"));
+
+            const tx = await contract
+                .connect(signerItem.signer)
+                .collectSettlementAmountMultiClient(shopId, clients, signature);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    shopId,
+                    txHash: tx.hash,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/shop/settlement/collect : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        } finally {
+            this.releaseRelaySigner(signerItem);
+        }
+    }
+
+    /**
+     * POST /v1/shop/settlement/collect/history
+     * @private
+     */
+    private async shop_settlement_collect_history(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/shop/settlement/collect/history/:shopId ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const shopId: string = String(req.params.shopId).trim();
+            let pageSize = Number(req.query.pageSize);
+            if (pageSize > 50) pageSize = 50;
+            let pageNumber = Number(req.query.pageNumber);
+            if (pageNumber < 1) pageNumber = 1;
+
+            const records = await this.graph_sidechain.getSettlementAmountList(shopId, pageNumber, pageSize);
+            const pageInfo = await this.graph_sidechain.getSettlementAmountPageInfo(shopId, pageSize);
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    pageInfo,
+                    items: records.map((m) => {
+                        return {
+                            clientId: m.clientId,
+                            clientAccount: m.clientAccount,
+                            clientCurrency: m.clientCurrency,
+                            clientAmount: m.clientAmount.toString(),
+                            clientTotal: m.clientTotal.toString(),
+                            managerId: m.managerId,
+                            managerAccount: m.managerAccount,
+                            managerCurrency: m.managerCurrency,
+                            managerAmount: m.managerAmount.toString(),
+                            managerTotal: m.managerTotal.toString(),
+                            blockNumber: m.blockNumber.toString(),
+                            blockTimestamp: m.blockTimestamp.toString(),
+                            transactionHash: m.transactionHash,
+                        };
+                    }),
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`GET /v1/shop/settlement/collect/history/:shopId : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(this.makeResponseData(msg.code, undefined, msg.error));
         }

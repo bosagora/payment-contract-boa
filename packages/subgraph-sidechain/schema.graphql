@@ -125,6 +125,23 @@ type ShopTradeHistory @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
+type CollectedSettlementAmount @entity(immutable: true) {
+  id: Bytes!
+  clientId: Bytes! # bytes32
+  clientAccount: Bytes! # address
+  clientCurrency: String! # string
+  clientAmount: BigInt! # uint256
+  clientTotal: BigInt! # uint256
+  managerId: Bytes! # bytes32
+  managerAccount: Bytes! # address
+  managerCurrency: String! # string
+  managerAmount: BigInt! # uint256
+  managerTotal: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
 type Shop @entity {
   id: Bytes! # shopId
 

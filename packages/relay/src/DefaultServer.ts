@@ -14,6 +14,7 @@ import { ContractManager } from "./contract/ContractManager";
 import { RelaySigners } from "./contract/Signers";
 import { INotificationEventHandler, INotificationSender, NotificationSender } from "./delegator/NotificationSender";
 import { Metrics } from "./metrics/Metrics";
+import { AgentRouter } from "./routers/AgentRouter";
 import { BridgeRouter } from "./routers/BridgeRouter";
 import { HistoryRouter } from "./routers/HistoryRouter";
 import { PhoneLinkRouter } from "./routers/PhoneLinkRouter";
@@ -42,6 +43,7 @@ export class DefaultServer extends WebService {
     public readonly purchaseRouter: StorePurchaseRouter;
     public readonly tokenRouter: TokenRouter;
     public readonly taskRouter: TaskRouter;
+    public readonly agentRouter: AgentRouter;
     public readonly phoneLinkRouter: PhoneLinkRouter;
     public readonly providerRouter: ProviderRouter;
     public readonly bridgeRouter: BridgeRouter;
@@ -159,6 +161,16 @@ export class DefaultServer extends WebService {
             this.graph_mainchain,
             this.relaySigners
         );
+        this.agentRouter = new AgentRouter(
+            this,
+            this.config,
+            this.contractManager,
+            this.metrics,
+            this.storage,
+            this.graph_sidechain,
+            this.graph_mainchain,
+            this.relaySigners
+        );
         this.providerRouter = new ProviderRouter(
             this,
             this.config,
@@ -232,6 +244,7 @@ export class DefaultServer extends WebService {
         await this.purchaseRouter.registerRoutes();
         await this.tokenRouter.registerRoutes();
         await this.phoneLinkRouter.registerRoutes();
+        await this.agentRouter.registerRoutes();
         await this.providerRouter.registerRoutes();
         await this.bridgeRouter.registerRoutes();
         await this.historyRouter.registerRoutes();
