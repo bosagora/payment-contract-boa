@@ -190,6 +190,7 @@ export enum MobileType {
 export interface MobileData {
     account: string;
     type: MobileType;
+    shopId: string;
     token: string;
     language: string;
     os: string;

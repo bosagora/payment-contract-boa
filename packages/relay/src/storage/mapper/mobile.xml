@@ -7,6 +7,7 @@
             (
                 "account"                ,
                 "type"                   ,
+                "shopId"                   ,
                 "token"                  ,
                 "language"               ,
                 "os"
@@ -15,18 +16,19 @@
             (
                 #{account}               ,
                 #{type}                  ,
+                #{shopId}                ,
                 #{token}                 ,
                 #{language}              ,
                 #{os}
             )
-        ON CONFLICT ("account", "type")
+        ON CONFLICT ("account", "type", "shopId")
         DO UPDATE
-        SET "token" = #{token},
+            SET "token" = #{token},
             "language" = #{language},
             "os" = #{os};
     </insert>
 
     <select id="getMobile">
-        SELECT * FROM mobiles WHERE LOWER("account") = LOWER(#{account}) AND "type" = ${type} ;
+        SELECT * FROM mobiles WHERE LOWER("account") = LOWER(#{account}) AND "type" = ${type} AND LOWER("shopId") = LOWER(#{shopId})  ;
     </select>
 </mapper>

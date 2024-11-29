@@ -57,10 +57,11 @@
         (
             "account"               VARCHAR(42)  NOT NULL,
             "type"                  INTEGER DEFAULT 0,
+            "shopId"                VARCHAR(66) DEFAULT '0x0000000000000000000000000000000000000000000000000000000000000000',
             "token"                 VARCHAR(50) NOT NULL,
             "language"              VARCHAR(3)   NOT NULL,
             "os"                    VARCHAR(12)  NOT NULL,
-            PRIMARY KEY ("account", "type")
+            PRIMARY KEY ("account", "type", "shopId")
             );
     </sql>
 

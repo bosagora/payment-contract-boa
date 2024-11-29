@@ -1646,6 +1646,7 @@ describe("Test of Server", function () {
             const param = {
                 account: wallet.address,
                 type: 1,
+                shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
                 token: "12345678901234567890123456789012345678901234567890",
                 language: "kr",
                 os: "iOS",

@@ -1354,7 +1354,7 @@ export class PaymentRouter {
                 );
             }
 
-            const mobileData = await this.storage.getMobile(shopInfo.account, MobileType.SHOP_APP);
+            const mobileData = await this.storage.getMobile(shopInfo.account, MobileType.SHOP_APP, shopInfo.shopId);
 
             if (!this.config.relay.testMode && mobileData === undefined) {
                 return res.status(200).json(ResponseMessage.getErrorMessage("2005"));

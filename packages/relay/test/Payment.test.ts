@@ -1518,6 +1518,12 @@ describe("Test of Server", function () {
             config.relay.certifiers = deployments.accounts.certifiers.map((m) => m.privateKey);
             config.relay.callbackEndpoint = "http://127.0.0.1:3400/callback";
             config.relay.relayEndpoint = `http://127.0.0.1:${config.server.port}`;
+
+            client = new TestClient({
+                headers: {
+                    Authorization: config.relay.accessKey,
+                },
+            });
         });
 
         before("Create TestServer", async () => {
@@ -1585,6 +1591,7 @@ describe("Test of Server", function () {
             const param = {
                 account: wallet.address,
                 type: 1,
+                shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
                 token: "12345678901234567890123456789012345678901234567890",
                 language: "kr",
                 os: "iOS",
