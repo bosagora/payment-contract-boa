@@ -12,6 +12,8 @@ import { ResponseMessage } from "../utils/Errors";
 import express from "express";
 import { body, param, query, validationResult } from "express-validator";
 
+import { HashZero } from "@ethersproject/constants";
+
 export class ETCRouter {
     private web_service: WebService;
     private readonly config: Config;
@@ -118,6 +120,7 @@ export class ETCRouter {
         try {
             const account: string = String(req.body.account).trim();
             const type = req.body.type === undefined ? 0 : Number(req.body.type);
+            const shopId = req.body.shopId === undefined ? HashZero : String(req.body.shopId).trim();
             const token: string = String(req.body.token).trim();
             const language: string = String(req.body.language).trim();
             const os: string = String(req.body.os).trim();
@@ -130,6 +133,7 @@ export class ETCRouter {
             const item = {
                 account,
                 type,
+                shopId,
                 token,
                 language,
                 os,
@@ -167,11 +171,12 @@ export class ETCRouter {
         try {
             const account: string = String(req.body.account).trim();
             const type: number = Number(req.body.type);
+            const shopId = req.body.shopId === undefined ? HashZero : String(req.body.shopId).trim();
             const title: string = String(req.body.title).trim();
             const contents: string = String(req.body.contents).trim();
             const contentType: string = String(req.body.contentType).trim();
 
-            const mobileData = await this.storage.getMobile(account, type);
+            const mobileData = await this.storage.getMobile(account, type, shopId);
             if (mobileData !== undefined) {
                 await this.sender.send(mobileData.token, title, contents, { type: contentType });
             }
@@ -204,8 +209,9 @@ export class ETCRouter {
         try {
             const account: string = String(req.params.account).trim();
             const type: number = Number(req.query.type);
+            const shopId = req.query.shopId === undefined ? HashZero : String(req.query.shopId).trim();
 
-            const mobileData = await this.storage.getMobile(account, type);
+            const mobileData = await this.storage.getMobile(account, type, shopId);
             if (mobileData === undefined) {
                 return res.status(200).json(ResponseMessage.getErrorMessage("2008"));
             }
@@ -215,6 +221,7 @@ export class ETCRouter {
                 this.makeResponseData(0, {
                     account: mobileData.account,
                     type: mobileData.type,
+                    shopId: mobileData.shopId,
                     token: mobileData.token,
                     language: mobileData.language,
                     os: mobileData.os,
@@ -243,7 +250,8 @@ export class ETCRouter {
         try {
             const account: string = String(req.params.account).trim();
             const type: number = Number(req.query.type);
-            const mobileData = await this.storage.getMobile(account, type);
+            const shopId = req.query.shopId === undefined ? HashZero : String(req.query.shopId).trim();
+            const mobileData = await this.storage.getMobile(account, type, shopId);
             const exists = mobileData !== undefined && mobileData.account.toLowerCase() === account.toLowerCase();
 
             this.metrics.add("success", 1);

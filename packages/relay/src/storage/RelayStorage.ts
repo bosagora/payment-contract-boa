@@ -22,6 +22,8 @@ import {
 } from "../types";
 import { ContractUtils } from "../utils/ContractUtils";
 
+import { HashZero } from "@ethersproject/constants";
+
 import * as hre from "hardhat";
 
 /**
@@ -664,6 +666,7 @@ export class RelayStorage extends Storage {
             this.queryForMapper("mobile", "postMobile", {
                 account: item.account,
                 type: item.type,
+                shopId: item.shopId,
                 token: item.token,
                 language: item.language,
                 os: item.os,
@@ -678,15 +681,16 @@ export class RelayStorage extends Storage {
         });
     }
 
-    public getMobile(account: string, type: number): Promise<MobileData | undefined> {
+    public getMobile(account: string, type: number, shopId: string = HashZero): Promise<MobileData | undefined> {
         return new Promise<MobileData | undefined>(async (resolve, reject) => {
-            this.queryForMapper("mobile", "getMobile", { account, type })
+            this.queryForMapper("mobile", "getMobile", { account, type, shopId })
                 .then((result) => {
                     if (result.rows.length > 0) {
                         const m = result.rows[0];
                         return resolve({
                             account: m.account,
                             type: m.type,
+                            shopId: m.shopId,
                             token: m.token,
                             language: m.language,
                             os: m.os,
