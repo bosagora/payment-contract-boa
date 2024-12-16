@@ -44,7 +44,7 @@ export type AgentApiSpec = Tspec.DefineApiSpec<{
                 };
             };
         };
-        "/v1/agent/provision/": {
+        "/v1/agent/provision": {
             post: {
                 summary: "Register information on the provider's agent";
                 body: {
@@ -139,7 +139,7 @@ export type AgentApiSpec = Tspec.DefineApiSpec<{
                 };
             };
         };
-        "/v1/agent/refund/": {
+        "/v1/agent/refund": {
             post: {
                 summary: "Register information on the refund's agent";
                 body: {
@@ -234,7 +234,7 @@ export type AgentApiSpec = Tspec.DefineApiSpec<{
                 };
             };
         };
-        "/v1/agent/withdrawal/": {
+        "/v1/agent/withdrawal": {
             post: {
                 summary: "Register information on the withdrawal's agent";
                 body: {
