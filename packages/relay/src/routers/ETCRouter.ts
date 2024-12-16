@@ -103,6 +103,12 @@ export class ETCRouter {
             [param("account").exists().trim().isEthereumAddress(), query("type").exists()],
             this.mobile_exists.bind(this)
         );
+
+        this.app.post(
+            "/v1/mobile/exists/token",
+            [body("account").exists().trim().isEthereumAddress(), body("token").exists(), body("type").exists()],
+            this.mobile_exists_token.bind(this)
+        );
     }
 
     /**
@@ -259,12 +265,54 @@ export class ETCRouter {
                 this.makeResponseData(0, {
                     account,
                     type,
+                    shopId,
                     exists,
                 })
             );
         } catch (error: any) {
             const msg = ResponseMessage.getEVMErrorMessage(error);
             logger.error(`GET /v1/mobile/exists : ${msg.error.message}`);
+            this.metrics.add("failure", 1);
+            return res.status(200).json(msg);
+        }
+    }
+
+    /**
+     * POST /v1/mobile/exists/token
+     * @private
+     */
+    private async mobile_exists_token(req: express.Request, res: express.Response) {
+        logger.http(`POST /v1/mobile/exists/token ${req.ip}:${JSON.stringify(req.body)}`);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        try {
+            const account: string = String(req.body.account).trim();
+            const type = req.body.type === undefined ? 0 : Number(req.body.type);
+            const shopId = req.body.shopId === undefined ? HashZero : String(req.body.shopId).trim();
+            const token: string = String(req.body.token).trim();
+            const mobileData = await this.storage.getMobile(account, type, shopId);
+            const exists =
+                mobileData !== undefined &&
+                mobileData.account.toLowerCase() === account.toLowerCase() &&
+                mobileData.token === token;
+
+            this.metrics.add("success", 1);
+            return res.status(200).json(
+                this.makeResponseData(0, {
+                    account,
+                    type,
+                    token,
+                    shopId,
+                    exists,
+                })
+            );
+        } catch (error: any) {
+            const msg = ResponseMessage.getEVMErrorMessage(error);
+            logger.error(`POST /v1/mobile/exists/token : ${msg.error.message}`);
             this.metrics.add("failure", 1);
             return res.status(200).json(msg);
         }
