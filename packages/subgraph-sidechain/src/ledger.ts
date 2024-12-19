@@ -3,15 +3,15 @@ import { AmountUnit, NullAccount, NullBytes32 } from "./utils";
 import {
     Deposited as DepositedEvent,
     ProvidedPoint as ProvidedPointEvent,
-    Refunded as RefundedEvent,
     ProvidedUnPayablePoint as ProvidedUnPayablePointEvent,
+    Refunded as RefundedEvent,
     Withdrawn as WithdrawnEvent,
 } from "../generated/Ledger/Ledger";
 import { SavedPurchase as SavedPurchaseEvent } from "../generated/LoyaltyProvider/LoyaltyProvider";
 import { LoyaltyPaymentEvent as LoyaltyPaymentEventEvent } from "../generated/LoyaltyConsumer/LoyaltyConsumer";
 import {
-    ChangedToPayablePoint as ChangedToPayablePointEvent,
     ChangedPointToToken as ChangedPointToTokenEvent,
+    ChangedToPayablePoint as ChangedToPayablePointEvent,
 } from "../generated/LoyaltyExchanger/LoyaltyExchanger";
 import { TransferredLoyaltyToken as TransferredLoyaltyTokenEvent } from "../generated/LoyaltyTransfer/LoyaltyTransfer";
 import {
@@ -23,15 +23,15 @@ import {
     BurnedUnPayablePoint as BurnedUnPayablePointEvent,
 } from "../generated/LoyaltyBurner/LoyaltyBurner";
 import {
+    BurnedPoint,
+    BurnedUnPayablePoint,
+    LoyaltyBridgeDeposited,
+    LoyaltyBridgeWithdrawn,
+    LoyaltyPaymentEvent,
     SavedPurchase,
     UserBalance,
     UserTradeHistory,
     UserUnPayableTradeHistory,
-    LoyaltyPaymentEvent,
-    LoyaltyBridgeDeposited,
-    LoyaltyBridgeWithdrawn,
-    BurnedPoint,
-    BurnedUnPayablePoint,
 } from "../generated/schema";
 
 enum LoyaltyPaymentStatus {
@@ -57,6 +57,7 @@ enum UserAction {
     REFUND = 31,
     TRANSFER_IN = 41,
     TRANSFER_OUT = 42,
+    PROVIDER_OUT = 52,
 }
 
 // region UserBalance
@@ -194,6 +195,7 @@ export function handleChangedToPayablePoint(event: ChangedToPayablePointEvent): 
     handleChangedPointForHistory(event);
     handleChangedPointForUnPayablePointForHistory(event);
 }
+
 export function handleChangedPointForUnPayablePointForHistory(event: ChangedToPayablePointEvent): void {
     let entity = new UserUnPayableTradeHistory(event.transaction.hash.concatI32(event.logIndex.toI32()));
     entity.phone = event.params.phone;
@@ -241,6 +243,7 @@ export function handleChangedPointForHistory(event: ChangedToPayablePointEvent):
 export function handleChangedPointToToken(event: ChangedPointToTokenEvent): void {
     handleChangedPointToTokenForHistory(event);
 }
+
 export function handleChangedPointToTokenForHistory(event: ChangedPointToTokenEvent): void {
     handleChangedBalancePoint(
         event.params.account,
@@ -341,7 +344,7 @@ export function handleProvidedForUnPayablePointForHistory(event: ProvidedUnPayab
             event.transaction.hash.concatI32(event.logIndex.plus(BigInt.fromI32(64)).toI32())
         );
         entity2.account = event.params.provider;
-        entity2.action = UserAction.TRANSFER_OUT;
+        entity2.action = UserAction.PROVIDER_OUT;
         entity2.cancel = false;
         entity2.amountPoint = BigInt.fromI32(0);
         entity2.amountToken = event.params.consumedToken.div(AmountUnit);
@@ -407,7 +410,7 @@ export function handleProvidedPointForHistory(event: ProvidedPointEvent): void {
             event.transaction.hash.concatI32(event.logIndex.plus(BigInt.fromI32(64)).toI32())
         );
         entity2.account = event.params.provider;
-        entity2.action = UserAction.TRANSFER_OUT;
+        entity2.action = UserAction.PROVIDER_OUT;
         entity2.cancel = false;
         entity2.amountPoint = BigInt.fromI32(0);
         entity2.amountToken = event.params.consumedToken.div(AmountUnit);
@@ -461,6 +464,7 @@ export function handleRefundedForHistory(event: RefundedEvent): void {
     entity.transactionHash = event.transaction.hash;
     entity.save();
 }
+
 // endregion
 
 // region LoyaltyTransfer
@@ -535,6 +539,7 @@ export function handleTransferredLoyaltyTokenForHistory(event: TransferredLoyalt
         entity.save();
     }
 }
+
 // endregion
 
 // region LoyaltyConsumer
