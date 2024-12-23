@@ -61,6 +61,8 @@ describe("Test of Server", function () {
     const userData: IUserData[] = [];
     const shopData: IShopData[] = [];
 
+    let temporaryAccount: string;
+
     interface IPurchaseData {
         purchaseId: string;
         amount: number;
@@ -235,6 +237,29 @@ describe("Test of Server", function () {
             };
             const purchaseAmount = Amount.make(purchase.amount, 18).value;
 
+            it("Get Temporary Account", async () => {
+                const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+                const message = ContractUtils.getAccountMessage(
+                    userData[purchase.userIndex].address,
+                    nonce,
+                    contractManager.sideChainId
+                );
+                const signature = await ContractUtils.signMessage(
+                    new Wallet(userData[purchase.userIndex].privateKey),
+                    message
+                );
+
+                const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+                const response = await client.post(url, {
+                    account: userData[purchase.userIndex].address,
+                    signature,
+                });
+
+                assert.deepStrictEqual(response.data.code, 0);
+                assert.ok(response.data.data.temporaryAccount !== undefined);
+                temporaryAccount = response.data.data.temporaryAccount;
+            });
+
             let paymentId: string;
             it("Open New Payment", async () => {
                 const url = URI(serverURL).directory("/v1/payment/new").filename("open").toString();
@@ -244,7 +269,7 @@ describe("Test of Server", function () {
                     amount: purchaseAmount.toString(),
                     currency: "krw",
                     shopId: shopData[purchase.shopIndex].shopId,
-                    account: userData[purchase.userIndex].address,
+                    account: temporaryAccount,
                 };
                 const response = await client.post(url, params);
 

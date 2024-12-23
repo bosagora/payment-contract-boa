@@ -169,8 +169,8 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                      */
                     shopId: string;
                     /**
-                     * Wallet address of user
-                     * @example "0x5A3Fc8990417b3e6ddCdAE0E8039E798A609Ef84"
+                     * Temporary wallet address of user
+                     * @example "0xfFfFFfFF5D8F0dB23fE79F2085C4069B00000000"
                      */
                     account: string;
                     /**
@@ -1009,8 +1009,8 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                      */
                     shopId: string;
                     /**
-                     * Wallet address of user
-                     * @example "0x5A3Fc8990417b3e6ddCdAE0E8039E798A609Ef84"
+                     * Temporary wallet address of user
+                     * @example "0xfFfFFfFF5D8F0dB23fE79F2085C4069B00000000"
                      */
                     account: string;
                     /**

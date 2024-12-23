@@ -724,6 +724,8 @@ export class PaymentRouter {
                     temporaryAccount = account;
                     account = realAccount;
                 }
+            } else {
+                return res.json(ResponseMessage.getErrorMessage("2050"));
             }
 
             const purchaseId: string = String(req.body.purchaseId).trim();
@@ -777,6 +779,8 @@ export class PaymentRouter {
 
                 temporaryAccount = originalAccount;
                 account = realAccount;
+            } else {
+                return res.json(ResponseMessage.getErrorMessage("2050"));
             }
 
             const purchaseId: string = String(req.body.purchaseId).trim();

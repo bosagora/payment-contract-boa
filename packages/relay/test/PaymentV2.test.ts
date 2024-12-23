@@ -42,6 +42,8 @@ describe("Test of Server", function () {
     const shops = deployments.accounts.shops;
     const paymentSigner = Wallet.createRandom();
 
+    let temporaryAccount: string;
+
     let shopContract: Shop;
     let providerContract: LoyaltyProvider;
     let ledgerContract: Ledger;
@@ -327,6 +329,29 @@ describe("Test of Server", function () {
                 assert.deepStrictEqual(response.data.data.feeRate, 0.05);
             });
 
+            it("Get Temporary Account", async () => {
+                const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+                const message = ContractUtils.getAccountMessage(
+                    userData[purchase.userIndex].address,
+                    nonce,
+                    contractManager.sideChainId
+                );
+                const signature = await ContractUtils.signMessage(
+                    new Wallet(userData[purchase.userIndex].privateKey),
+                    message
+                );
+
+                const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+                const response = await client.post(url, {
+                    account: userData[purchase.userIndex].address,
+                    signature,
+                });
+
+                assert.deepStrictEqual(response.data.code, 0);
+                assert.ok(response.data.data.temporaryAccount !== undefined);
+                temporaryAccount = response.data.data.temporaryAccount;
+            });
+
             let paymentId: string;
             it("Endpoint POST /v2/payment/new/open", async () => {
                 const url = URI(serverURL).directory("/v2/payment/new").filename("open").toString();
@@ -336,7 +361,7 @@ describe("Test of Server", function () {
                     amount: amountOfLoyalty.toString(),
                     currency: "krw",
                     shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
-                    account: users[purchaseOfLoyalty.userIndex].address,
+                    account: temporaryAccount,
                     terminalId: "TM000001",
                     signature: "",
                 };
@@ -439,6 +464,29 @@ describe("Test of Server", function () {
                 assert.ok(response.data.error.message === "The status code for this payment cannot be approved");
             });
 
+            it("Get Temporary Account", async () => {
+                const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+                const message = ContractUtils.getAccountMessage(
+                    userData[purchase.userIndex].address,
+                    nonce,
+                    contractManager.sideChainId
+                );
+                const signature = await ContractUtils.signMessage(
+                    new Wallet(userData[purchase.userIndex].privateKey),
+                    message
+                );
+
+                const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+                const response = await client.post(url, {
+                    account: userData[purchase.userIndex].address,
+                    signature,
+                });
+
+                assert.deepStrictEqual(response.data.code, 0);
+                assert.ok(response.data.data.temporaryAccount !== undefined);
+                temporaryAccount = response.data.data.temporaryAccount;
+            });
+
             it("Endpoint POST /v2/payment/new/open", async () => {
                 const url = URI(serverURL).directory("/v2/payment/new").filename("open").toString();
 
@@ -447,7 +495,7 @@ describe("Test of Server", function () {
                     amount: amountOfLoyalty.toString(),
                     currency: "krw",
                     shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
-                    account: users[purchaseOfLoyalty.userIndex].address,
+                    account: temporaryAccount,
                     terminalId: "TM000001",
                     signature: "",
                 };
@@ -827,6 +875,29 @@ describe("Test of Server", function () {
                 assert.deepStrictEqual(response.data.data.feeRate, 0.05);
             });
 
+            it("Get Temporary Account", async () => {
+                const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+                const message = ContractUtils.getAccountMessage(
+                    userData[purchase.userIndex].address,
+                    nonce,
+                    contractManager.sideChainId
+                );
+                const signature = await ContractUtils.signMessage(
+                    new Wallet(userData[purchase.userIndex].privateKey),
+                    message
+                );
+
+                const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+                const response = await client.post(url, {
+                    account: userData[purchase.userIndex].address,
+                    signature,
+                });
+
+                assert.deepStrictEqual(response.data.code, 0);
+                assert.ok(response.data.data.temporaryAccount !== undefined);
+                temporaryAccount = response.data.data.temporaryAccount;
+            });
+
             let paymentId: string;
             it("Endpoint POST /v2/payment/new/open", async () => {
                 const url = URI(serverURL).directory("/v2/payment/new").filename("open").toString();
@@ -836,7 +907,7 @@ describe("Test of Server", function () {
                     amount: amountOfLoyalty.toString(),
                     currency: "krw",
                     shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
-                    account: users[purchaseOfLoyalty.userIndex].address,
+                    account: temporaryAccount,
                     terminalId: "TM000001",
                     signature: "",
                 };
@@ -1251,6 +1322,29 @@ describe("Test of Server", function () {
                 assert.deepStrictEqual(response.data.data.feeRate, 0.05);
             });
 
+            it("Get Temporary Account", async () => {
+                const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+                const message = ContractUtils.getAccountMessage(
+                    userData[purchase.userIndex].address,
+                    nonce,
+                    contractManager.sideChainId
+                );
+                const signature = await ContractUtils.signMessage(
+                    new Wallet(userData[purchase.userIndex].privateKey),
+                    message
+                );
+
+                const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+                const response = await client.post(url, {
+                    account: userData[purchase.userIndex].address,
+                    signature,
+                });
+
+                assert.deepStrictEqual(response.data.code, 0);
+                assert.ok(response.data.data.temporaryAccount !== undefined);
+                temporaryAccount = response.data.data.temporaryAccount;
+            });
+
             let paymentId: string;
             it("Endpoint POST /v2/payment/new/open", async () => {
                 const url = URI(serverURL).directory("/v2/payment/new").filename("open").toString();
@@ -1260,7 +1354,7 @@ describe("Test of Server", function () {
                     amount: amountOfLoyalty.toString(),
                     currency: "krw",
                     shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
-                    account: users[purchaseOfLoyalty.userIndex].address,
+                    account: temporaryAccount,
                     terminalId: "TM000001",
                     signature: "",
                 };
@@ -1738,6 +1832,29 @@ describe("Test of Server", function () {
             assert.deepStrictEqual(response.data.data.point.balance, pointAmount.toString());
         });
 
+        it("Get Temporary Account", async () => {
+            const nonce = await ledgerContract.nonceOf(userData[purchase.userIndex].address);
+            const message = ContractUtils.getAccountMessage(
+                userData[purchase.userIndex].address,
+                nonce,
+                contractManager.sideChainId
+            );
+            const signature = await ContractUtils.signMessage(
+                new Wallet(userData[purchase.userIndex].privateKey),
+                message
+            );
+
+            const url = URI(serverURL).directory("/v1/payment/account").filename("temporary").toString();
+            const response = await client.post(url, {
+                account: userData[purchase.userIndex].address,
+                signature,
+            });
+
+            assert.deepStrictEqual(response.data.code, 0);
+            assert.ok(response.data.data.temporaryAccount !== undefined);
+            temporaryAccount = response.data.data.temporaryAccount;
+        });
+
         it("Endpoint POST /v2/payment/new/open", async () => {
             const url = URI(serverURL).directory("/v2/payment/new").filename("open").toString();
 
@@ -1746,7 +1863,7 @@ describe("Test of Server", function () {
                 amount: amountOfLoyalty.toString(),
                 currency: "krw",
                 shopId: shopData[purchaseOfLoyalty.shopIndex].shopId,
-                account: users[purchaseOfLoyalty.userIndex].address,
+                account: temporaryAccount,
                 terminalId: "TM000001",
                 signature: "",
             };

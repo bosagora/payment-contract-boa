@@ -82,6 +82,7 @@ export class ResponseMessage {
         ["2030", "This payment cannot be closed before it is approved"],
         ["2033", "The task ID is not exist"],
         ["2040", "The status code for this task cannot be approved"],
+        ["2050", "Invalid payment QR code"],
         ["3001", "Chain Bridge functionality is not available"],
         ["3002", "Loyalty Bridge functionality is not available"],
         ["3003", "The ability to exchange points for tokens is not supported"],
