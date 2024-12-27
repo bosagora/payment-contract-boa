@@ -65,7 +65,8 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
     function initialize(
         address _validatorAddress,
         address _linkAddress,
-        address _currencyRateAddress
+        address _currencyRateAddress,
+        address _protocolFeeAddress
     ) external initializer {
         __UUPSUpgradeable_init();
         __Ownable_init_unchained();
@@ -75,6 +76,10 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
         currencyRateContract = ICurrencyRate(_currencyRateAddress);
         isSetLedger = false;
         isSetShop = false;
+
+        adActionProtocolFeeAccount = _protocolFeeAddress;
+        adActionAgentFee = DEFAULT_AD_ACTION_AGENT_FEE;
+        adActionProtocolFee = DEFAULT_AD_ACTION_PROTOCOL_FEE;
     }
 
     /// @notice 원장 컨트랙트를 등록한다.
@@ -207,7 +212,8 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                             data.currency,
                             data.purchaseId,
                             data.shopId,
-                            data.sender
+                            data.sender,
+                            DMS.TAG_PROVIDE_PURCHASE
                         );
                         shopContract.addProvidedAmount(
                             data.shopId,
@@ -224,7 +230,8 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                                 data.currency,
                                 data.purchaseId,
                                 data.shopId,
-                                data.sender
+                                data.sender,
+                                DMS.TAG_PROVIDE_PURCHASE
                             );
                         } else {
                             ledgerContract.providePoint(
@@ -234,7 +241,8 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                                 data.currency,
                                 data.purchaseId,
                                 data.shopId,
-                                data.sender
+                                data.sender,
+                                DMS.TAG_PROVIDE_PURCHASE
                             );
                         }
                         shopContract.addProvidedAmount(
@@ -282,8 +290,10 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
         );
 
         address sender;
+        bool isAgent;
         if (recurve1 == _provider) {
             sender = _provider;
+            isAgent = false;
         } else {
             address agent = ledgerContract.provisionAgentOf(_provider);
             require(agent != address(0x0), "1501");
@@ -296,8 +306,10 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
             );
             require(recurve2 == agent, "1501");
             sender = agent;
+            isAgent = true;
         }
 
+        address provider = _provider;
         ledgerContract.providePoint(
             _receiver,
             _point,
@@ -305,14 +317,43 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
             DMS.DEFAULT_CURRENCY_SYMBOL,
             "",
             bytes32(0x0),
-            _provider
+            provider,
+            DMS.TAG_PROVIDE_AD
         );
+
+        uint256 agentFee = 0;
+        if (isAgent) {
+            agentFee = DMS.zeroGWEI((_point * adActionAgentFee) / 10000);
+            ledgerContract.providePoint(
+                sender,
+                agentFee,
+                agentFee,
+                DMS.DEFAULT_CURRENCY_SYMBOL,
+                "",
+                bytes32(0x0),
+                provider,
+                DMS.TAG_PROVIDE_AD_FEE
+            );
+        }
+
+        uint256 protocolFee = DMS.zeroGWEI((_point * adActionProtocolFee) / 10000);
+        ledgerContract.providePoint(
+            adActionProtocolFeeAccount,
+            protocolFee,
+            protocolFee,
+            DMS.DEFAULT_CURRENCY_SYMBOL,
+            "",
+            bytes32(0x0),
+            provider,
+            DMS.TAG_PROVIDE_AD_PROTOCOL_FEE
+        );
+
         ledgerContract.increaseNonce(sender);
 
-        uint256 amountToken = currencyRateContract.convertPointToToken(_point);
-        uint256 balancePoint = ledgerContract.pointBalanceOf(_provider);
-        uint256 balanceToken = ledgerContract.tokenBalanceOf(_provider);
-        emit ProvidedLoyaltyPointToAddress(_provider, _receiver, _point, amountToken, balancePoint, balanceToken);
+        uint256 amountToken = currencyRateContract.convertPointToToken(_point + agentFee + protocolFee);
+        uint256 balancePoint = ledgerContract.pointBalanceOf(provider);
+        uint256 balanceToken = ledgerContract.tokenBalanceOf(provider);
+        emit ProvidedLoyaltyPointToAddress(provider, _receiver, _point, amountToken, balancePoint, balanceToken);
     }
 
     function provideToPhone(address _provider, bytes32 _phoneHash, uint256 _point, bytes calldata _signature) external {
@@ -328,8 +369,10 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
         );
 
         address sender;
+        bool isAgent;
         if (recurve1 == _provider) {
             sender = _provider;
+            isAgent = false;
         } else {
             address agent = ledgerContract.provisionAgentOf(_provider);
             require(agent != address(0x0), "1501");
@@ -342,8 +385,10 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
             );
             require(recurve2 == agent, "1501");
             sender = agent;
+            isAgent = true;
         }
 
+        address provider = _provider;
         address receiver = linkContract.toAddress(_phoneHash);
         if (receiver == address(0x00)) {
             ledgerContract.provideUnPayablePoint(
@@ -353,7 +398,8 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                 DMS.DEFAULT_CURRENCY_SYMBOL,
                 "",
                 bytes32(0x0),
-                _provider
+                provider,
+                DMS.TAG_PROVIDE_AD
             );
         } else {
             ledgerContract.providePoint(
@@ -363,14 +409,72 @@ contract LoyaltyProvider is LoyaltyProviderStorage, Initializable, OwnableUpgrad
                 DMS.DEFAULT_CURRENCY_SYMBOL,
                 "",
                 bytes32(0x0),
-                _provider
+                provider,
+                DMS.TAG_PROVIDE_AD
             );
         }
+
+        uint256 agentFee = 0;
+        if (isAgent) {
+            agentFee = DMS.zeroGWEI((_point * adActionAgentFee) / 10000);
+            ledgerContract.providePoint(
+                sender,
+                agentFee,
+                agentFee,
+                DMS.DEFAULT_CURRENCY_SYMBOL,
+                "",
+                bytes32(0x0),
+                provider,
+                DMS.TAG_PROVIDE_AD_FEE
+            );
+        }
+
+        uint256 protocolFee = DMS.zeroGWEI((_point * adActionProtocolFee) / 10000);
+        ledgerContract.providePoint(
+            adActionProtocolFeeAccount,
+            protocolFee,
+            protocolFee,
+            DMS.DEFAULT_CURRENCY_SYMBOL,
+            "",
+            bytes32(0x0),
+            provider,
+            DMS.TAG_PROVIDE_AD_PROTOCOL_FEE
+        );
+
         ledgerContract.increaseNonce(sender);
 
-        uint256 amountToken = currencyRateContract.convertPointToToken(_point);
-        uint256 balancePoint = ledgerContract.pointBalanceOf(_provider);
-        uint256 balanceToken = ledgerContract.tokenBalanceOf(_provider);
-        emit ProvidedLoyaltyPointToPhone(_provider, _phoneHash, _point, amountToken, balancePoint, balanceToken);
+        uint256 amountToken = currencyRateContract.convertPointToToken(_point + agentFee + protocolFee);
+        uint256 balancePoint = ledgerContract.pointBalanceOf(provider);
+        uint256 balanceToken = ledgerContract.tokenBalanceOf(provider);
+        emit ProvidedLoyaltyPointToPhone(provider, _phoneHash, _point, amountToken, balancePoint, balanceToken);
+    }
+
+    function setAdActionAgentFee(uint32 _fee) external {
+        require(_fee <= MAX_AD_ACTION_AGENT_FEE, "1521");
+        require(_msgSender() == owner(), "1050");
+        adActionAgentFee = _fee;
+    }
+
+    function getAdActionAgentFee() external view returns (uint32) {
+        return adActionAgentFee;
+    }
+
+    function setAdActionProtocolFee(uint32 _fee) external {
+        require(_fee <= MAX_AD_ACTION_PROTOCOL_FEE, "1521");
+        require(_msgSender() == owner(), "1050");
+        adActionProtocolFee = _fee;
+    }
+
+    function getAdActionProtocolFee() external view returns (uint32) {
+        return adActionProtocolFee;
+    }
+
+    function getAdActionProtocolFeeAccount() external view returns (address) {
+        return adActionProtocolFeeAccount;
+    }
+
+    function changeAdActionProtocolFeeAccount(address _account) external {
+        require(_msgSender() == owner(), "1050");
+        adActionProtocolFeeAccount = _account;
     }
 }

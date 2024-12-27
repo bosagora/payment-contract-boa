@@ -31,7 +31,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         bytes32 shopId,
         address provider,
         uint256 consumedToken,
-        uint256 providerBalanceToken
+        uint256 providerBalanceToken,
+        uint256 tag
     );
 
     /// @notice 포인트가 지급될 때 발생되는 이벤트
@@ -45,7 +46,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         bytes32 shopId,
         address provider,
         uint256 consumedToken,
-        uint256 providerBalanceToken
+        uint256 providerBalanceToken,
+        uint256 tag
     );
 
     event Refunded(
@@ -223,9 +225,10 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) external override onlyProvider {
-        _provideUnPayablePoint(_phone, _loyaltyPoint, _loyaltyValue, _currency, _purchaseId, _shopId, _sender);
+        _provideUnPayablePoint(_phone, _loyaltyPoint, _loyaltyValue, _currency, _purchaseId, _shopId, _sender, _tag);
     }
 
     function _provideUnPayablePoint(
@@ -235,7 +238,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) internal {
         uint256 consumedToken = 0;
         if (_sender == systemAccount) {
@@ -249,6 +253,7 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         }
         uint256 balance = unPayablePointBalances[_phone];
         uint256 providerTokenBalance = tokenBalances[_sender];
+        uint256 tag = _tag;
         emit ProvidedUnPayablePoint(
             _phone,
             _loyaltyPoint,
@@ -259,7 +264,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
             _shopId,
             _sender,
             consumedToken,
-            providerTokenBalance
+            providerTokenBalance,
+            tag
         );
     }
 
@@ -277,9 +283,10 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) external override onlyProvider {
-        _providePoint(_account, _loyaltyPoint, _loyaltyValue, _currency, _purchaseId, _shopId, _sender);
+        _providePoint(_account, _loyaltyPoint, _loyaltyValue, _currency, _purchaseId, _shopId, _sender, _tag);
     }
 
     function _providePoint(
@@ -289,7 +296,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) internal {
         uint256 consumedToken = 0;
         if (_sender == systemAccount) {
@@ -304,6 +312,7 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
         }
         uint256 balance = pointBalances[_account];
         uint256 providerTokenBalance = tokenBalances[_sender];
+        uint256 tag = _tag;
         emit ProvidedPoint(
             _account,
             _loyaltyPoint,
@@ -314,7 +323,8 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
             _shopId,
             _sender,
             consumedToken,
-            providerTokenBalance
+            providerTokenBalance,
+            tag
         );
     }
 
@@ -395,7 +405,7 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     /// @param _fee % 단위 입니다.
     function setPaymentFee(uint32 _fee) external override {
         require(_fee <= MAX_PAYMENT_FEE, "1521");
-        require(_msgSender() == paymentFeeAccount, "1050");
+        require(_msgSender() == owner(), "1050");
         paymentFee = _fee;
     }
 
@@ -488,13 +498,13 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     }
 
     function changeFeeAccount(address _account) external {
-        require(_msgSender() == paymentFeeAccount, "1050");
+        require(_msgSender() == owner(), "1050");
 
         paymentFeeAccount = _account;
     }
 
     function changeProtocolFeeAccount(address _account) external {
-        require(_msgSender() == protocolFeeAccount, "1050");
+        require(_msgSender() == owner(), "1050");
 
         protocolFeeAccount = _account;
     }

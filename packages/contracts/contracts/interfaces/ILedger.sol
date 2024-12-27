@@ -10,7 +10,8 @@ interface ILedger {
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) external;
 
     function provideUnPayablePoint(
@@ -20,7 +21,8 @@ interface ILedger {
         string calldata _currency,
         string calldata _purchaseId,
         bytes32 _shopId,
-        address _sender
+        address _sender,
+        uint256 _tag
     ) external;
 
     function refund(

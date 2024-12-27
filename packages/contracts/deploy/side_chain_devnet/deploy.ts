@@ -54,6 +54,7 @@ interface IAccount {
     system: Wallet;
     paymentFee: Wallet;
     protocolFee: Wallet;
+    adProtocolFee: Wallet;
     validators: Wallet[];
     linkValidators: Wallet[];
     bridgeValidators: Wallet[];
@@ -86,6 +87,7 @@ class Deployments {
             system,
             paymentFee,
             protocolFee,
+            adProtocolFee,
             validator01,
             validator02,
             validator03,
@@ -130,6 +132,7 @@ class Deployments {
             system,
             paymentFee,
             protocolFee,
+            adProtocolFee,
             validators: [
                 validator01,
                 validator02,
@@ -518,6 +521,7 @@ async function deployLoyaltyProvider(accounts: IAccount, deployment: Deployments
             deployment.getContractAddress("Validator"),
             deployment.getContractAddress("PhoneLinkCollection"),
             deployment.getContractAddress("CurrencyRate"),
+            accounts.adProtocolFee.address,
         ],
         {
             initializer: "initialize",

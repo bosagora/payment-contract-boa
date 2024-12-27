@@ -17,6 +17,7 @@ import * as path from "path";
 import URI from "urijs";
 import { URL } from "url";
 
+import { BigNumber } from "@ethersproject/bignumber";
 import { AddressZero } from "@ethersproject/constants";
 
 chai.use(solidity);
@@ -158,7 +159,6 @@ describe("Test of LoyaltyProvider", function () {
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.pointBalanceOf(receiver.address);
         const pointAmount = Amount.make(10, 18).value;
-        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
         const nonce = await contractManager.sideLedgerContract.nonceOf(provider.address);
         const message = ContractUtils.getProvidePointToAddressMessage(
             provider.address,
@@ -179,9 +179,19 @@ describe("Test of LoyaltyProvider", function () {
         expect(response.data.data).to.not.equal(undefined);
         expect(response.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
-        expect(await contractManager.sideLedgerContract.tokenBalanceOf(provider.address)).to.deep.equal(
-            balance0.sub(tokenAmount)
+        const addActionAgentFee = await contractManager.sideLoyaltyProviderContract.getAdActionAgentFee();
+        const addActionProtocolFee = await contractManager.sideLoyaltyProviderContract.getAdActionProtocolFee();
+        const pointFee0 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionAgentFee)).div(10000));
+        const pointFee1 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionProtocolFee)).div(10000));
+
+        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(
+            pointAmount.add(pointFee1)
         );
+        const expected = balance0.sub(tokenAmount);
+        const actual = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
+
+        expect(actual.sub(expected).abs().lt(BigNumber.from(1500000000))).to.be.equal(true);
+
         expect(await contractManager.sideLedgerContract.pointBalanceOf(receiver.address)).to.deep.equal(
             balance1.add(pointAmount)
         );
@@ -194,7 +204,6 @@ describe("Test of LoyaltyProvider", function () {
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.unPayablePointBalanceOf(phoneHash);
         const pointAmount = Amount.make(10, 18).value;
-        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
         const nonce = await contractManager.sideLedgerContract.nonceOf(provider.address);
         const message = ContractUtils.getProvidePointToPhoneMessage(
             provider.address,
@@ -215,9 +224,19 @@ describe("Test of LoyaltyProvider", function () {
         expect(response.data.data).to.not.equal(undefined);
         expect(response.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
-        expect(await contractManager.sideLedgerContract.tokenBalanceOf(provider.address)).to.deep.equal(
-            balance0.sub(tokenAmount)
+        const addActionAgentFee = await contractManager.sideLoyaltyProviderContract.getAdActionAgentFee();
+        const addActionProtocolFee = await contractManager.sideLoyaltyProviderContract.getAdActionProtocolFee();
+        const pointFee0 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionAgentFee)).div(10000));
+        const pointFee1 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionProtocolFee)).div(10000));
+
+        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(
+            pointAmount.add(pointFee1)
         );
+        const expected = balance0.sub(tokenAmount);
+        const actual = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
+
+        expect(actual.sub(expected).abs().lt(BigNumber.from(1500000000))).to.be.equal(true);
+
         expect(await contractManager.sideLedgerContract.unPayablePointBalanceOf(phoneHash)).to.deep.equal(
             balance1.add(pointAmount)
         );
@@ -273,7 +292,6 @@ describe("Test of LoyaltyProvider", function () {
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.pointBalanceOf(receiver.address);
         const pointAmount = Amount.make(10, 18).value;
-        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
         const nonce = await contractManager.sideLedgerContract.nonceOf(agent.address);
         const message = ContractUtils.getProvidePointToAddressMessage(
             provider.address,
@@ -294,9 +312,19 @@ describe("Test of LoyaltyProvider", function () {
         expect(response.data.data).to.not.equal(undefined);
         expect(response.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
-        expect(await contractManager.sideLedgerContract.tokenBalanceOf(provider.address)).to.deep.equal(
-            balance0.sub(tokenAmount)
+        const addActionAgentFee = await contractManager.sideLoyaltyProviderContract.getAdActionAgentFee();
+        const addActionProtocolFee = await contractManager.sideLoyaltyProviderContract.getAdActionProtocolFee();
+        const pointFee0 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionAgentFee)).div(10000));
+        const pointFee1 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionProtocolFee)).div(10000));
+
+        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(
+            pointAmount.add(pointFee0).add(pointFee1)
         );
+        const expected = balance0.sub(tokenAmount);
+        const actual = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
+
+        expect(actual.sub(expected).abs().lt(BigNumber.from(1500000000))).to.be.equal(true);
+
         expect(await contractManager.sideLedgerContract.pointBalanceOf(receiver.address)).to.deep.equal(
             balance1.add(pointAmount)
         );
@@ -310,7 +338,6 @@ describe("Test of LoyaltyProvider", function () {
         const balance0 = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
         const balance1 = await contractManager.sideLedgerContract.unPayablePointBalanceOf(phoneHash);
         const pointAmount = Amount.make(10, 18).value;
-        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(pointAmount);
         const nonce = await contractManager.sideLedgerContract.nonceOf(agent.address);
         const message = ContractUtils.getProvidePointToPhoneMessage(
             provider.address,
@@ -331,9 +358,19 @@ describe("Test of LoyaltyProvider", function () {
         expect(response.data.data).to.not.equal(undefined);
         expect(response.data.data.txHash).to.match(/^0x[A-Fa-f0-9]{64}$/i);
 
-        expect(await contractManager.sideLedgerContract.tokenBalanceOf(provider.address)).to.deep.equal(
-            balance0.sub(tokenAmount)
+        const addActionAgentFee = await contractManager.sideLoyaltyProviderContract.getAdActionAgentFee();
+        const addActionProtocolFee = await contractManager.sideLoyaltyProviderContract.getAdActionProtocolFee();
+        const pointFee0 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionAgentFee)).div(10000));
+        const pointFee1 = ContractUtils.zeroGWEI(pointAmount.mul(BigNumber.from(addActionProtocolFee)).div(10000));
+
+        const tokenAmount = await contractManager.sideCurrencyRateContract.convertPointToToken(
+            pointAmount.add(pointFee0).add(pointFee1)
         );
+        const expected = balance0.sub(tokenAmount);
+        const actual = await contractManager.sideLedgerContract.tokenBalanceOf(provider.address);
+
+        expect(actual.sub(expected).abs().lt(BigNumber.from(1500000000))).to.be.equal(true);
+
         expect(await contractManager.sideLedgerContract.unPayablePointBalanceOf(phoneHash)).to.deep.equal(
             balance1.add(pointAmount)
         );

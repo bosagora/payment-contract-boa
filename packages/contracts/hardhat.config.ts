@@ -91,6 +91,17 @@ function getAccounts() {
     }
 
     if (
+        process.env.AD_PROTOCOL_FEE !== undefined &&
+        process.env.AD_PROTOCOL_FEE.trim() !== "" &&
+        reg_bytes64.test(process.env.AD_PROTOCOL_FEE)
+    ) {
+        accounts.push(process.env.AD_PROTOCOL_FEE);
+    } else {
+        process.env.AD_PROTOCOL_FEE = Wallet.createRandom().privateKey;
+        accounts.push(process.env.AD_PROTOCOL_FEE);
+    }
+
+    if (
         process.env.VALIDATOR01 !== undefined &&
         process.env.VALIDATOR01.trim() !== "" &&
         reg_bytes64.test(process.env.VALIDATOR01)
