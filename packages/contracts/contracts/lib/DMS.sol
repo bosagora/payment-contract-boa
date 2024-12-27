@@ -10,6 +10,11 @@ library DMS {
 
     string public constant DEFAULT_CURRENCY_SYMBOL = "php";
 
+    uint256 public constant TAG_PROVIDE_PURCHASE = 0;
+    uint256 public constant TAG_PROVIDE_AD = 1;
+    uint256 public constant TAG_PROVIDE_AD_FEE = 10;
+    uint256 public constant TAG_PROVIDE_AD_PROTOCOL_FEE = 11;
+
     /// @notice Hash value of a blank string
     bytes32 public constant NULL = 0x32105b1d0b88ada155176b58ee08b45c31e4f2f7337475831982c313533b880c;
 
