@@ -54,9 +54,9 @@ dataSources:
       eventHandlers:
         - event: Deposited(address,uint256,uint256,uint256)
           handler: handleDeposited
-        - event: ProvidedPoint(address,uint256,uint256,string,uint256,string,bytes32,address,uint256,uint256)
+        - event: ProvidedPoint(address,uint256,uint256,string,uint256,string,bytes32,address,uint256,uint256,uint256)
           handler: handleProvidedPoint
-        - event: ProvidedUnPayablePoint(bytes32,uint256,uint256,string,uint256,string,bytes32,address,uint256,uint256)
+        - event: ProvidedUnPayablePoint(bytes32,uint256,uint256,string,uint256,string,bytes32,address,uint256,uint256,uint256)
           handler: handleProvidedUnPayablePoint
         - event: Withdrawn(address,uint256,uint256,uint256)
           handler: handleWithdrawn
