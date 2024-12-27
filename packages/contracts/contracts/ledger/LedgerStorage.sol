@@ -42,4 +42,6 @@ contract LedgerStorage {
     IBIP20DelegatedTransfer internal tokenContract;
     ICurrencyRate internal currencyRateContract;
     bytes32 internal tokenId;
+
+    uint256[50] private __gap;
 }
