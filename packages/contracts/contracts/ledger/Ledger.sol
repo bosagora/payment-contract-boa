@@ -360,15 +360,17 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
 
     /// @notice 토큰의 잔고에서 뺀다. Consumer 컨트랙트만 호출할 수 있다.
     function subTokenBalance(address _account, uint256 _amount) external override onlyAccessLedger {
-        if (tokenBalances[_account] >= _amount) tokenBalances[_account] -= _amount;
+        uint256 balance = tokenBalances[_account];
+        require(balance >= _amount, "1511");
+        tokenBalances[_account] = balance - _amount;
     }
 
     /// @notice 토큰을 전달한다. Consumer 컨트랙트만 호출할 수 있다.
     function transferToken(address _from, address _to, uint256 _amount) external override onlyAccessLedger {
-        if (tokenBalances[_from] >= _amount) {
-            tokenBalances[_from] -= _amount;
-            tokenBalances[_to] += _amount;
-        }
+        uint256 fromBalance = tokenBalances[_from];
+        require(fromBalance >= _amount, "1511");
+        tokenBalances[_from] = fromBalance - _amount;
+        tokenBalances[_to] += _amount;
     }
 
     /// @notice 포인트의 잔고를 리턴한다
@@ -417,6 +419,7 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     /// @notice 사용가능한 포인트로 전환합니다.
     function changeToPayablePoint(bytes32 _phone, address _account) external override onlyExchanger {
         uint256 amount = unPayablePointBalances[_phone];
+        require(amount > 0, "1511");
         unPayablePointBalances[_phone] = 0;
         pointBalances[_account] += amount;
     }
@@ -438,7 +441,9 @@ contract Ledger is LedgerStorage, Initializable, OwnableUpgradeable, UUPSUpgrade
     }
 
     function burnUnPayablePoint(bytes32 _phone, uint256 _amount) external override onlyAccessBurner {
-        if (unPayablePointBalances[_phone] >= _amount) unPayablePointBalances[_phone] -= _amount;
+        uint256 balance = unPayablePointBalances[_phone];
+        require(balance >= _amount, "1511");
+        unPayablePointBalances[_phone] = balance - _amount;
     }
 
     function burnPoint(address _account, uint256 _amount) external override onlyAccessBurner {
