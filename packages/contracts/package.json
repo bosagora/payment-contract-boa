@@ -1,6 +1,6 @@
 {
     "name": "acc-contracts-v2",
-    "version": "2.10.0",
+    "version": "2.12.0",
     "description": "Smart contracts that decentralized loyalty systems",
     "files": [
         "**/*.sol"
