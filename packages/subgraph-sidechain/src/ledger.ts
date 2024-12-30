@@ -58,7 +58,18 @@ enum UserAction {
     TRANSFER_IN = 41,
     TRANSFER_OUT = 42,
     PROVIDER_OUT = 52,
+    PROVIDER_FEE_AD_AGENT = 53,
+    PROVIDER_FEE_AD_PROTOCOL = 54,
+    RECEIVE_FEE_PAYMENT = 61,
+    RECEIVE_FEE_PROTOCOL = 62,
+    RECEIVE_FEE_AD_AGENT = 63,
+    RECEIVE_FEE_AD_PROTOCOL = 64,
 }
+
+const TAG_PROVIDE_PURCHASE: u32 = 0;
+const TAG_PROVIDE_AD: u32 = 1;
+const TAG_PROVIDE_AD_AGENT_FEE: u32 = 10;
+const TAG_PROVIDE_AD_PROTOCOL_FEE: u32 = 11;
 
 // region UserBalance
 export function handleChangedBalancePoint(
@@ -332,7 +343,8 @@ export function handleProvidedForUnPayablePointForHistory(event: ProvidedUnPayab
     entity.transactionHash = event.transaction.hash;
     entity.save();
 
-    if (event.params.consumedToken.gt(BigInt.fromI32(0))) {
+    const tag = event.params.tag.toU32();
+    if (tag == TAG_PROVIDE_AD || tag == TAG_PROVIDE_AD_AGENT_FEE || tag == TAG_PROVIDE_AD_PROTOCOL_FEE) {
         const balanceEntity2 = handleChangedBalanceToken(
             event.params.provider,
             event.params.providerBalanceToken,
@@ -344,7 +356,19 @@ export function handleProvidedForUnPayablePointForHistory(event: ProvidedUnPayab
             event.transaction.hash.concatI32(event.logIndex.plus(BigInt.fromI32(64)).toI32())
         );
         entity2.account = event.params.provider;
-        entity2.action = UserAction.PROVIDER_OUT;
+        switch (tag) {
+            case TAG_PROVIDE_AD:
+                entity2.action = UserAction.PROVIDER_OUT;
+                break;
+
+            case TAG_PROVIDE_AD_AGENT_FEE:
+                entity2.action = UserAction.PROVIDER_FEE_AD_AGENT;
+                break;
+
+            case TAG_PROVIDE_AD_PROTOCOL_FEE:
+                entity2.action = UserAction.PROVIDER_FEE_AD_PROTOCOL;
+                break;
+        }
         entity2.cancel = false;
         entity2.amountPoint = BigInt.fromI32(0);
         entity2.amountToken = event.params.consumedToken.div(AmountUnit);
@@ -398,7 +422,8 @@ export function handleProvidedPointForHistory(event: ProvidedPointEvent): void {
     entity.transactionHash = event.transaction.hash;
     entity.save();
 
-    if (event.params.consumedToken.gt(BigInt.fromI32(0))) {
+    const tag = event.params.tag.toU32();
+    if (tag == TAG_PROVIDE_AD || tag == TAG_PROVIDE_AD_AGENT_FEE || tag == TAG_PROVIDE_AD_PROTOCOL_FEE) {
         const balanceEntity2 = handleChangedBalanceToken(
             event.params.provider,
             event.params.providerBalanceToken,
@@ -410,7 +435,20 @@ export function handleProvidedPointForHistory(event: ProvidedPointEvent): void {
             event.transaction.hash.concatI32(event.logIndex.plus(BigInt.fromI32(64)).toI32())
         );
         entity2.account = event.params.provider;
-        entity2.action = UserAction.PROVIDER_OUT;
+        switch (tag) {
+            case TAG_PROVIDE_AD:
+                entity2.action = UserAction.PROVIDER_OUT;
+                break;
+
+            case TAG_PROVIDE_AD_AGENT_FEE:
+                entity2.action = UserAction.PROVIDER_FEE_AD_AGENT;
+                break;
+
+            case TAG_PROVIDE_AD_PROTOCOL_FEE:
+                entity2.action = UserAction.PROVIDER_FEE_AD_PROTOCOL;
+                break;
+        }
+
         entity2.cancel = false;
         entity2.amountPoint = BigInt.fromI32(0);
         entity2.amountToken = event.params.consumedToken.div(AmountUnit);
