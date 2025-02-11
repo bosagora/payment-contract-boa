@@ -215,6 +215,7 @@ export class RelayConfig implements IRelayConfig {
     public supportChainBridge: boolean;
     public supportLoyaltyBridge: boolean;
     public supportExchange: boolean;
+    public supportPaymentV1: boolean;
 
     constructor() {
         const defaults = RelayConfig.defaultValue();
@@ -236,6 +237,7 @@ export class RelayConfig implements IRelayConfig {
         this.supportChainBridge = defaults.supportChainBridge;
         this.supportLoyaltyBridge = defaults.supportLoyaltyBridge;
         this.supportExchange = defaults.supportExchange;
+        this.supportPaymentV1 = defaults.supportPaymentV1;
     }
 
     public static defaultValue(): IRelayConfig {
@@ -263,6 +265,7 @@ export class RelayConfig implements IRelayConfig {
             supportChainBridge: true,
             supportLoyaltyBridge: true,
             supportExchange: true,
+            supportPaymentV1: true,
         };
     }
 
@@ -288,6 +291,8 @@ export class RelayConfig implements IRelayConfig {
             this.supportLoyaltyBridge = config.supportLoyaltyBridge.toString().toLowerCase() === "true";
         if (config.supportExchange !== undefined)
             this.supportExchange = config.supportExchange.toString().toLowerCase() === "true";
+        if (config.supportPaymentV1 !== undefined)
+            this.supportPaymentV1 = config.supportPaymentV1.toString().toLowerCase() === "true";
     }
 
     public isPaymentSigner(account: string): boolean {
@@ -521,6 +526,7 @@ export interface IRelayConfig {
     supportChainBridge: boolean;
     supportLoyaltyBridge: boolean;
     supportExchange: boolean;
+    supportPaymentV1: boolean;
 }
 
 export interface IContractsConfig {

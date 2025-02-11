@@ -86,6 +86,7 @@ export class ResponseMessage {
         ["3001", "Chain Bridge functionality is not available"],
         ["3002", "Loyalty Bridge functionality is not available"],
         ["3003", "The ability to exchange points for tokens is not supported"],
+        ["3004", "The endpoint of payment version 1 is not supported"],
         ["3072", "The shopId is invalid"],
         ["4000", "Denied by user"],
         ["5000", "Smart Contract Error"],

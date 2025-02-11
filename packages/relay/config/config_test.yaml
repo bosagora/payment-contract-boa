@@ -101,6 +101,7 @@ relay:
   supportChainBridge: true
   supportLoyaltyBridge: true
   supportExchange: true
+  supportPaymentV1: true
 
 contracts:
   sideChain:

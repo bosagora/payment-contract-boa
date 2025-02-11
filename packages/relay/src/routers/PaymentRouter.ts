@@ -702,6 +702,10 @@ export class PaymentRouter {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
         }
 
+        if (!this.config.relay.supportPaymentV1) {
+            return res.json(ResponseMessage.getErrorMessage("3004"));
+        }
+
         const shopId: string = String(req.body.shopId).trim();
         if (shopId.substring(0, 6) !== this.config.relay.allowedShopIdPrefix) {
             return res.status(200).json(ResponseMessage.getErrorMessage("3072"));
@@ -1030,6 +1034,9 @@ export class PaymentRouter {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
         }
 
+        if (!this.config.relay.supportPaymentV1) {
+            return res.json(ResponseMessage.getErrorMessage("3004"));
+        }
         let accessKey = req.get("Authorization");
         if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
         if (accessKey !== this.config.relay.accessKey) {
@@ -1437,6 +1444,10 @@ export class PaymentRouter {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
         }
 
+        if (!this.config.relay.supportPaymentV1) {
+            return res.json(ResponseMessage.getErrorMessage("3004"));
+        }
+
         try {
             let accessKey = req.get("Authorization");
             if (accessKey === undefined) accessKey = String(req.body.accessKey).trim();
@@ -1698,6 +1709,10 @@ export class PaymentRouter {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(200).json(ResponseMessage.getErrorMessage("2001", { validation: errors.array() }));
+        }
+
+        if (!this.config.relay.supportPaymentV1) {
+            return res.json(ResponseMessage.getErrorMessage("3004"));
         }
 
         let accessKey = req.get("Authorization");
