@@ -8,6 +8,6 @@ WORKDIR /app/
 ADD . /app/
 COPY ./env/.env.sample /app/env/.env
 
-RUN yarn install
+RUN yarn install --pure-lockfile
 RUN yarn run build
 ENTRYPOINT [ "/app/docker/entrypoint.sh" ]
