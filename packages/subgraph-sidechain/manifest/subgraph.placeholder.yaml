@@ -1,6 +1,6 @@
 specVersion: 0.0.5
 description: A template for Sub Graphs
-repository: https://github.com/acc-coin/acc-osx
+repository: https://github.com/kios-coin/kios-osx
 schema:
   file: ./schema.graphql
 dataSources:
@@ -278,7 +278,7 @@ dataSources:
         - BridgeWithdrawn
       abis:
         - name: ChainBridge
-          file: $DMS_OSX_MODULE/artifacts/acc-bridge-contracts-v2/contracts/bridge/Bridge.sol/Bridge.json
+          file: $DMS_OSX_MODULE/artifacts/kios-bridge-contracts-v2/contracts/bridge/Bridge.sol/Bridge.json
       eventHandlers:
         - event: BridgeDeposited(bytes32,bytes32,address,uint256,uint256)
           handler: handleBridgeDeposited

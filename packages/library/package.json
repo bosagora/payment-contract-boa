@@ -1,6 +1,6 @@
 {
-    "name": "acc-contracts-lib-v2",
-    "version": "2.12.0",
+    "name": "kios-contracts-lib-v2",
+    "version": "2.13.1",
     "description": "",
     "main": "dist/bundle-cjs.js",
     "module": "dist/bundle-esm.js",
@@ -11,19 +11,19 @@
     "scripts": {
         "clean": "rm -Rf dist && rm -Rf types",
         "build:contracts": "cd ../contracts && yarn build",
-        "build": "find ../contracts/artifacts/contracts/ ../contracts/artifacts/loyalty-tokens/contracts/ ../contracts/artifacts/acc-bridge-contracts-v2/contracts/ -name '*.json' -type f | grep -v '.dbg.json' | xargs typechain --target=ethers-v5 --out-dir ./types",
+        "build": "find ../contracts/artifacts/contracts/ ../contracts/artifacts/loyalty-tokens/contracts/ ../contracts/artifacts/kios-bridge-contracts-v2/contracts/ -name '*.json' -type f | grep -v '.dbg.json' | xargs typechain --target=ethers-v5 --out-dir ./types",
         "build:npm": "rollup --config rollup.config.ts"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acc-coin/acc-osx.git"
+        "url": "git+https://github.com/kios-coin/kios-osx.git"
     },
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "bugs": {
-        "url": "https://github.com/acc-coin/acc-osx/issues"
+        "url": "https://github.com/kios-coin/kios-osx/issues"
     },
-    "homepage": "https://github.com/acc-coin/acc-osx#readme",
+    "homepage": "https://github.com/kios-coin/kios-osx#readme",
     "devDependencies": {
         "@rollup/plugin-json": "^4.1.0",
         "@rollup/plugin-typescript": "^8.3.1",

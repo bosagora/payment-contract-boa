@@ -1922,16 +1922,6 @@ abstract-leveldown@~6.2.1:
     level-supports "~1.0.0"
     xtend "~4.0.0"
 
-acc-bridge-contracts-v2@~2.5.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/acc-bridge-contracts-v2/-/acc-bridge-contracts-v2-2.5.0.tgz#f5e9e1eb60650f6938e00e121894971ac846367e"
-  integrity sha512-qE3jxuinP+i4QKzDddbCACuBxnMUbyVFy24PGyUzscIR5bqkLYsZRaRb7Ozq1lnJHZSr226e6axvIDQDRpgkxg==
-  dependencies:
-    "@openzeppelin/contracts" "^4.9.5"
-    "@openzeppelin/contracts-upgradeable" "^4.9.5"
-    "@openzeppelin/hardhat-upgrades" "^1.28.0"
-    loyalty-tokens "~2.1.1"
-
 accepts@~1.3.8:
   version "1.3.8"
   resolved "https://registry.npmjs.org/accepts/-/accepts-1.3.8.tgz"
@@ -5831,6 +5821,16 @@ kind-of@^6.0.2:
   version "6.0.3"
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
+
+kios-bridge-contracts-v2@~2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/kios-bridge-contracts-v2/-/kios-bridge-contracts-v2-2.5.0.tgz#2bd610f79ba9b79e903466ece3104decb5e58b1b"
+  integrity sha512-GdKFGt83Db3avHxjZFL24ef7JsZnJcBBjaIwIhLAJTH3B4yGK3W2/lEDSpH2fVurPRhHk5fAHuqXcofIqnbNIg==
+  dependencies:
+    "@openzeppelin/contracts" "^4.9.5"
+    "@openzeppelin/contracts-upgradeable" "^4.9.5"
+    "@openzeppelin/hardhat-upgrades" "^1.28.0"
+    loyalty-tokens "~2.1.1"
 
 klaw@^1.0.0:
   version "1.3.1"

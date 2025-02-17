@@ -1,5 +1,5 @@
 {
-    "name": "acc-relay",
+    "name": "kios-relay",
     "version": "2.0.0",
     "description": "Relay the transaction for the decentralized loyalty system",
     "main": "src/main.js",
@@ -36,14 +36,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acc-coin/acc-osx.git"
+        "url": "git+https://github.com/kios-coin/kios-osx.git"
     },
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "bugs": {
-        "url": "https://github.com/acc-coin/acc-osx/issues"
+        "url": "https://github.com/kios-coin/kios-osx/issues"
     },
-    "homepage": "https://github.com/acc-coin/acc-osx#readme",
+    "homepage": "https://github.com/kios-coin/kios-osx#readme",
     "devDependencies": {
         "@types/argparse": "^2.0.2",
         "@types/chai": "^4.3.5",
@@ -73,8 +73,8 @@
         "@openzeppelin/hardhat-upgrades": "^1.28.0",
         "@typechain/ethers-v5": "^10.1.0",
         "@typechain/hardhat": "^6.1.2",
-        "acc-bridge-contracts-v2": "~2.5.0",
-        "acc-contracts-v2": "~2.12.0",
+        "kios-bridge-contracts-v2": "~2.5.0",
+        "kios-contracts-v2": "~2.13.1",
         "argparse": "^2.0.1",
         "assert": "^2.0.0",
         "axios": "^1.6.7",

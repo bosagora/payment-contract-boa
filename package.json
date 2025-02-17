@@ -1,8 +1,8 @@
 {
-  "name": "dms-osx",
+  "name": "kios-osx",
   "version": "1.0.0",
   "description": "A smart contract framework that decentralized loyalty systems",
-  "repository": "https://github.com/acc-coin/acc-osx",
+  "repository": "https://github.com/kios-coin/kios-osx",
   "author": "BOSagora Foundation",
   "license": "AGPL-3.0-or-later",
   "private": true,

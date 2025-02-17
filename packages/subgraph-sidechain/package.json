@@ -1,8 +1,8 @@
 {
-    "name": "dms-osx-subgraph-sidechain",
+    "name": "kios-osx-subgraph-sidechain",
     "version": "1.0.0",
     "description": "The DMS Subgraph for sidechain",
-    "homepage": "https://github.com/acc-coin/acc-osx",
+    "homepage": "https://github.com/kios-coin/kios-osx",
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "scripts": {
@@ -10,8 +10,8 @@
         "manifest": "scripts/build-manifest.sh",
         "build": "scripts/build-subgraph.sh",
         "deploy": "scripts/deploy-subgraph.sh",
-        "create:sidechain": "graph create acc-coin/acc-osx-sidechain --node http://localhost:8020",
-        "remove:sidechain": "graph remove acc-coin/acc-osx-sidechain --node http://localhost:8020",
+        "create:sidechain": "graph create kios-coin/kios-osx-sidechain --node http://localhost:8020",
+        "remove:sidechain": "graph remove kios-coin/kios-osx-sidechain --node http://localhost:8020",
         "deploy:sidechain": "LOCAL=true scripts/deploy-subgraph.sh",
         "formatting:check": "prettier '**/*.{json,ts,js}' -c",
         "formatting:write": "prettier '**/*.{json,ts,js}' --write"

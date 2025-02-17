@@ -1,6 +1,6 @@
 {
-    "name": "acc-contracts-v2",
-    "version": "2.12.0",
+    "name": "kios-contracts-v2",
+    "version": "2.13.1",
     "description": "Smart contracts that decentralized loyalty systems",
     "files": [
         "**/*.sol"
@@ -27,14 +27,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acc-coin/acc-osx.git"
+        "url": "git+https://github.com/kios-coin/kios-osx.git"
     },
     "author": "BOSagora Foundation",
     "license": "AGPL-3.0-or-later",
     "bugs": {
-        "url": "https://github.com/acc-coin/acc-osx/issues"
+        "url": "https://github.com/kios-coin/kios-osx/issues"
     },
-    "homepage": "https://github.com/acc-coin/acc-osx#readme",
+    "homepage": "https://github.com/kios-coin/kios-osx#readme",
     "devDependencies": {
         "@ethersproject/bignumber": "^5.7.0",
         "@ethersproject/bytes": "^5.7.0",
@@ -72,8 +72,8 @@
         "@openzeppelin/contracts": "^4.9.5",
         "@openzeppelin/contracts-upgradeable": "^4.9.5",
         "@openzeppelin/hardhat-upgrades": "^1.28.0",
-        "acc-bridge-contracts-v2": "~2.5.0",
-        "loyalty-tokens": "~2.1.1",
+        "kios-bridge-contracts-v2": "~2.5.0",
+        "loyalty-tokens": "~2.3.0",
         "multisig-wallet-contracts": "~2.0.0"
     }
 }

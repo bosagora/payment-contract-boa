@@ -4,8 +4,8 @@ pragma solidity ^0.8.2;
 
 import "loyalty-tokens/contracts/BIP20/BIP20DelegatedTransfer.sol";
 
-import "acc-bridge-contracts-v2/contracts/interfaces/IBridge.sol";
-import "acc-bridge-contracts-v2/contracts/interfaces/IBridgeValidator.sol";
+import "kios-bridge-contracts-v2/contracts/interfaces/IBridge.sol";
+import "kios-bridge-contracts-v2/contracts/interfaces/IBridgeValidator.sol";
 
 import "../interfaces/ILedger.sol";
 

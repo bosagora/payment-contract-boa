@@ -9,8 +9,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "loyalty-tokens/contracts/BIP20/BIP20DelegatedTransfer.sol";
-import "acc-bridge-contracts-v2/contracts/interfaces/IBridgeLiquidity.sol";
-import "acc-bridge-contracts-v2/contracts/lib/BridgeLib.sol";
+import "kios-bridge-contracts-v2/contracts/interfaces/IBridgeLiquidity.sol";
+import "kios-bridge-contracts-v2/contracts/lib/BridgeLib.sol";
 
 import "../interfaces/ICurrencyRate.sol";
 import "../interfaces/ILedger.sol";

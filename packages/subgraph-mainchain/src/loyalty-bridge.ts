@@ -3,7 +3,7 @@ import {
     BridgeWithdrawn as BridgeWithdrawnEvent,
 } from "../generated/LoyaltyBridge/LoyaltyBridge";
 import { LoyaltyBridgeDeposited, LoyaltyBridgeWithdrawn } from "../generated/schema";
-import { AmountUnit } from "dms-osx-subgraph-sidechain/src/utils";
+import { AmountUnit } from "./utils";
 
 export function handleBridgeDeposited(event: BridgeDepositedEvent): void {
     let entity = new LoyaltyBridgeDeposited(event.transaction.hash.concatI32(event.logIndex.toI32()));

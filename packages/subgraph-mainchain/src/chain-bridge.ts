@@ -3,7 +3,7 @@ import {
     BridgeWithdrawn as BridgeWithdrawnEvent,
 } from "../generated/ChainBridge/ChainBridge";
 import { ChainBridgeDeposited, ChainBridgeWithdrawn } from "../generated/schema";
-import { AmountUnit } from "dms-osx-subgraph-sidechain/src/utils";
+import { AmountUnit } from "./utils";
 
 export function handleBridgeDeposited(event: BridgeDepositedEvent): void {
     let entity = new ChainBridgeDeposited(event.transaction.hash.concatI32(event.logIndex.toI32()));
