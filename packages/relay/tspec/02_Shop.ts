@@ -34,7 +34,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                             name: string;
                             /**
                              * Basic currency symbol of Shop
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -119,7 +119,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                             name: string;
                             /**
                              * Basic currency symbol of Shop
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -262,7 +262,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                     name: string;
                     /**
                      * Basic currency symbol of Shop
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                     /**
@@ -296,7 +296,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                             name: string;
                             /**
                              * Basic currency symbol of Shop
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -342,7 +342,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                     name: string;
                     /**
                      * Basic currency symbol of Shop
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                 };
@@ -371,7 +371,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                             name: string;
                             /**
                              * Basic currency symbol of Shop
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -586,7 +586,7 @@ export type ShopApiSpec = Tspec.DefineApiSpec<{
                             name: string;
                             /**
                              * Basic currency symbol of Shop
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**

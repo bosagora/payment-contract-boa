@@ -8,7 +8,7 @@ library DMS {
     uint256 public constant TOKEN_MAX_PROTOCOL_FEE = 5e18;
     uint256 public constant TOKEN_DEFAULT_PROTOCOL_FEE = 1e17;
 
-    string public constant DEFAULT_CURRENCY_SYMBOL = "php";
+    string public constant DEFAULT_CURRENCY_SYMBOL = "krw";
 
     uint256 public constant TAG_PROVIDE_PURCHASE = 0;
     uint256 public constant TAG_PROVIDE_AD = 1;

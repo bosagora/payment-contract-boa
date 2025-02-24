@@ -15,7 +15,7 @@ export type CurrencyApiSpec = Tspec.DefineApiSpec<{
                     amount: string;
                     /**
                      * Currency Symbol of source (ex. acc, point, usd, krw, php, ...)
-                     * @example "php"
+                     * @example "krw"
                      */
                     from: string;
                     /**

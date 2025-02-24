@@ -30,7 +30,7 @@ export type SystemInfoApiSpec = Tspec.DefineApiSpec<{
                                 precision: number;
                                 /**
                                  * Symbol of a currency of the same value
-                                 * @example "PHP"
+                                 * @example "krw"
                                  */
                                 equivalentCurrency: string;
                             };

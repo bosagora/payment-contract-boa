@@ -65,7 +65,7 @@ interface IAccount {
 
 type FnDeployer = (accounts: IAccount, deployment: Deployments) => Promise<any>;
 
-const BASE_CURRENCY = "PHP";
+const BASE_CURRENCY = "KRW";
 
 class Deployments {
     public deployments: Map<string, IDeployedContract>;
@@ -999,35 +999,39 @@ async function storeSampleExchangeRate(accounts: IAccount, deployment: Deploymen
     const rates = [
         {
             symbol: "ACC",
-            rate: BigNumber.from(1761925042),
+            rate: BigNumber.from(41405238963),
         },
         {
             symbol: "LYT",
-            rate: BigNumber.from(1761925042),
+            rate: BigNumber.from(41405238963),
+        },
+        {
+            symbol: "KIOS",
+            rate: BigNumber.from(41405238963),
         },
         {
             symbol: "KRW",
-            rate: BigNumber.from(42553191),
+            rate: BigNumber.from(1000000000),
         },
         {
             symbol: "USD",
-            rate: BigNumber.from(58730834752),
+            rate: BigNumber.from(1380174632544),
         },
         {
             symbol: "PHP",
-            rate: BigNumber.from(1000000000),
+            rate: BigNumber.from(23500000270),
         },
         {
             symbol: "krw",
-            rate: BigNumber.from(42553191),
+            rate: BigNumber.from(1000000000),
         },
         {
             symbol: "usd",
-            rate: BigNumber.from(58730834752),
+            rate: BigNumber.from(1380174632544),
         },
         {
             symbol: "php",
-            rate: BigNumber.from(1000000000),
+            rate: BigNumber.from(23500000270),
         },
     ];
     const chainId = (await hre.ethers.provider.getNetwork()).chainId;

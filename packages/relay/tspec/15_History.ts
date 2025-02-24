@@ -329,7 +329,7 @@ export type HistoryApiSpec = Tspec.DefineApiSpec<{
                                 shopId: string;
                                 /**
                                  * Basic currency symbol of Shop
-                                 * @example "php"
+                                 * @example "krw"
                                  */
                                 currency: string;
                                 /**

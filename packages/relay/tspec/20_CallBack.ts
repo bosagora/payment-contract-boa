@@ -19,7 +19,7 @@ interface PaymentCallBackData {
     amount: string;
     /**
      * Currency symbol for amount to be used for payment
-     * @example "php"
+     * @example "krw"
      */
     currency: string;
     /**
@@ -92,7 +92,7 @@ interface ShopCallBackData {
     name: string;
     /**
      * New currency symbol to be changed of Shop
-     * @example "php"
+     * @example "krw"
      */
     currency: string;
     /**

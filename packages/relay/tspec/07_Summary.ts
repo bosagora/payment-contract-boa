@@ -60,7 +60,7 @@ export type Summary1ApiSpec = Tspec.DefineApiSpec<{
                                 currency: {
                                     /**
                                      * Symbol of Basic Currency (info. decimals is 18)
-                                     * @example "php"
+                                     * @example "krw"
                                      */
                                     symbol: string;
                                     /**
@@ -245,7 +245,7 @@ export type Summary1ApiSpec = Tspec.DefineApiSpec<{
                                 currency: {
                                     /**
                                      * Symbol of Basic Currency (info. decimals is 18)
-                                     * @example "php"
+                                     * @example "krw"
                                      */
                                     symbol: string;
                                     /**
@@ -428,7 +428,7 @@ export type Summary2ApiSpec = Tspec.DefineApiSpec<{
                                 name: string;
                                 /**
                                  * Basic currency symbol of Shop
-                                 * @example "php"
+                                 * @example "krw"
                                  */
                                 currency: string;
                                 /**
@@ -505,7 +505,7 @@ export type Summary2ApiSpec = Tspec.DefineApiSpec<{
                                 currency: {
                                     /**
                                      * Symbol of Basic Currency (info. decimals is 18)
-                                     * @example "php"
+                                     * @example "krw"
                                      */
                                     symbol: string;
                                     /**
@@ -653,7 +653,7 @@ export type Summary2ApiSpec = Tspec.DefineApiSpec<{
                                 name: string;
                                 /**
                                  * Basic currency symbol of Shop
-                                 * @example "php"
+                                 * @example "krw"
                                  */
                                 currency: string;
                                 /**
@@ -730,7 +730,7 @@ export type Summary2ApiSpec = Tspec.DefineApiSpec<{
                                 currency: {
                                     /**
                                      * Symbol of Basic Currency (info. decimals is 18)
-                                     * @example "php"
+                                     * @example "krw"
                                      */
                                     symbol: string;
                                     /**

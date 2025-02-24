@@ -382,7 +382,7 @@ async function deployCurrencyRate(accounts: IAccount, deployment: Deployments) {
                 rate: multiple.mul(150),
             },
             {
-                symbol: "ACC",
+                symbol: "KIOS",
                 rate: multiple.mul(150),
             },
             {

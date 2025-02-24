@@ -60,7 +60,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                     amount: string;
                     /**
                      * Currency symbol for amount to be used for payment
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                 };
@@ -84,7 +84,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -160,7 +160,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                     amount: string;
                     /**
                      * Currency symbol for amount to be used for payment
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                     /**
@@ -204,7 +204,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -309,7 +309,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -419,7 +419,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -489,7 +489,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -594,7 +594,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -699,7 +699,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -809,7 +809,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -900,7 +900,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                     amount: string;
                     /**
                      * Currency symbol for amount to be used for payment
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                 };
@@ -924,7 +924,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1000,7 +1000,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                     amount: string;
                     /**
                      * Currency symbol for amount to be used for payment
-                     * @example "php"
+                     * @example "krw"
                      */
                     currency: string;
                     /**
@@ -1049,7 +1049,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1159,7 +1159,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1269,7 +1269,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1339,7 +1339,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1449,7 +1449,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1559,7 +1559,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
@@ -1669,7 +1669,7 @@ export type PaymentApiSpec = Tspec.DefineApiSpec<{
                             amount: string;
                             /**
                              * Currency symbol for amount to be used for payment
-                             * @example "php"
+                             * @example "krw"
                              */
                             currency: string;
                             /**
