@@ -32,6 +32,8 @@ import { toChecksumAddress } from "ethereumjs-util";
 export enum LoyaltyNetworkID {
     ACC_TESTNET = 1,
     ACC_MAINNET,
+    KIOS_TESTNET = 3,
+    KIOS_MAINNET,
 }
 export class ContractUtils {
     public static findLog(receipt: ContractReceipt, iface: Interface, eventName: string): Log | undefined {
